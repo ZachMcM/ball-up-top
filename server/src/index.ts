@@ -7,7 +7,7 @@ import { limiter } from "../utils/limiter";
 import { routes } from "./routes";
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = parseInt(process.env.PORT!);
 
 app.use(cors());
 app.use(morgan("combined"));
@@ -20,5 +20,5 @@ app.use(limiter);
 app.use("/", routes);
 
 app.listen(PORT, () => {
-  console.log(`server listening on port ${PORT}`);
+  console.log(`Server listening on port ${PORT}`);
 });

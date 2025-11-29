@@ -1,7 +1,8 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "../src/db";
-import { expo } from "@better-auth/expo/*";
+import { expo } from "@better-auth/expo";
+import { phoneNumber } from "better-auth/plugins"
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
