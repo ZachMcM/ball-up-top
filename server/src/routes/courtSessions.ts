@@ -82,14 +82,19 @@ function computeOutlierWeight(
 }
 
 function applyEMA(oldRaw: number, newRaw: number, weight: number) {
-  const EMA = oldRaw * (1 - weight) + newRaw * weight;
+  const w = clamp(0, 1, weight);
+
+  const EMA = oldRaw * (1 - w) + newRaw * w;
 
   const maxShift = 5;
   const delta = EMA - oldRaw;
 
-  if (delta > maxShift) return oldRaw + maxShift;
-  if (delta < -maxShift) return oldRaw - maxShift;
-  return EMA;
+  let updated = EMA;
+
+  if (delta > maxShift) updated = oldRaw + maxShift;
+  if (delta < -maxShift) updated = oldRaw - maxShift;
+
+  return clamp(45, 99, updated);
 }
 
 courtSessionsRoute.get(
@@ -334,8 +339,11 @@ courtSessionsRoute.post(
             finishingRating,
             raterOverallAtTime: rater.overall,
             runCompetitivenessAtTime: runCompetitiveness,
-            finalWeightApplied:
-              overlapWeight * raterWeight * runCompetitiveness,
+            finalWeightApplied: clamp(
+              0,
+              1,
+              overlapWeight * raterWeight * runCompetitiveness * owDef
+            ),
           });
 
           await tx
