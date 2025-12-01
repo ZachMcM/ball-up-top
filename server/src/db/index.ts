@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import * as relations from "./relations";
 import * as schema from "./schema";
+import { logger } from "../../utils/logger";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL!,
@@ -12,7 +13,7 @@ const pool = new Pool({
 });
 
 pool.on("error", (err) => {
-  console.error("Unexpected database pool error on idle client:", err);
+  logger.error("Unexpected database pool error on idle client:", err);
 });
 
 export const db = drizzle(pool, {

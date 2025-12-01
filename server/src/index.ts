@@ -5,6 +5,7 @@ import morgan from "morgan";
 import { auth } from "../utils/auth";
 import { limiter } from "../utils/limiter";
 import { routes } from "./routes";
+import { logger } from "../utils/logger";
 
 const app = express();
 const PORT = parseInt(process.env.PORT!);
@@ -20,5 +21,5 @@ app.use(limiter);
 app.use("/", routes);
 
 app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+  logger.info(`Server listening on port ${PORT}`);
 });

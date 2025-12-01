@@ -1,17 +1,46 @@
-import { pgTable, text, timestamp, boolean, index } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  index,
+  doublePrecision,
+  integer,
+  serial,
+} from "drizzle-orm/pg-core";
 
-export const user = pgTable("user", {
-  id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  email: text("email").notNull().unique(),
-  emailVerified: boolean("email_verified").default(false).notNull(),
-  image: text("image"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .$onUpdate(() => /* @__PURE__ */ new Date())
-    .notNull(),
-});
+export const user = pgTable(
+  "user",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    email: text("email").notNull().unique(),
+    emailVerified: boolean("email_verified").default(false).notNull(),
+    image: text("image"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+
+    // ratings
+    overall: doublePrecision().default(60).notNull(),
+    finishingRating: doublePrecision("finishing_rating").default(60).notNull(),
+    playmakingRating: doublePrecision("playmaking_rating")
+      .default(60)
+      .notNull(),
+    defenseRating: doublePrecision("defense_rating").default(60).notNull(),
+    shootingRating: doublePrecision("shooting_rating").default(60).notNull(),
+
+    // archetype
+    archetype: text().default("Unranked").notNull(),
+
+    // extra attributes
+    height: text().notNull(),
+    weight: integer().notNull(),
+  },
+  (table) => [index("user_overall_idx").on(table.overall)]
+);
 
 export const session = pgTable(
   "session",
@@ -29,7 +58,7 @@ export const session = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
   },
-  (table) => [index("session_userId_idx").on(table.userId)],
+  (table) => [index("session_userId_idx").on(table.userId)]
 );
 
 export const account = pgTable(
@@ -53,7 +82,7 @@ export const account = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("account_userId_idx").on(table.userId)],
+  (table) => [index("account_userId_idx").on(table.userId)]
 );
 
 export const verification = pgTable(
@@ -69,5 +98,94 @@ export const verification = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("verification_identifier_idx").on(table.identifier)],
+  (table) => [index("verification_identifier_idx").on(table.identifier)]
+);
+
+export const court = pgTable(
+  "court",
+  {
+    id: serial().primaryKey().notNull(),
+    name: text().notNull(),
+    aliases: text().array().notNull().default([]),
+    googlePlaceId: text("google_place_id").notNull().unique(),
+    address: text("address").notNull(),
+
+    lat: doublePrecision("lat").notNull(),
+    lng: doublePrecision("lng").notNull(),
+
+    indoor: boolean("indoor").notNull().default(false),
+    verified: boolean("verified").notNull().default(false),
+
+    photoUrl: text("photo_url"),
+
+    createdByUserId: text("created_by_user_id").references(() => user.id),
+
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("court_lat_lng_idx").on(table.lat, table.lng),
+    index("court_verified_idx").on(table.verified),
+    index("court_created_by_user_id_idx").on(table.createdByUserId),
+  ]
+);
+
+export const courtSession = pgTable(
+  "court_session",
+  {
+    id: serial().primaryKey().notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id),
+    courtId: integer("court_id")
+      .notNull()
+      .references(() => court.id),
+    startTime: timestamp("start_time").defaultNow().notNull(),
+    endTime: timestamp("end_time"),
+    hasRated: boolean("has_rated").default(false),
+  },
+  (table) => [
+    index("court_session_user_id_idx").on(table.userId),
+    index("court_session_court_id_idx").on(table.courtId),
+    index("court_session_start_time_idx").on(table.startTime),
+  ]
+);
+
+export const rating = pgTable(
+  "rating",
+  {
+    id: serial().primaryKey().notNull(),
+
+    raterId: text("rater_id")
+      .notNull()
+      .references(() => user.id),
+    rateeId: text("ratee_id")
+      .notNull()
+      .references(() => user.id),
+
+    raterCourtSession: integer("rater_court_session")
+      .notNull()
+      .references(() => courtSession.id),
+
+    shootingRating: doublePrecision("shooting_rating").notNull(),
+    defenseRating: doublePrecision("defense_rating").notNull(),
+    playmakingRating: doublePrecision("playmaking_rating").notNull(),
+    finishingRating: doublePrecision("finishing_rating").notNull(),
+
+    raterOverallAtTime: doublePrecision("rater_overall_at_time").notNull(),
+    runCompetitivenessAtTime: doublePrecision(
+      "run_competitiveness_at_time"
+    ).notNull(),
+    finalWeightApplied: doublePrecision("final_weight_applied").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("rating_ratee_idx").on(table.rateeId),
+    index("rating_rater_idx").on(table.raterId),
+    index("rating_rater_court_session_idx").on(table.raterCourtSession),
+    index("rating_created_at_idx").on(table.createdAt),
+  ]
 );

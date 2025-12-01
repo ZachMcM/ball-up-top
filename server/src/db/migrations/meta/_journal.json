@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1764559571682,
+      "tag": "0000_brainy_firebird",
+      "breakpoints": true
+    }
+  ]
+}

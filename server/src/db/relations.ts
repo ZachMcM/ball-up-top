@@ -1,9 +1,11 @@
 import { relations } from "drizzle-orm";
-import { account, session, user } from "./schema";
+import { account, court, courtSession, rating, session, user } from "./schema";
 
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
+  createdCourts: many(court),
+  courtSessions: many(courtSession),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -17,5 +19,43 @@ export const accountRelations = relations(account, ({ one }) => ({
   user: one(user, {
     fields: [account.userId],
     references: [user.id],
+  }),
+}));
+
+export const courtRelations = relations(court, ({ one, many }) => ({
+  createdByUser: one(user, {
+    fields: [court.createdByUserId],
+    references: [user.id],
+  }),
+  courtSessions: many(courtSession),
+}));
+
+export const courtSessionRelations = relations(
+  courtSession,
+  ({ one, many }) => ({
+    user: one(user, {
+      fields: [courtSession.userId],
+      references: [user.id],
+    }),
+    court: one(court, {
+      fields: [courtSession.courtId],
+      references: [court.id],
+    }),
+    ratings: many(rating),
+  })
+);
+
+export const ratingRelations = relations(rating, ({ one }) => ({
+  rater: one(user, {
+    fields: [rating.raterId],
+    references: [user.id],
+  }),
+  ratee: one(user, {
+    fields: [rating.rateeId],
+    references: [user.id],
+  }),
+  raterCourtSession: one(courtSession, {
+    fields: [rating.raterCourtSession],
+    references: [courtSession.id],
   }),
 }));

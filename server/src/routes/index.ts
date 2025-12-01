@@ -1,3 +1,6 @@
 import { Router } from "express";
+import { courtSessionsRoute } from "./courts";
 
-export const routes = Router()
+export const routes = Router();
+
+routes.use(courtSessionsRoute);
