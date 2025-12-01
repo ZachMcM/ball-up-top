@@ -37,7 +37,7 @@ CREATE TABLE "court_session" (
 	"court_id" integer NOT NULL,
 	"start_time" timestamp DEFAULT now() NOT NULL,
 	"end_time" timestamp,
-	"has_rated" boolean DEFAULT false
+	"has_rated" boolean
 );
 --> statement-breakpoint
 CREATE TABLE "rating" (
@@ -45,11 +45,11 @@ CREATE TABLE "rating" (
 	"rater_id" text NOT NULL,
 	"ratee_id" text NOT NULL,
 	"rater_court_session" integer NOT NULL,
-	"shooting_rating" double precision NOT NULL,
-	"defense_rating" double precision NOT NULL,
-	"playmaking_rating" double precision NOT NULL,
-	"finishing_rating" double precision NOT NULL,
-	"rater_overall_at_time" double precision NOT NULL,
+	"shooting_rating" integer NOT NULL,
+	"defense_rating" integer NOT NULL,
+	"playmaking_rating" integer NOT NULL,
+	"finishing_rating" integer NOT NULL,
+	"rater_overall_at_time" integer NOT NULL,
 	"run_competitiveness_at_time" double precision NOT NULL,
 	"final_weight_applied" double precision NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
@@ -75,14 +75,13 @@ CREATE TABLE "user" (
 	"image" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
-	"overall" double precision DEFAULT 60 NOT NULL,
-	"finishing_rating" double precision DEFAULT 60 NOT NULL,
-	"playmaking_rating" double precision DEFAULT 60 NOT NULL,
-	"defense_rating" double precision DEFAULT 60 NOT NULL,
-	"shooting_rating" double precision DEFAULT 60 NOT NULL,
+	"overall" integer DEFAULT 60 NOT NULL,
+	"finishing_rating" integer DEFAULT 60 NOT NULL,
+	"playmaking_rating" integer DEFAULT 60 NOT NULL,
+	"defense_rating" integer DEFAULT 60 NOT NULL,
+	"shooting_rating" integer DEFAULT 60 NOT NULL,
 	"archetype" text DEFAULT 'Unranked' NOT NULL,
 	"height" text NOT NULL,
-	"weight" integer NOT NULL,
 	CONSTRAINT "user_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint

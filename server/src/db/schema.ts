@@ -24,20 +24,19 @@ export const user = pgTable(
       .notNull(),
 
     // ratings
-    overall: doublePrecision().default(60).notNull(),
-    finishingRating: doublePrecision("finishing_rating").default(60).notNull(),
-    playmakingRating: doublePrecision("playmaking_rating")
+    overall: integer().default(60).notNull(),
+    finishingRating: integer("finishing_rating").default(60).notNull(),
+    playmakingRating: integer("playmaking_rating")
       .default(60)
       .notNull(),
-    defenseRating: doublePrecision("defense_rating").default(60).notNull(),
-    shootingRating: doublePrecision("shooting_rating").default(60).notNull(),
+    defenseRating: integer("defense_rating").default(60).notNull(),
+    shootingRating: integer("shooting_rating").default(60).notNull(),
 
     // archetype
     archetype: text().default("Unranked").notNull(),
 
     // extra attributes
     height: text().notNull(),
-    weight: integer().notNull(),
   },
   (table) => [index("user_overall_idx").on(table.overall)]
 );
@@ -145,7 +144,7 @@ export const courtSession = pgTable(
       .references(() => court.id),
     startTime: timestamp("start_time").defaultNow().notNull(),
     endTime: timestamp("end_time"),
-    hasRated: boolean("has_rated").default(false),
+    hasRated: boolean("has_rated"),
   },
   (table) => [
     index("court_session_user_id_idx").on(table.userId),
@@ -170,12 +169,12 @@ export const rating = pgTable(
       .notNull()
       .references(() => courtSession.id),
 
-    shootingRating: doublePrecision("shooting_rating").notNull(),
-    defenseRating: doublePrecision("defense_rating").notNull(),
-    playmakingRating: doublePrecision("playmaking_rating").notNull(),
-    finishingRating: doublePrecision("finishing_rating").notNull(),
+    shootingRating: integer("shooting_rating").notNull(),
+    defenseRating: integer("defense_rating").notNull(),
+    playmakingRating: integer("playmaking_rating").notNull(),
+    finishingRating: integer("finishing_rating").notNull(),
 
-    raterOverallAtTime: doublePrecision("rater_overall_at_time").notNull(),
+    raterOverallAtTime: integer("rater_overall_at_time").notNull(),
     runCompetitivenessAtTime: doublePrecision(
       "run_competitiveness_at_time"
     ).notNull(),

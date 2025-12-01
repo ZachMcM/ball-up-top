@@ -10,16 +10,18 @@ courts.post("/courts/:courtId/sessions", authMiddleware, async (req, res) => {
   try {
     const courtId = parseInt(req.params.courtId);
 
-    if (isNaN(courtId)) {
-      return res.status(400).json({ error: "Invalid courtId, isNaN" });
+    if (!Number.isInteger(courtId)) {
+      return res.status(400).json({ error: "Court ID is not an integer." });
     }
 
     await db.insert(courtSession).values({
       userId: res.locals.userId!,
       courtId,
     });
+
+    res.json({ success: true })
   } catch (error) {
-    handleError(error, res, "/courts/:courtId/sessions");
+    handleError(error, res, "POST /courts/:courtId/sessions");
   }
 });
 

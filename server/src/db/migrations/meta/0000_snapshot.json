@@ -1,5 +1,5 @@
 {
-  "id": "2309e182-fb00-48f6-9f33-02748e962ee0",
+  "id": "5fdc23ca-8547-41f1-998b-7d0088798f10",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -335,8 +335,7 @@
           "name": "has_rated",
           "type": "boolean",
           "primaryKey": false,
-          "notNull": false,
-          "default": false
+          "notNull": false
         }
       },
       "indexes": {
@@ -450,31 +449,31 @@
         },
         "shooting_rating": {
           "name": "shooting_rating",
-          "type": "double precision",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
         "defense_rating": {
           "name": "defense_rating",
-          "type": "double precision",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
         "playmaking_rating": {
           "name": "playmaking_rating",
-          "type": "double precision",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
         "finishing_rating": {
           "name": "finishing_rating",
-          "type": "double precision",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
         "rater_overall_at_time": {
           "name": "rater_overall_at_time",
-          "type": "double precision",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -758,35 +757,35 @@
         },
         "overall": {
           "name": "overall",
-          "type": "double precision",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "default": 60
         },
         "finishing_rating": {
           "name": "finishing_rating",
-          "type": "double precision",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "default": 60
         },
         "playmaking_rating": {
           "name": "playmaking_rating",
-          "type": "double precision",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "default": 60
         },
         "defense_rating": {
           "name": "defense_rating",
-          "type": "double precision",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "default": 60
         },
         "shooting_rating": {
           "name": "shooting_rating",
-          "type": "double precision",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "default": 60
@@ -801,12 +800,6 @@
         "height": {
           "name": "height",
           "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "weight": {
-          "name": "weight",
-          "type": "integer",
           "primaryKey": false,
           "notNull": true
         }
