@@ -27,7 +27,7 @@ import {
   RATER_MIN_WT,
   RUN_COMP_MAX_WT,
   RUN_COMP_MIN_WT,
-} from "../config";
+} from "../config/ratings";
 
 export const courtSessionsRoute = Router();
 
