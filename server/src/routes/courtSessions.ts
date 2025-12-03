@@ -8,6 +8,26 @@ import { courtSession, rating, user } from "../db/schema";
 import * as z from "zod";
 import { clamp } from "../../utils/clamp";
 import { generateArchetype } from "../../utils/generateArchetype";
+import {
+  EST_RATINGS_PER_SESS,
+  EXPERIENCE_GROWTH_RT,
+  MAX_EXPERIENCE_WT,
+  MAX_OVERLAP_WT,
+  MAX_OVR,
+  MAX_SHIFT,
+  MIN_EXPERIENCE_WT,
+  MIN_LIFETIME_CT,
+  MIN_OVERLAP_WT,
+  MIN_OVR,
+  OVERLAP_DIFF_THRESH_1,
+  OVERLAP_DIFF_THRESH_2,
+  OVERLAP_DIFF_THRESH_2_WT,
+  OVERLAP_MS_THRESH,
+  RATER_MAX_WT,
+  RATER_MIN_WT,
+  RUN_COMP_MAX_WT,
+  RUN_COMP_MIN_WT,
+} from "../config";
 
 export const courtSessionsRoute = Router();
 
@@ -52,11 +72,15 @@ async function getEncounteredPlayers(
 
     const overlapMs = overlapEnd.getTime() - overlapStart.getTime();
 
-    if (overlapMs >= 2 * 60 * 1000) {
+    if (overlapMs >= OVERLAP_MS_THRESH) {
       if (!uniquePlayers.has(s.user.id)) {
         uniquePlayers.set(s.user.id, {
           user: s.user,
-          overlapWeight: clamp(0.05, 1, overlapMs / maxOverlapMs),
+          overlapWeight: clamp(
+            MIN_OVERLAP_WT,
+            MAX_OVERLAP_WT,
+            overlapMs / maxOverlapMs
+          ),
         });
       }
     }
@@ -65,19 +89,25 @@ async function getEncounteredPlayers(
   return [...uniquePlayers.values()];
 }
 
+function computeExperienceWeight(sessionsPlayed: number, ratingsGiven: number) {
+  const base = Math.max(sessionsPlayed, Math.floor(ratingsGiven / EST_RATINGS_PER_SESS));
+  const raw = MIN_EXPERIENCE_WT + Math.log1p(base) / EXPERIENCE_GROWTH_RT;
+  return clamp(MIN_EXPERIENCE_WT, MAX_EXPERIENCE_WT, raw);
+}
+
 function computeOutlierWeight(
   newRaw: number,
   oldRaw: number,
   lifetimeCount: number
 ) {
-  if (lifetimeCount < 5) {
+  if (lifetimeCount < MIN_LIFETIME_CT) {
     return 1.0;
   }
 
   const diff = Math.abs(newRaw - oldRaw);
 
-  if (diff > 30) return 0.0;
-  if (diff > 20) return 0.5;
+  if (diff > OVERLAP_DIFF_THRESH_1) return 0.0;
+  if (diff > OVERLAP_DIFF_THRESH_2) return OVERLAP_DIFF_THRESH_2_WT;
   return 1.0;
 }
 
@@ -86,15 +116,14 @@ function applyEMA(oldRaw: number, newRaw: number, weight: number) {
 
   const EMA = oldRaw * (1 - w) + newRaw * w;
 
-  const maxShift = 5;
   const delta = EMA - oldRaw;
 
   let updated = EMA;
 
-  if (delta > maxShift) updated = oldRaw + maxShift;
-  if (delta < -maxShift) updated = oldRaw - maxShift;
+  if (delta > MAX_SHIFT) updated = oldRaw + MAX_SHIFT;
+  if (delta < -MAX_SHIFT) updated = oldRaw - MAX_SHIFT;
 
-  return clamp(45, 99, updated);
+  return clamp(MIN_OVR, MAX_OVR, updated);
 }
 
 courtSessionsRoute.get(
@@ -143,10 +172,10 @@ const BatchRatings = z.object({
   ratings: z.array(
     z.object({
       userId: z.string(),
-      defenseRating: z.number().int().min(45).max(99),
-      finishingRating: z.number().int().min(45).max(99),
-      shootingRating: z.number().int().min(45).max(99),
-      playmakingRating: z.number().int().min(45).max(99),
+      defenseRating: z.number().int().min(MIN_OVR).max(MAX_OVR),
+      finishingRating: z.number().int().min(MIN_OVR).max(MAX_OVR),
+      shootingRating: z.number().int().min(MIN_OVR).max(MAX_OVR),
+      playmakingRating: z.number().int().min(MIN_OVR).max(MAX_OVR),
     })
   ),
 });
@@ -192,6 +221,18 @@ courtSessionsRoute.post(
         columns: {
           overall: true,
         },
+        with: {
+          courtSessions: {
+            columns: {
+              id: true,
+            },
+          },
+          outgoingRatings: {
+            columns: {
+              id: true,
+            },
+          },
+        },
       }))!;
 
       const encounteredPlayers = await getEncounteredPlayers(
@@ -210,8 +251,8 @@ courtSessionsRoute.post(
       );
 
       const runCompetitiveness = clamp(
-        0.5,
-        1.2,
+        RUN_COMP_MIN_WT,
+        RUN_COMP_MAX_WT,
         encounteredPlayers.reduce(
           (accum, curr) => accum + curr.user.overall,
           0
@@ -220,7 +261,15 @@ courtSessionsRoute.post(
           100
       );
 
-      const raterWeight = clamp(0.5, 1.2, rater.overall / 100);
+      const raterWeight = clamp(
+        RATER_MIN_WT,
+        RATER_MAX_WT,
+        rater.overall / 100
+      );
+      const experienceWeight = computeExperienceWeight(
+        rater.courtSessions.length,
+        rater.outgoingRatings.length
+      );
 
       const { ratings } = validBody.data;
       await db.transaction(async (tx) => {
@@ -276,14 +325,13 @@ courtSessionsRoute.post(
             lifetimeCount.length
           );
 
-          const finalWeightDef =
-            overlapWeight * raterWeight * runCompetitiveness * owDef;
-          const finalWeightFin =
-            overlapWeight * raterWeight * runCompetitiveness * owFin;
-          const finalWeightSho =
-            overlapWeight * raterWeight * runCompetitiveness * owSho;
-          const finalWeightPlay =
-            overlapWeight * raterWeight * runCompetitiveness * owPlay;
+          const combinedWeights =
+            raterWeight * experienceWeight * runCompetitiveness * overlapWeight;
+
+          const finalWeightDef = combinedWeights * owDef;
+          const finalWeightFin = combinedWeights * owFin;
+          const finalWeightSho = combinedWeights * owSho;
+          const finalWeightPlay = combinedWeights * owPlay;
 
           const newDefense = applyEMA(
             ratee.defenseRating,
@@ -320,11 +368,11 @@ courtSessionsRoute.post(
           await tx
             .update(user)
             .set({
-              overall: newOverall,
-              defenseRating: newDefense,
-              finishingRating: newFinishing,
-              playmakingRating: newPlaymaking,
-              shootingRating: newShooting,
+              overall: Math.round(newOverall),
+              defenseRating: Math.round(newDefense),
+              finishingRating: Math.round(newFinishing),
+              playmakingRating: Math.round(newPlaymaking),
+              shootingRating: Math.round(newShooting),
               archetype: newArchetype,
             })
             .where(eq(user.id, rateeId));
@@ -339,11 +387,10 @@ courtSessionsRoute.post(
             finishingRating,
             raterOverallAtTime: rater.overall,
             runCompetitivenessAtTime: runCompetitiveness,
-            finalWeightApplied: clamp(
-              0,
-              1,
-              overlapWeight * raterWeight * runCompetitiveness * owDef
-            ),
+            finalWeightAppliedDefense: finalWeightDef,
+            finalWeightAppliedFinishing: finalWeightFin,
+            finalWeightAppliedPlaymaking: finalWeightPlay,
+            finalWeightAppliedShooting: finalWeightSho,
           });
 
           await tx

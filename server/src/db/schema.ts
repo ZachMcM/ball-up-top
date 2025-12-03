@@ -26,9 +26,7 @@ export const user = pgTable(
     // ratings
     overall: integer().default(60).notNull(),
     finishingRating: integer("finishing_rating").default(60).notNull(),
-    playmakingRating: integer("playmaking_rating")
-      .default(60)
-      .notNull(),
+    playmakingRating: integer("playmaking_rating").default(60).notNull(),
     defenseRating: integer("defense_rating").default(60).notNull(),
     shootingRating: integer("shooting_rating").default(60).notNull(),
 
@@ -178,7 +176,20 @@ export const rating = pgTable(
     runCompetitivenessAtTime: doublePrecision(
       "run_competitiveness_at_time"
     ).notNull(),
-    finalWeightApplied: doublePrecision("final_weight_applied").notNull(),
+
+    finalWeightAppliedShooting: doublePrecision(
+      "final_weight_applied_shooting"
+    ).notNull(),
+    finalWeightAppliedPlaymaking: doublePrecision(
+      "final_weight_applied_playmaking"
+    ).notNull(),
+    finalWeightAppliedDefense: doublePrecision(
+      "final_weight_applied_defense"
+    ).notNull(),
+    finalWeightAppliedFinishing: doublePrecision(
+      "final_weight_applied_finishing"
+    ).notNull(),
+
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [

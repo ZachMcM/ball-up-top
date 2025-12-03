@@ -6,6 +6,8 @@ export const userRelations = relations(user, ({ many }) => ({
   accounts: many(account),
   createdCourts: many(court),
   courtSessions: many(courtSession),
+  incomingRatings: many(rating, { relationName: "incomingRatings" }),
+  outgoingRatings: many(rating, { relationName: "outgoingRatings" }),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -49,10 +51,12 @@ export const ratingRelations = relations(rating, ({ one }) => ({
   rater: one(user, {
     fields: [rating.raterId],
     references: [user.id],
+    relationName: "outgoingRatings"
   }),
   ratee: one(user, {
     fields: [rating.rateeId],
     references: [user.id],
+    relationName: "incomingRatings"
   }),
   raterCourtSession: one(courtSession, {
     fields: [rating.raterCourtSession],
