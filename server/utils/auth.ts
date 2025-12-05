@@ -9,6 +9,19 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
   }),
+  user: {
+    additionalFields: {
+      onboardingStep: {
+        type: "string",
+      },
+      height: {
+        type: "string",
+      },
+    },
+  },
+  session: {
+    expiresIn: 365 * 24 * 60 * 60, // one year
+  },
   plugins: [
     expo(),
     emailOTP({
@@ -24,9 +37,6 @@ export const auth = betterAuth({
       },
     }),
   ],
-  session: {
-    expiresIn: 365 * 24 * 60 * 60, // one year
-  },
   trustedOrigins: [
     "pull-up-client://", // Production Expo app
     // Development mode - Expo's exp:// scheme with local IP ranges

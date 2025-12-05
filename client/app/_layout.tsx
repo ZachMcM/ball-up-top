@@ -1,3 +1,4 @@
+import { LocationProvider, useLocation } from '@/components/providers/LocationProvider';
 import '@/global.css';
 import { authClient } from '@/lib/auth-client';
 
@@ -5,18 +6,21 @@ import { NAV_THEME, THEME } from '@/lib/theme';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
 import { focusManager, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Stack } from 'expo-router';
+import { SplashScreen, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import { useEffect } from 'react';
 import type { AppStateStatus } from 'react-native';
 import { AppState, Platform } from 'react-native';
-import { toast, Toaster } from 'sonner-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Toaster } from 'sonner-native';
 
 export {
   // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
+  ErrorBoundary
 } from 'expo-router';
+
+SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
@@ -36,45 +40,110 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
-        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-        <RootNavigatior />
-        <Toaster
-          toastOptions={{
-            style: {
-              backgroundColor: THEME[colorScheme!].background,
-              borderColor: THEME[colorScheme!].border,
-            },
-          }}
-        />
-        <PortalHost />
-      </ThemeProvider>
-    </QueryClientProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryClientProvider client={queryClient}>
+        <LocationProvider>
+          <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+            <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+            <RootNavigatior />
+            <Toaster
+              toastOptions={{
+                style: {
+                  backgroundColor: THEME[colorScheme!].popover,
+                  borderColor: THEME[colorScheme!].border,
+                  borderWidth: 1,
+                },
+              }}
+            />
+            <PortalHost />
+          </ThemeProvider>
+        </LocationProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }
 
 export function RootNavigatior() {
   const { data: currentUserData, isPending: isSessionPending } = authClient.useSession();
+  const { hasLocationPermission } = useLocation();
+  const isOnboardingComplete = currentUserData?.user.onboardingStep === 'complete';
+
+  useEffect(() => {
+    if (!isSessionPending) {
+      SplashScreen.hideAsync();
+    }
+  }, [isSessionPending]);
 
   return (
     <Stack>
-      <Stack.Protected guard={currentUserData === null}>
-        <Stack.Screen
-          name="index"
-          options={{ title: 'Pull Up', headerBackButtonDisplayMode: 'minimal' }}
-        />
-        <Stack.Screen
-          name="verify"
-          options={{ title: 'Pull Up', headerBackButtonDisplayMode: 'minimal' }}
-        />
-      </Stack.Protected>
-      <Stack.Protected guard={currentUserData !== null && !isSessionPending}>
+      <Stack.Protected
+        guard={
+          currentUserData !== null &&
+          !isSessionPending &&
+          isOnboardingComplete &&
+          hasLocationPermission === true
+        }>
         <Stack.Screen
           name="(tabs)"
           options={{
             headerShown: false,
           }}
+        />
+      </Stack.Protected>
+      <Stack.Protected guard={currentUserData === null && !isSessionPending}>
+        <Stack.Screen
+          name="(auth)/signin"
+          options={{ title: 'Pull Up', headerBackButtonDisplayMode: 'minimal' }}
+        />
+        <Stack.Screen
+          name="(auth)/verify-otp"
+          options={{ title: 'Pull Up', headerBackButtonDisplayMode: 'minimal' }}
+        />
+      </Stack.Protected>
+      <Stack.Protected
+        guard={currentUserData !== null && !isSessionPending && !isOnboardingComplete}>
+        <Stack.Screen
+          name="(onboarding)/name"
+          options={{
+            title: 'Pull Up',
+            headerBackButtonDisplayMode: 'minimal',
+          }}
+        />
+        <Stack.Screen
+          name="(onboarding)/height"
+          options={{
+            title: 'Pull Up',
+            headerBackButtonDisplayMode: 'minimal',
+          }}
+        />
+        <Stack.Screen
+          name="(onboarding)/image"
+          options={{
+            title: 'Pull Up',
+            headerBackButtonDisplayMode: 'minimal',
+          }}
+        />
+      </Stack.Protected>
+      <Stack.Protected
+        guard={
+          currentUserData !== null &&
+          !isSessionPending &&
+          isOnboardingComplete &&
+          hasLocationPermission !== true
+        }>
+        <Stack.Screen
+          name="location-permission"
+          options={{
+            headerShown: false,
+          }}
+        />
+      </Stack.Protected>
+      <Stack.Protected guard={isSessionPending || hasLocationPermission === null}>
+        <Stack.Screen
+          options={{
+            headerShown: false,
+          }}
+          name="loading"
         />
       </Stack.Protected>
     </Stack>

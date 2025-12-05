@@ -17,7 +17,7 @@ export default function Verify() {
   const { countdown, restartCountdown } = useCountdown(RESEND_CODE_INTERVAL_SECONDS);
 
   if (!email) {
-    return <Redirect href="/" />;
+    return <Redirect href="/signin" />;
   }
 
   async function getNewOtp() {
@@ -40,7 +40,7 @@ export default function Verify() {
     });
     setIsPending(false);
     if (error && error.message) {
-      toast.error(error.message);
+      toast.error(error.message, { position: 'bottom-center' });
     }
     console.log('Response', data, error);
   }
@@ -81,8 +81,8 @@ export default function Verify() {
           </Text>
         </Button>
         <Button className="w-full" disabled={isPending} onPress={signIn} size="lg">
-          {isPending && <ActivityIndicator />}
           <Text>Continue</Text>
+          {isPending && <ActivityIndicator />}
         </Button>
       </View>
     </KeyboardAvoidingView>

@@ -4,15 +4,7 @@ import { Activity, MapPin, User } from 'lucide-react-native';
 
 export default function TabsLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarLabelStyle: {
-          fontSize: 12,
-        },
-        tabBarStyle: {
-          height: 64
-        }
-      }}>
+    <Tabs>
       <Tabs.Screen
         name="index"
         options={{

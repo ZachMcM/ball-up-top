@@ -22,7 +22,7 @@ export default function Index() {
 
   const onSubmit = (values: z.infer<typeof EmailSchema>) => {
     sendOTP(values.email);
-    router.navigate(`/verify?email=${encodeURIComponent(values.email)}`);
+    router.navigate(`/verify-otp?email=${encodeURIComponent(values.email)}`);
   };
 
   async function sendOTP(email: string) {

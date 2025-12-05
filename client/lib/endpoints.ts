@@ -1,4 +1,5 @@
-import { authClient } from "./auth-client";
+import { ImagePickerAsset } from 'expo-image-picker';
+import { authClient } from './auth-client';
 
 export type serverRequestParams = {
   endpoint: string;
@@ -32,7 +33,7 @@ export async function serverRequest({ endpoint, method, body, formData }: server
     fetchOptions.body = body;
   }
 
-  const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}${endpoint}`, fetchOptions);
+  const res = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}${endpoint}`, fetchOptions);
 
   const data = await res.json();
 
@@ -41,4 +42,20 @@ export async function serverRequest({ endpoint, method, body, formData }: server
   }
 
   return data;
+}
+
+export async function patchUserImage(asset: ImagePickerAsset) {
+  const formData = new FormData();
+
+  formData.append('image', {
+    uri: asset.uri,
+    type: asset.mimeType || 'image/jpeg',
+    name: asset.fileName || 'image.jpg',
+  } as any);
+
+  return await serverRequest({
+    endpoint: '/users/image',
+    method: 'PATCH',
+    formData,
+  });
 }

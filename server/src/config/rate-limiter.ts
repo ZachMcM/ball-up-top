@@ -1,0 +1,1 @@
+export const MAX_REQS_PER_WINDOW=1000
