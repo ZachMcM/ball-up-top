@@ -22,6 +22,8 @@ export const user = pgTable(
       .defaultNow()
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
+    phoneNumber: text("phone_number").unique(),
+    phoneNumberVerified: boolean("phone_number_verified"),
 
     // ratings
     overall: integer().default(60).notNull(),
@@ -34,7 +36,12 @@ export const user = pgTable(
     archetype: text().default("Unranked").notNull(),
 
     // extra attributes
-    height: text().notNull(),
+    height: text(),
+
+    onboardingStep: text("onboarding_step")
+      .default("name")
+      .notNull()
+      .$type<"name" | "height" | "image" | "complete">(),
   },
   (table) => [index("user_overall_idx").on(table.overall)]
 );

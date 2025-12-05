@@ -1,14 +1,16 @@
-import { createAuthClient } from 'better-auth/react';
 import { expoClient } from '@better-auth/expo/client';
+import { emailOTPClient } from 'better-auth/client/plugins';
+import { createAuthClient } from 'better-auth/react';
 import * as SecureStore from 'expo-secure-store';
 
 export const authClient = createAuthClient({
-  baseURL: 'http://localhost:8081', // Base URL of your Better Auth backend.
+  baseURL: process.env.EXPO_PUBLIC_SERVER_URL,
   plugins: [
     expoClient({
       scheme: 'pull-up-client',
       storagePrefix: 'pull-up-client',
       storage: SecureStore,
     }),
+    emailOTPClient(),
   ],
 });

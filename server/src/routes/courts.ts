@@ -4,9 +4,9 @@ import { handleError } from "../../utils/handleError";
 import { db } from "../db";
 import { courtSession } from "../db/schema";
 
-export const courts = Router();
+export const courtsRoute = Router();
 
-courts.post("/courts/:courtId/sessions", authMiddleware, async (req, res) => {
+courtsRoute.post("/courts/:courtId/sessions", authMiddleware, async (req, res) => {
   try {
     const courtId = parseInt(req.params.courtId);
 

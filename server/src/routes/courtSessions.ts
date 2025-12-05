@@ -362,7 +362,7 @@ courtSessionsRoute.post(
             newPlaymaking,
             newFinishing,
             newShooting,
-            ratee.height
+            ratee.height!
           );
 
           await tx

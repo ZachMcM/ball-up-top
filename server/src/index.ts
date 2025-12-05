@@ -21,5 +21,5 @@ app.use(limiter);
 app.use("/", routes);
 
 app.listen(PORT, () => {
-  logger.info(`Server listening on port ${PORT}`);
+  logger.info(`Server listening on port ${PORT} in ${process.env.NODE_ENV}`);
 });

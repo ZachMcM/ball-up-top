@@ -1,6 +1,6 @@
 import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 
-export default function Courts() {
+export default function Activity() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
