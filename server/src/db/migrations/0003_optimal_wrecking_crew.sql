@@ -1,0 +1,1 @@
+ALTER TABLE "court" RENAME COLUMN "photo_url" TO "image";

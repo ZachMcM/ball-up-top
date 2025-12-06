@@ -38,7 +38,7 @@ const HeightSchema = z.object({
 export default function Height() {
   const { data: currentUserData } = authClient.useSession();
 
-  const form = useForm<z.infer<typeof HeightSchema>>({
+  const { control, handleSubmit } = useForm<z.infer<typeof HeightSchema>>({
     resolver: zodResolver(HeightSchema),
     defaultValues: {
       height: !currentUserData?.user.height ? undefined : currentUserData.user.height,
@@ -70,7 +70,7 @@ export default function Height() {
       <View className="flex w-full flex-col items-center gap-4 p-8">
         <Text className="text-xl font-bold">What's your height?</Text>
         <Controller
-          control={form.control}
+          control={control}
           rules={{ required: true }}
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <View className="flex w-full flex-col gap-2">
@@ -105,7 +105,7 @@ export default function Height() {
           disabled={isPending}
           className="w-full"
           size="lg"
-          onPress={form.handleSubmit((values) => saveHeight(values.height))}>
+          onPress={handleSubmit((values) => saveHeight(values.height))}>
           <Text>Continue</Text>
           {isPending && <ActivityIndicator />}
         </Button>

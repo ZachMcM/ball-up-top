@@ -19,7 +19,7 @@ const NameSchema = z.object({
 export default function Name() {
   const { data: currentUserData } = authClient.useSession();
 
-  const form = useForm<z.infer<typeof NameSchema>>({
+  const { control, handleSubmit } = useForm<z.infer<typeof NameSchema>>({
     resolver: zodResolver(NameSchema),
     defaultValues: {
       firstName: !currentUserData?.user.name ? undefined : currentUserData?.user.name.split(' ')[0],
@@ -50,7 +50,7 @@ export default function Name() {
         <Text className="text-xl font-bold">What's your name?</Text>
         <View className="flex flex-row items-center gap-2">
           <Controller
-            control={form.control}
+            control={control}
             rules={{ required: true }}
             render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
               <View className="flex w-full flex-1 flex-col gap-2">
@@ -69,7 +69,7 @@ export default function Name() {
             name="firstName"
           />
           <Controller
-            control={form.control}
+            control={control}
             rules={{ required: true }}
             render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
               <View className="flex w-full flex-1 flex-col gap-2">
@@ -95,9 +95,7 @@ export default function Name() {
           className="w-full"
           size="lg"
           disabled={isPending}
-          onPress={form.handleSubmit((values) =>
-            saveName(`${values.firstName} ${values.lastName}`)
-          )}>
+          onPress={handleSubmit((values) => saveName(`${values.firstName} ${values.lastName}`))}>
           <Text>Continue</Text>
           {isPending && <ActivityIndicator />}
         </Button>

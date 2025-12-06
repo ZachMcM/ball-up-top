@@ -7,6 +7,7 @@ import {
   EmptyContent,
   EmptyDescription,
   EmptyHeader,
+  EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
@@ -14,7 +15,8 @@ import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { getCourts } from '@/lib/endpoints';
 import { useQuery } from '@tanstack/react-query';
-import { PlusCircle, SlidersHorizontal } from 'lucide-react-native';
+import { router } from 'expo-router';
+import { Ban, PlusCircle, SlidersHorizontal } from 'lucide-react-native';
 import { useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { useDebounce } from 'use-debounce';
@@ -66,7 +68,7 @@ export default function Courts() {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       className="flex-1">
-      <View className="flex w-full flex-col gap-6 px-4 py-8">
+      <View className="flex w-full flex-col gap-6 p-6">
         <View className="flex w-full flex-col gap-3">
           <View className="flex flex-row items-center gap-3">
             <Icon as={SlidersHorizontal} size={18} />
@@ -78,21 +80,21 @@ export default function Courts() {
                 onPress={() => handleIndoorOutdoorToggle('indoor')}
                 variant={isIndoor ? 'secondary' : 'outline'}
                 size="sm"
-                className="rounded-full border">
+                className="rounded-full border border-border">
                 <Text>Indoor</Text>
               </Button>
               <Button
                 onPress={() => handleIndoorOutdoorToggle('outdoor')}
                 variant={isIndoor === false ? 'secondary' : 'outline'}
                 size="sm"
-                className="rounded-full border">
+                className="rounded-full border border-border">
                 <Text>Outdoor</Text>
               </Button>
               <Button
                 onPress={() => handleVerifiedToggle()}
                 variant={isVerified ? 'secondary' : 'outline'}
                 size="sm"
-                className="rounded-full border">
+                className="rounded-full border border-border">
                 <Text>Verified</Text>
               </Button>
             </NativewindScrollView>
@@ -124,7 +126,7 @@ export default function Courts() {
               </EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
-              <Button size="sm">
+              <Button onPress={() => router.navigate("/add-court")} size="sm">
                 <Text>Add Court</Text>
                 <Icon size={16} className="text-primary-foreground" as={PlusCircle} />
               </Button>

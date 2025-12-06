@@ -1,11 +1,13 @@
 import { Router } from "express";
-import { authMiddleware } from "../../utils/middleware";
+import { authMiddleware, upload } from "../../utils/middleware";
 import { handleError } from "../../utils/handleError";
 import { db } from "../db";
 import { court, courtSession } from "../db/schema";
 import { eq, sql } from "drizzle-orm";
 import * as z from "zod";
 import { MAX_DISTANCE_MI } from "../config/courts";
+import { r2 } from "../../utils/r2";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 
 export const courtsRoute = Router();
 
@@ -38,7 +40,7 @@ const CourtsParamsSchema = z.object({
   limit: z.coerce.number(),
   searchQuery: z.string().optional(),
   indoor: z.coerce.boolean().optional(),
-  verified: z.coerce.boolean().optional()
+  verified: z.coerce.boolean().optional(),
 });
 
 courtsRoute.get("/courts", authMiddleware, async (req, res) => {
@@ -48,7 +50,8 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
       return res.status(400).json({ error: validQueryParams.error.message });
     }
 
-    const { lat, lng, limit, searchQuery, indoor, verified } = validQueryParams.data;
+    const { lat, lng, limit, searchQuery, indoor, verified } =
+      validQueryParams.data;
 
     // Haversine formula for calculating distance on Earth's surface
     // Returns distance in miles
@@ -71,19 +74,18 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
         lng: court.lng,
         indoor: court.indoor,
         verified: court.verified,
-        photoUrl: court.photoUrl,
+        image: court.image,
         distance: distanceFormula,
       })
       .from(court)
       .where(sql`${distanceFormula} <= ${MAX_DISTANCE_MI}`)
       .$dynamic();
 
-    // Apply optional filters
     if (indoor !== undefined) {
       query = query.where(eq(court.indoor, indoor));
     }
     if (verified !== undefined) {
-      query = query.where(eq(court.verified, verified))
+      query = query.where(eq(court.verified, verified));
     }
 
     if (searchQuery) {
@@ -103,3 +105,95 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
     handleError(error, res, "GET /courts");
   }
 });
+
+const PostCourtsBodySchema = z.object({
+  name: z.string().min(1),
+  indoor: z.coerce.boolean(),
+  googlePlaceId: z.string(),
+  lat: z.coerce.number(),
+  lng: z.coerce.number(),
+  address: z.string(),
+  aliases: z
+    .string()
+    .transform((val) => JSON.parse(val))
+    .pipe(z.array(z.string()))
+    .optional(),
+});
+
+courtsRoute.post(
+  "/courts",
+  authMiddleware,
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      const file = req.file;
+
+      if (!file) {
+        return res.status(400).json({ error: "No image file provided" });
+      }
+
+      const allowedMimeTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/webp",
+        "image/gif",
+      ];
+      if (!allowedMimeTypes.includes(file.mimetype)) {
+        return res.status(400).json({
+          error:
+            "Invalid file type. Only JPEG, PNG, WebP, and GIF images are allowed",
+        });
+      }
+
+      const validBody = PostCourtsBodySchema.safeParse(req.body);
+      if (!validBody.success) {
+        return res.status(400).json({ error: validBody.error.message });
+      }
+
+      const { name, indoor, googlePlaceId, lat, lng, address, aliases } =
+        validBody.data;
+
+      const existingCourt = await db.query.court.findFirst({
+        where: eq(court.googlePlaceId, googlePlaceId),
+      });
+
+      if (existingCourt) {
+        return res
+          .status(409)
+          .json({ error: "A court with that place already exists" });
+      }
+
+      const fileName = `courts/${
+        res.locals.userId
+      }-${Date.now()}.${file.originalname.split(".").pop()}`;
+
+      await r2.send(
+        new PutObjectCommand({
+          Bucket: process.env.R2_BUCKET_NAME!,
+          Key: fileName,
+          Body: file.buffer,
+          ContentType: file.mimetype,
+        })
+      );
+
+      const imageUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
+
+      await db.insert(court).values({
+        name,
+        indoor,
+        googlePlaceId,
+        lat,
+        lng,
+        address,
+        aliases,
+        createdByUserId: res.locals.userId,
+        image: imageUrl,
+      });
+
+      return res.json({ success: true });
+    } catch (error) {
+      handleError(error, res, "POST /courts");
+    }
+  }
+);

@@ -120,7 +120,7 @@ export const court = pgTable(
     indoor: boolean("indoor").notNull().default(false),
     verified: boolean("verified").notNull().default(false),
 
-    photoUrl: text("photo_url").notNull(),
+    image: text("image").notNull(),
 
     createdByUserId: text("created_by_user_id").references(() => user.id),
 

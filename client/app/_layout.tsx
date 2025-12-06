@@ -6,7 +6,7 @@ import { NAV_THEME, THEME } from '@/lib/theme';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
 import { focusManager, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { SplashScreen, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import { useEffect } from 'react';
@@ -17,10 +17,8 @@ import { Toaster } from 'sonner-native';
 
 export {
   // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
+  ErrorBoundary
 } from 'expo-router';
-
-SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
@@ -68,12 +66,6 @@ export function RootNavigatior() {
   const { hasLocationPermission } = useLocation();
   const isOnboardingComplete = currentUserData?.user.onboardingStep === 'complete';
 
-  useEffect(() => {
-    if (!isSessionPending) {
-      SplashScreen.hideAsync();
-    }
-  }, [isSessionPending]);
-
   return (
     <Stack>
       <Stack.Protected
@@ -87,6 +79,13 @@ export function RootNavigatior() {
           name="(tabs)"
           options={{
             headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="add-court"
+          options={{
+            presentation: 'modal',
+            title: "Add Court"
           }}
         />
       </Stack.Protected>

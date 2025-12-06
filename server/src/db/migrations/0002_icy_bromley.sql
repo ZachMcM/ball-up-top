@@ -1,0 +1,1 @@
+CREATE INDEX "court_indoor_idx" ON "court" USING btree ("indoor");

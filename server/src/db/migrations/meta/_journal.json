@@ -15,6 +15,20 @@
       "when": 1764989503720,
       "tag": "0001_fantastic_black_widow",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1765054993499,
+      "tag": "0002_icy_bromley",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1765055026510,
+      "tag": "0003_optimal_wrecking_crew",
+      "breakpoints": true
     }
   ]
 }

@@ -14,7 +14,7 @@ const EmailSchema = z.object({
 });
 
 export default function Index() {
-  const form = useForm<z.infer<typeof EmailSchema>>({
+  const { control, handleSubmit } = useForm<z.infer<typeof EmailSchema>>({
     resolver: zodResolver(EmailSchema),
   });
 
@@ -40,7 +40,7 @@ export default function Index() {
       <View className="flex w-full flex-col items-center gap-4 p-8">
         <Text className="text-xl font-bold">What's your email?</Text>
         <Controller
-          control={form.control}
+          control={control}
           rules={{ required: true }}
           render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
             <View className="flex w-full flex-col gap-2">
@@ -61,7 +61,7 @@ export default function Index() {
         <Text className="text-center text-xs font-medium text-muted-foreground">
           By continuing, you agree to our Privacy Policy and Terms of Service
         </Text>
-        <Button className="w-full" size="lg" onPress={form.handleSubmit(onSubmit)}>
+        <Button className="w-full" size="lg" onPress={handleSubmit(onSubmit)}>
           <Text>Continue</Text>
         </Button>
       </View>

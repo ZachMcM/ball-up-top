@@ -1,3 +1,17 @@
+import * as z from 'zod';
+
+export type Place = z.infer<typeof PlaceSchema>;
+
+export const PlaceSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  location: z.object({
+    latitude: z.number(),
+    longitude: z.number(),
+  }),
+  formattedAddress: z.string(),
+});
+
 export interface Court {
   id: number;
   name: string;
@@ -8,6 +22,6 @@ export interface Court {
   lng: number;
   indoor: boolean;
   verified: boolean;
-  photoUrl: string;
+  image: string;
   distance: number;
 }

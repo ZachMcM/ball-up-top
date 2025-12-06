@@ -1,6 +1,8 @@
 import { ImagePickerAsset } from 'expo-image-picker';
 import { authClient } from './auth-client';
-import { Court } from '@/types/court';
+import { Court, Place } from '@/types/court';
+import * as z from 'zod';
+import { AddCourtSchema } from '@/app/add-court';
 
 export type serverRequestParams = {
   endpoint: string;
@@ -61,20 +63,30 @@ export async function patchUserImage(asset: ImagePickerAsset) {
   });
 }
 
+export async function getPlaces(searchQuery: string): Promise<Place[]> {
+  if (searchQuery.trim() === '') {
+    return [];
+  }
+  return await serverRequest({
+    endpoint: `/places?searchQuery=${searchQuery}`,
+    method: 'GET',
+  });
+}
+
 export async function getCourts({
   lat,
   lng,
   limit = 25,
   searchQuery,
   indoor,
-  verified
+  verified,
 }: {
   lat: number;
   lng: number;
   limit?: number;
   searchQuery?: string;
   indoor?: boolean;
-  verified?: boolean
+  verified?: boolean;
 }): Promise<Court[]> {
   const params = new URLSearchParams();
 
@@ -89,11 +101,44 @@ export async function getCourts({
     params.append('indoor', indoor.toString());
   }
   if (verified !== undefined) {
-    params.append('verified', verified.toString())
+    params.append('verified', verified.toString());
   }
 
   return await serverRequest({
     endpoint: `/courts?${params.toString()}`,
     method: 'GET',
+  });
+}
+
+export async function postCourt({
+  place,
+  name,
+  indoor,
+  nickname,
+  image: asset,
+}: z.infer<typeof AddCourtSchema>) {
+  const formData = new FormData();
+
+  formData.append('image', {
+    uri: asset.uri,
+    type: asset.mimeType || 'image/jpeg',
+    name: asset.fileName || 'image.jpg',
+  } as any);
+
+  formData.append('name', name);
+  formData.append('indoor', indoor.toString());
+  formData.append('googlePlaceId', place.id);
+  formData.append('address', place.formattedAddress);
+  formData.append('lat', place.location.latitude.toString());
+  formData.append('lng', place.location.longitude.toString());
+
+  if (nickname) {
+    formData.append('aliases', JSON.stringify([nickname]));
+  }
+
+  await serverRequest({
+    endpoint: '/courts',
+    method: 'POST',
+    formData,
   });
 }

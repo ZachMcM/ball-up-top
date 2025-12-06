@@ -7,7 +7,7 @@ import { View, type ViewProps } from 'react-native';
 function Empty({ className, ...props }: ViewProps & React.RefAttributes<View>) {
   return (
     <View
-      className={cn('flex flex-col items-center justify-center gap-6 p-6 rounded-lg', className)}
+      className={cn('flex flex-col items-center justify-center gap-6 p-6 rounded-xl', className)}
       {...props}
     />
   );
@@ -23,7 +23,7 @@ const emptyMediaVariants = cva('flex items-center justify-center', {
   variants: {
     variant: {
       default: 'h-16 w-16',
-      icon: 'h-12 w-12 rounded-full bg-muted p-3',
+      icon: 'h-9 w-9 rounded-full bg-muted p-3',
     },
   },
   defaultVariants: {
