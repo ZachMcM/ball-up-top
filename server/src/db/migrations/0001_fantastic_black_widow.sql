@@ -1,0 +1,1 @@
+ALTER TABLE "court" ALTER COLUMN "photo_url" SET NOT NULL;

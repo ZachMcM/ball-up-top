@@ -5,16 +5,34 @@ import { AppState } from 'react-native';
 
 interface LocationContextValues {
   hasLocationPermission: boolean | null;
-  isPending: boolean;
+  isRequestingPermission: boolean;
   requestPermission: () => Promise<void>;
-  getLocation: () => Promise<Location.LocationObject>;
+  location: Location.LocationObject | null;
+  isLocationPending: boolean;
 }
 const LocationContext = createContext<LocationContextValues | null>(null);
 
 export function LocationProvider({ children }: { children: ReactNode }) {
   const { data: currentUserData, isPending: isSessionPending } = authClient.useSession();
   const [hasLocationPermission, setHasLocationPermission] = useState<boolean | null>(null);
-  const [isPending, setIsPending] = useState(false);
+  const [isRequestingPermission, setIsRequestingPermission] = useState(false);
+  const [isLocationPending, setIsLocationPending] = useState(false);
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+
+  const updateLocation = async () => {
+    const location = await Location.getCurrentPositionAsync();
+    setLocation(location);
+  };
+
+  useEffect(() => {
+    if (hasLocationPermission) {
+      (async () => {
+        setIsLocationPending(true);
+        await updateLocation();
+        setIsLocationPending(false);
+      })();
+    }
+  }, [isSessionPending, currentUserData?.user.onboardingStep, hasLocationPermission]);
 
   // Check location permission status
   useEffect(() => {
@@ -28,6 +46,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       const subscription = AppState.addEventListener('change', (state) => {
         if (state === 'active') {
           checkLocationPermission();
+          updateLocation();
         }
       });
       return () => subscription.remove();
@@ -35,34 +54,39 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   }, [isSessionPending, currentUserData?.user.onboardingStep]);
 
   const requestPermission = async () => {
-    setIsPending(true);
+    setIsRequestingPermission(true);
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
-
-      if (status === 'granted') {
-        return;
-      } else {
-        setHasLocationPermission(true);
-      }
+      setHasLocationPermission(status === 'granted');
     } catch (error) {
       console.error('Error requesting location permission:', error);
       setHasLocationPermission(false);
     } finally {
-      setIsPending(false);
+      setIsRequestingPermission(false);
     }
   };
+  // In LocationProvider - update every 5 minutes while app is active
+  useEffect(() => {
+    if (!hasLocationPermission) return;
 
-  const getLocation = async () => {
-    return Location.getCurrentPositionAsync();
-  };
+    const interval = setInterval(
+      async () => {
+        await updateLocation();
+      },
+      5 * 60 * 1000
+    ); // 5 minutes
+
+    return () => clearInterval(interval);
+  }, [hasLocationPermission]);
 
   return (
     <LocationContext.Provider
       value={{
-        isPending,
-        getLocation,
+        isRequestingPermission,
         requestPermission,
         hasLocationPermission,
+        location,
+        isLocationPending,
       }}>
       {children}
     </LocationContext.Provider>

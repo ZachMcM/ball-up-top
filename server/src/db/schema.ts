@@ -120,7 +120,7 @@ export const court = pgTable(
     indoor: boolean("indoor").notNull().default(false),
     verified: boolean("verified").notNull().default(false),
 
-    photoUrl: text("photo_url"),
+    photoUrl: text("photo_url").notNull(),
 
     createdByUserId: text("created_by_user_id").references(() => user.id),
 
@@ -134,6 +134,7 @@ export const court = pgTable(
     index("court_lat_lng_idx").on(table.lat, table.lng),
     index("court_verified_idx").on(table.verified),
     index("court_created_by_user_id_idx").on(table.createdByUserId),
+    index("court_indoor_idx").on(table.indoor),
   ]
 );
 

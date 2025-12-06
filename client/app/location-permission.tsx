@@ -9,7 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useLocation } from '@/components/providers/LocationProvider';
 
 export default function LocationPermission() {
-  const { hasLocationPermission, requestPermission, isPending } = useLocation()
+  const { hasLocationPermission, requestPermission, isRequestingPermission } = useLocation()
 
   return (
     <View className="flex w-full flex-1 flex-col items-center justify-center gap-4 p-8">
@@ -34,9 +34,9 @@ export default function LocationPermission() {
           </Button>
         </>
       ) : (
-        <Button className="w-full" onPress={requestPermission} disabled={isPending}>
+        <Button className="w-full" onPress={requestPermission} disabled={isRequestingPermission}>
           <Text>Enable Location Access</Text>
-          {isPending && <ActivityIndicator />}
+          {isRequestingPermission && <ActivityIndicator />}
         </Button>
       )}
       <Text className="max-w-sm text-center text-xs text-muted-foreground">

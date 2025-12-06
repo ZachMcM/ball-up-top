@@ -1,5 +1,6 @@
 import { ImagePickerAsset } from 'expo-image-picker';
 import { authClient } from './auth-client';
+import { Court } from '@/types/court';
 
 export type serverRequestParams = {
   endpoint: string;
@@ -57,5 +58,42 @@ export async function patchUserImage(asset: ImagePickerAsset) {
     endpoint: '/users/image',
     method: 'PATCH',
     formData,
+  });
+}
+
+export async function getCourts({
+  lat,
+  lng,
+  limit = 25,
+  searchQuery,
+  indoor,
+  verified
+}: {
+  lat: number;
+  lng: number;
+  limit?: number;
+  searchQuery?: string;
+  indoor?: boolean;
+  verified?: boolean
+}): Promise<Court[]> {
+  const params = new URLSearchParams();
+
+  params.append('lat', lat.toString());
+  params.append('lng', lng.toString());
+  params.append('limit', limit.toString());
+
+  if (searchQuery !== undefined && searchQuery !== '') {
+    params.append('searchQuery', searchQuery);
+  }
+  if (indoor !== undefined) {
+    params.append('indoor', indoor.toString());
+  }
+  if (verified !== undefined) {
+    params.append('verified', verified.toString())
+  }
+
+  return await serverRequest({
+    endpoint: `/courts?${params.toString()}`,
+    method: 'GET',
   });
 }
