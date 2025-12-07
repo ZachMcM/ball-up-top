@@ -1,11 +1,17 @@
 import { CourtListEntry } from '@/types/court';
-import { ChartColumnIcon, MapPin, UsersIcon } from 'lucide-react-native';
+import { THEME } from '@/lib/theme';
+import { MapPin, UsersIcon } from 'lucide-react-native';
 import { Image, View } from 'react-native';
 import { AspectRatio } from './ui/aspect-ratio';
 import { Icon } from './ui/icon';
 import { Text } from './ui/text';
+import { LineChart } from 'react-native-gifted-charts';
+import { useColorScheme } from 'nativewind';
+import { getNormalizedTime } from '@/lib/utils';
 
 export default function CourtCard({ court }: { court: CourtListEntry }) {
+  const { colorScheme } = useColorScheme();
+
   return (
     <View className="flex flex-col gap-4 rounded-xl border border-border p-4">
       <View className="flex flex-row gap-4">
@@ -47,6 +53,24 @@ export default function CourtCard({ court }: { court: CourtListEntry }) {
           </View>
         </View>
       </View>
+      <LineChart
+        curved
+        hideYAxisText
+        areaChart
+        height={64}
+        thickness={3}
+        color={THEME[colorScheme!].primary}
+        hideDataPoints
+        hideRules
+        scrollToIndex={11}
+        xAxisThickness={0}
+        yAxisThickness={0}
+        xAxisLabelTextStyle={{ color: THEME[colorScheme!].primary }}
+        data={court.activityGraph.map((entry, i) => ({
+          value: i == 0 ? 0 : Math.random() * 50,
+          label: getNormalizedTime(entry.hour),
+        }))}
+      />
     </View>
   );
 }

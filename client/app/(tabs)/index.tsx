@@ -124,7 +124,7 @@ export default function Courts() {
             <EmptyHeader>
               <EmptyTitle>No Courts Found</EmptyTitle>
               <EmptyDescription>
-                No courts were found with those filters. Try a different search or adding a new
+                No courts found nearby. Try a different search or adding a new
                 court.
               </EmptyDescription>
             </EmptyHeader>

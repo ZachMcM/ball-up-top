@@ -196,7 +196,7 @@ export default function AddCourt() {
                     </EmptyMedia>
                     <EmptyTitle>No Places Found</EmptyTitle>
                     <EmptyDescription>
-                      No places were found for that search. Try a different search.
+                      No places found nearby. Try a different search.
                     </EmptyDescription>
                   </EmptyHeader>
                 </Empty>
