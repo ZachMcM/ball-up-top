@@ -36,6 +36,13 @@
       "when": 1765083108601,
       "tag": "0004_amazing_hellcat",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1765085575195,
+      "tag": "0005_burly_starfox",
+      "breakpoints": true
     }
   ]
 }

@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
 import {
   NativeSelectScrollView,
   Select,
@@ -12,6 +13,7 @@ import { authClient } from '@/lib/auth-client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
+import { ArrowLeftIcon } from 'lucide-react-native';
 import { Controller, useForm } from 'react-hook-form';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { toast } from 'sonner-native';
@@ -101,14 +103,22 @@ export default function Height() {
           This will help determine your archetype and help others identify you. You can change this
           later.
         </Text>
-        <Button
-          disabled={isPending}
-          className="w-full"
-          size="lg"
-          onPress={handleSubmit((values) => saveHeight(values.height))}>
-          <Text>Continue</Text>
-          {isPending && <ActivityIndicator />}
-        </Button>
+        <View className="flex w-full flex-row items-center gap-2">
+          {router.canGoBack() && (
+            <Button size="lg" className='flex-1' onPress={() => router.back()} variant="outline">
+              <Icon as={ArrowLeftIcon} size={18} />
+              <Text>Back</Text>
+            </Button>
+          )}
+          <Button
+            disabled={isPending}
+            size="lg"
+            className='flex-1'
+            onPress={handleSubmit((values) => saveHeight(values.height))}>
+            <Text>Continue</Text>
+            {isPending && <ActivityIndicator />}
+          </Button>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );

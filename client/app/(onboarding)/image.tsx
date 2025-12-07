@@ -1,17 +1,18 @@
-import { Button } from '@/components/ui/button';
-import { Text } from '@/components/ui/text';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, View } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useMutation } from '@tanstack/react-query';
+import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
+import { Text } from '@/components/ui/text';
 import { authClient } from '@/lib/auth-client';
 import { patchUserImage } from '@/lib/endpoints';
+import { useMutation } from '@tanstack/react-query';
+import * as ImagePicker from 'expo-image-picker';
+import { useRouter } from 'expo-router';
+import { ArrowLeftIcon, User2, UserIcon } from 'lucide-react-native';
+import { useState } from 'react';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 import { toast } from 'sonner-native';
 
 export default function ImageScreen() {
-  const [selectedImageUri, setselectedImageUri] = useState<string | null>(null);
   const [selectedAsset, setSelectedAsset] = useState<ImagePicker.ImagePickerAsset | null>(null);
 
   const { mutate: saveImage, isPending } = useMutation({
@@ -39,10 +40,11 @@ export default function ImageScreen() {
     });
 
     if (!result.canceled) {
-      setselectedImageUri(result.assets[0].uri);
       setSelectedAsset(result.assets[0]);
     }
   }
+
+  const router = useRouter();
 
   return (
     <KeyboardAvoidingView
@@ -51,25 +53,37 @@ export default function ImageScreen() {
       <View className="flex w-full flex-col items-center gap-4 p-8">
         <Text className="text-xl font-bold">Add an image of yourself.</Text>
         <View className="flex items-center gap-4">
-          <Avatar alt="User Image" className="size-32">
-            <AvatarImage source={{ uri: selectedImageUri ?? undefined }} />
-            <AvatarFallback className="bg-muted" />
-          </Avatar>
+          <Pressable onPress={pickImage}>
+            <Avatar alt="User Image" className="size-32">
+              <AvatarImage source={{ uri: selectedAsset?.uri ?? undefined }} />
+              <AvatarFallback className="flex items-center justify-center border-2 border-dashed border-border bg-muted/30">
+                <Icon as={User2} size={56} />
+              </AvatarFallback>
+            </Avatar>
+          </Pressable>
           <Button variant="outline" onPress={pickImage}>
-            <Text>{selectedImageUri ? 'Change Image' : 'Select Image'}</Text>
+            <Text>{selectedAsset?.uri ? 'Change Image' : 'Select Image'}</Text>
           </Button>
         </View>
         <Text className="text-center text-xs font-medium text-muted-foreground">
           This help others identify you. You can change this later.
         </Text>
-        <Button
-          className="w-full"
-          size="lg"
-          disabled={isPending || !selectedImageUri || !selectedAsset}
-          onPress={() => saveImage()}>
-          <Text>Continue</Text>
-          {isPending && <ActivityIndicator />}
-        </Button>
+        <View className="flex w-full flex-row items-center gap-2">
+          {router.canGoBack() && (
+            <Button size="lg" className='flex-1' onPress={() => router.back()} variant="outline">
+              <Icon as={ArrowLeftIcon} size={18} />
+              <Text>Back</Text>
+            </Button>
+          )}
+          <Button
+            className="flex-1"
+            size="lg"
+            disabled={isPending || !selectedAsset?.uri || !selectedAsset}
+            onPress={() => saveImage()}>
+            <Text>Continue</Text>
+            {isPending && <ActivityIndicator />}
+          </Button>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );

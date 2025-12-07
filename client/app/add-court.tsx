@@ -32,7 +32,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, Ban, HouseIcon, ImageIcon, MapPin, SunIcon } from 'lucide-react-native';
+import { ArrowLeft, Ban, HouseIcon, ImageIcon, MapPin, SunIcon, XIcon } from 'lucide-react-native';
 import { Fragment, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
@@ -76,7 +76,10 @@ export default function AddCourt() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['courts'] });
       toast.success(
-        "Court successfully added! Please check back soon to review it's verification status."
+        "Court successfully added! Please check back soon to review it's verification status.",
+        {
+          position: 'bottom-center',
+        }
       );
       router.dismiss();
     },
@@ -152,6 +155,7 @@ export default function AddCourt() {
               </Text>
             </View>
             <Input
+              autoFocus
               value={searchQuery}
               onChangeText={(val) => {
                 setSearchQuery(val);
@@ -324,28 +328,27 @@ export default function AddCourt() {
                 <Icon size={18} as={ArrowLeft} />
                 <Text>Back</Text>
               </Button>
-              <AlertDialog>
+              <AlertDialog className="flex-1">
                 <AlertDialogTrigger asChild>
-                  <Button className="flex-1">
-                    <Text>Submit</Text>
+                  <Button disabled={isPending} className="flex-1">
+                    <Text>Save</Text>
+                    {isPending && <ActivityIndicator />}
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogTitle>Are you sure you want to add this court?</AlertDialogTitle>
                     <AlertDialogDescription>
                       Make sure all the information is correct before adding the court.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
-                  <AlertDialogFooter>
+                  <AlertDialogFooter className="flex flex-row items-center">
                     <AlertDialogCancel>
                       <Text>Cancel</Text>
+                      <Icon size={18} as={XIcon} />
                     </AlertDialogCancel>
-                    <AlertDialogAction
-                      disabled={isPending}
-                      onPress={handleSubmit((values) => saveCourt(values))}>
-                      <Text>Continue</Text>
-                      {isPending && <ActivityIndicator />}
+                    <AlertDialogAction onPress={handleSubmit((values) => saveCourt(values))}>
+                      <Text>Save</Text>
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>

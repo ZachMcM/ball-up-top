@@ -42,6 +42,9 @@ export default function Name() {
     },
   });
 
+  const onSubmit = (values: z.infer<typeof NameSchema>) =>
+    saveName(`${values.firstName} ${values.lastName}`);
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -55,6 +58,7 @@ export default function Name() {
             render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
               <View className="flex w-full flex-1 flex-col gap-2">
                 <Input
+                  autoFocus
                   placeholder="First Name"
                   onBlur={onBlur}
                   onChangeText={onChange}
@@ -75,6 +79,7 @@ export default function Name() {
               <View className="flex w-full flex-1 flex-col gap-2">
                 <Input
                   placeholder="Last Name"
+                  onSubmitEditing={handleSubmit(onSubmit)}
                   onBlur={onBlur}
                   onChangeText={onChange}
                   className={cn(error && 'border-destructive', 'w-full')}
@@ -91,11 +96,7 @@ export default function Name() {
         <Text className="text-xs font-medium text-muted-foreground">
           This will help others identify you. You can change this later.
         </Text>
-        <Button
-          className="w-full"
-          size="lg"
-          disabled={isPending}
-          onPress={handleSubmit((values) => saveName(`${values.firstName} ${values.lastName}`))}>
+        <Button className="w-full" size="lg" disabled={isPending} onPress={handleSubmit(onSubmit)}>
           <Text>Continue</Text>
           {isPending && <ActivityIndicator />}
         </Button>

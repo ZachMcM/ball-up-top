@@ -58,10 +58,11 @@ export default function Verify() {
           value={otp}
           onChangeText={setOtp}
           id="code"
+          autoFocus
           placeholder="123456"
           autoCapitalize="none"
           returnKeyType="send"
-          keyboardType="numeric"
+          keyboardType="number-pad"
           autoComplete="sms-otp"
           textContentType="oneTimeCode"
           onSubmitEditing={signIn}

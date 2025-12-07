@@ -42,8 +42,6 @@ export const user = pgTable(
       .default("name")
       .notNull()
       .$type<"name" | "height" | "image" | "complete">(),
-
-    verifiedCourtCreator: boolean("verified_court_creator").default(true)
   },
   (table) => [index("user_overall_idx").on(table.overall)]
 );

@@ -1,0 +1,1 @@
+ALTER TABLE "user" DROP COLUMN "verified_court_creator";

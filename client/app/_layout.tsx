@@ -6,7 +6,7 @@ import { NAV_THEME, THEME } from '@/lib/theme';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
 import { focusManager, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Stack, usePathname, useRouter } from 'expo-router';
+import { Stack, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import { useEffect } from 'react';
@@ -66,9 +66,6 @@ export function RootNavigatior() {
   const { locationPermissionStatus } = useLocation();
   const isOnboardingComplete = currentUserData?.user.onboardingStep === 'complete';
 
-  const pathname = usePathname();
-  console.log(pathname);
-
   // Show loading screen while checking session OR (when user exists, completed onboarding, AND location permission hasn't been checked yet)
   const isLoading =
     isSessionPending ||
@@ -112,21 +109,20 @@ export function RootNavigatior() {
           name="(onboarding)/name"
           options={{
             title: 'Pull Up',
-            headerBackButtonDisplayMode: 'minimal',
           }}
         />
         <Stack.Screen
           name="(onboarding)/height"
           options={{
             title: 'Pull Up',
-            headerBackButtonDisplayMode: 'minimal',
+            headerBackVisible: false,
           }}
         />
         <Stack.Screen
           name="(onboarding)/image"
           options={{
             title: 'Pull Up',
-            headerBackButtonDisplayMode: 'minimal',
+            headerBackVisible: false,
           }}
         />
       </Stack.Protected>

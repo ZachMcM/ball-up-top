@@ -29,8 +29,8 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     isCheckingLocationPermission && locationPermissionStatus === null;
 
   const isLocationPending = isUpdatingLocation && location === null;
-
   // Reset location permission state when user logs out
+
   useEffect(() => {
     if (currentUserData === null) {
       setlocationPermissionStatus(null);
@@ -46,7 +46,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    if (locationPermissionStatus == 'granted') {
+    if (locationPermissionStatus === 'granted') {
       (async () => {
         await updateLocation();
       })();
@@ -87,7 +87,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   };
   // In LocationProvider - update every 5 minutes while app is active
   useEffect(() => {
-    if (locationPermissionStatus === 'denied') return;
+    if (locationPermissionStatus !== 'granted') return;
 
     const interval = setInterval(
       async () => {

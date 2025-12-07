@@ -49,11 +49,14 @@ export default function Index() {
           render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
             <View className="flex w-full flex-col gap-2">
               <Input
+                autoFocus
                 placeholder="johndoe@example.com"
                 onBlur={onBlur}
                 onChangeText={onChange}
                 className={cn(error && 'border-destructive', 'w-full')}
                 value={value}
+                onSubmitEditing={handleSubmit(onSubmit)}
+                keyboardType="email-address"
               />
               {error && (
                 <Text className="text-sm font-medium text-destructive">{error.message}</Text>
