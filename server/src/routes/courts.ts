@@ -11,6 +11,7 @@ import {
 } from "../config/courts";
 import { db } from "../db";
 import { court, courtSession, user } from "../db/schema";
+import { getDistanceInMeters } from "../../utils/getDistanceMeters";
 
 export const courtsRoute = Router();
 
@@ -18,29 +19,6 @@ const CourtSessionPostBodySchema = z.object({
   lat: z.number().min(-90).max(90),
   lng: z.number().min(-180).max(180),
 });
-
-function getDistanceInMeters(
-  lat1: number,
-  lng1: number,
-  lat2: number,
-  lng2: number
-): number {
-  const R = 6371e3;
-  const phi_1 = (lat1 * Math.PI) / 180;
-  const phi_2 = (lat2 * Math.PI) / 180;
-  const delta_phi = ((lat2 - lat1) * Math.PI) / 180;
-  const delta_lambda = ((lng2 - lng1) * Math.PI) / 180;
-
-  const a =
-    Math.sin(delta_phi / 2) * Math.sin(delta_phi / 2) +
-    Math.cos(phi_1) *
-      Math.cos(phi_2) *
-      Math.sin(delta_lambda / 2) *
-      Math.sin(delta_lambda / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  return R * c;
-}
 
 courtsRoute.post(
   "/courts/:courtId/sessions",

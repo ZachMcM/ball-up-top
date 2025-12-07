@@ -3,10 +3,11 @@ import * as z from "zod";
 import { googlePlacesClient } from "../../utils/googlePlacesClient";
 import { handleError } from "../../utils/handleError";
 import { authMiddleware } from "../../utils/middleware";
-import { MAX_RESULTS } from "../config/places";
+import { MAX_RESULTS, MAX_DISTANCE_METERS } from "../config/places";
 import { db } from "../db";
 import { inArray } from "drizzle-orm";
 import { court } from "../db/schema";
+import { getDistanceInMeters } from "../../utils/getDistanceMeters";
 
 export const placesRoute = Router();
 
@@ -23,8 +24,7 @@ placesRoute.get("/places", authMiddleware, async (req, res) => {
       return res.status(400).json({ error: validQueryParams.error.message });
     }
 
-    const { searchQuery: textQuery, lat, lng } =
-      validQueryParams.data;
+    const { searchQuery: textQuery, lat, lng } = validQueryParams.data;
 
     const [response] = await googlePlacesClient.searchText(
       {
@@ -68,11 +68,18 @@ placesRoute.get("/places", authMiddleware, async (req, res) => {
       })
     ).map((c) => c.googlePlaceId);
 
-    const unclaimedPlaces = places.filter(
-      (p) => !preexistingPlaceIds.includes(p.id!)
+    const filteredPlaces = places.filter(
+      (p) =>
+        !preexistingPlaceIds.includes(p.id!) &&
+        getDistanceInMeters(
+          p.location?.latitude!,
+          p.location?.longitude!,
+          lat,
+          lng
+        ) <= MAX_DISTANCE_METERS
     );
 
-    return res.json(unclaimedPlaces);
+    return res.json(filteredPlaces);
   } catch (error) {
     handleError(error, res, "GET /places");
   }

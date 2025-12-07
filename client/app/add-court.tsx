@@ -1,5 +1,16 @@
 import { NativewindScrollView } from '@/components/NativewindScrollView';
 import { useLocation } from '@/components/providers/LocationProvider';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Button } from '@/components/ui/button';
 import {
@@ -313,13 +324,32 @@ export default function AddCourt() {
                 <Icon size={18} as={ArrowLeft} />
                 <Text>Back</Text>
               </Button>
-              <Button
-                disabled={isPending}
-                onPress={handleSubmit((values) => saveCourt(values))}
-                className="flex-1">
-                <Text>Submit</Text>
-                {isPending && <ActivityIndicator />}
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button className="flex-1">
+                    <Text>Submit</Text>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Make sure all the information is correct before adding the court.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>
+                      <Text>Cancel</Text>
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      disabled={isPending}
+                      onPress={handleSubmit((values) => saveCourt(values))}>
+                      <Text>Continue</Text>
+                      {isPending && <ActivityIndicator />}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </View>
           </Fragment>
         )}

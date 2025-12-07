@@ -1,0 +1,1 @@
+ALTER TABLE "user" ADD COLUMN "verified_court_creator" boolean DEFAULT true;

@@ -14,6 +14,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@react-native-community/netinfo": "^11.4.1",
     "@react-navigation/native": "^7.0.0",
+    "@rn-primitives/alert-dialog": "^1.2.0",
     "@rn-primitives/aspect-ratio": "^1.2.0",
     "@rn-primitives/avatar": "^1.2.0",
     "@rn-primitives/label": "^1.2.0",

@@ -66,6 +66,9 @@ export function RootNavigatior() {
   const { locationPermissionStatus, isLocationPermissionPending } = useLocation();
   const isOnboardingComplete = currentUserData?.user.onboardingStep === 'complete';
 
+  const pathname  = usePathname()
+  console.log(pathname)
+
   // Show loading screen while checking session OR (when user exists AND checking location)
   const isLoading = isSessionPending || (currentUserData !== null && isLocationPermissionPending);
 

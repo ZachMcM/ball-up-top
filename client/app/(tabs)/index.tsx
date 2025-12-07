@@ -24,7 +24,7 @@ import { useDebounce } from 'use-debounce';
 export default function Courts() {
   const { location, isLocationPending } = useLocation();
   const [isIndoor, setIsIndoor] = useState<boolean | undefined>(undefined);
-  const [isVerified, setIsVerified] = useState<boolean | undefined>(undefined);
+  const [isVerified, setIsVerified] = useState<boolean | undefined>(true);
   const [searchQuery, setSearchQuery] = useState<string | undefined>(undefined);
   const [debouncedSearchQuery] = useDebounce(searchQuery, 250);
 
