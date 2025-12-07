@@ -6,7 +6,7 @@ import { NAV_THEME, THEME } from '@/lib/theme';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
 import { focusManager, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Stack } from 'expo-router';
+import { Stack, usePathname, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import { useEffect } from 'react';
@@ -17,7 +17,7 @@ import { Toaster } from 'sonner-native';
 
 export {
   // Catch any errors thrown by the Layout component.
-  ErrorBoundary
+  ErrorBoundary,
 } from 'expo-router';
 
 const queryClient = new QueryClient();
@@ -63,15 +63,29 @@ export default function RootLayout() {
 
 export function RootNavigatior() {
   const { data: currentUserData, isPending: isSessionPending } = authClient.useSession();
-  const { hasLocationPermission } = useLocation();
+  const { hasLocationPermission, isCheckingLocationPermission } = useLocation();
   const isOnboardingComplete = currentUserData?.user.onboardingStep === 'complete';
+
+  const pathname = usePathname();
+
+  console.log(pathname);
+  console.log('Debug:', {
+    isSessionPending,
+    hasUser: currentUserData !== null,
+    isCheckingLocationPermission,
+    hasLocationPermission,
+    isOnboardingComplete,
+  });
+
+  // Show loading screen while checking session OR (when user exists AND checking location)
+  const isLoading = isSessionPending || (currentUserData !== null && isCheckingLocationPermission);
 
   return (
     <Stack>
       <Stack.Protected
         guard={
+          !isLoading &&
           currentUserData !== null &&
-          !isSessionPending &&
           isOnboardingComplete &&
           hasLocationPermission === true
         }>
@@ -85,11 +99,11 @@ export function RootNavigatior() {
           name="add-court"
           options={{
             presentation: 'modal',
-            title: "Add Court"
+            title: 'Add Court',
           }}
         />
       </Stack.Protected>
-      <Stack.Protected guard={currentUserData === null && !isSessionPending}>
+      <Stack.Protected guard={!isLoading && currentUserData === null}>
         <Stack.Screen
           name="(auth)/signin"
           options={{ title: 'Pull Up', headerBackButtonDisplayMode: 'minimal' }}
@@ -99,8 +113,7 @@ export function RootNavigatior() {
           options={{ title: 'Pull Up', headerBackButtonDisplayMode: 'minimal' }}
         />
       </Stack.Protected>
-      <Stack.Protected
-        guard={currentUserData !== null && !isSessionPending && !isOnboardingComplete}>
+      <Stack.Protected guard={!isLoading && currentUserData !== null && !isOnboardingComplete}>
         <Stack.Screen
           name="(onboarding)/name"
           options={{
@@ -125,8 +138,8 @@ export function RootNavigatior() {
       </Stack.Protected>
       <Stack.Protected
         guard={
+          !isLoading &&
           currentUserData !== null &&
-          !isSessionPending &&
           isOnboardingComplete &&
           hasLocationPermission === false
         }>
@@ -137,7 +150,7 @@ export function RootNavigatior() {
           }}
         />
       </Stack.Protected>
-      <Stack.Protected guard={isSessionPending || hasLocationPermission === null}>
+      <Stack.Protected guard={isLoading}>
         <Stack.Screen
           options={{
             headerShown: false,

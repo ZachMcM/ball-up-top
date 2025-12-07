@@ -10,7 +10,7 @@ import {
   MAX_DISTANCE_MI,
 } from "../config/courts";
 import { db } from "../db";
-import { court, courtSession } from "../db/schema";
+import { court, courtSession, user } from "../db/schema";
 
 export const courtsRoute = Router();
 
@@ -99,8 +99,14 @@ const CourtsParamsSchema = z.object({
   lng: z.coerce.number().min(-180).max(180),
   limit: z.coerce.number(),
   searchQuery: z.string().optional(),
-  indoor: z.coerce.boolean().optional(),
-  verified: z.coerce.boolean().optional(),
+  indoor: z
+    .string()
+    .transform((val) => val === "true")
+    .optional(),
+  verified: z
+    .string()
+    .transform((val) => val === "true")
+    .optional(),
 });
 
 courtsRoute.get("/courts", authMiddleware, async (req, res) => {
@@ -161,6 +167,22 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
       .groupBy(sql`court_id`)
       .as("activity_by_hour");
 
+    // Subquery to calculate average player overall rating and current active sessions
+    const sessionStats = db
+      .select({
+        courtId: courtSession.courtId,
+        avgPlayerOverall: sql<number>`
+          AVG(CASE WHEN ${courtSession.endTime} IS NULL THEN ${user.overall} END)
+        `.as("avg_player_overall"),
+        currentActiveSessions: sql<number>`
+          COUNT(CASE WHEN ${courtSession.endTime} IS NULL THEN 1 END)
+        `.as("current_active_sessions"),
+      })
+      .from(courtSession)
+      .innerJoin(user, eq(courtSession.userId, user.id))
+      .groupBy(courtSession.courtId)
+      .as("session_stats");
+
     const conditions = [sql`${distanceFormula} <= ${MAX_DISTANCE_MI}`];
 
     if (indoor !== undefined) {
@@ -191,9 +213,12 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
         image: court.image,
         distance: distanceFormula,
         activityGraph: activityByHour.activityData,
+        avgPlayerOverall: sql<number>`COALESCE(${sessionStats.avgPlayerOverall}, 0)`,
+        currentActiveSessions: sql<number>`COALESCE(${sessionStats.currentActiveSessions}, 0)`,
       })
       .from(court)
       .leftJoin(activityByHour, eq(court.id, activityByHour.courtId))
+      .leftJoin(sessionStats, eq(court.id, sessionStats.courtId))
       .where(and(...conditions));
 
     const courts = await query.orderBy(distanceFormula).limit(limit);
@@ -206,7 +231,10 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
 
 const PostCourtsBodySchema = z.object({
   name: z.string().min(1),
-  indoor: z.coerce.boolean(),
+  indoor: z
+    .string()
+    .transform((val) => val === "true")
+    .optional(),
   googlePlaceId: z.string(),
   lat: z.coerce.number().min(-90).max(90),
   lng: z.coerce.number().min(-180).max(180),

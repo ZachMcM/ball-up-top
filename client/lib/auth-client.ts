@@ -6,6 +6,9 @@ import { inferAdditionalFields } from 'better-auth/client/plugins';
 
 export const authClient = createAuthClient({
   baseURL: process.env.EXPO_PUBLIC_SERVER_URL,
+  sessionOptions: {
+    refetchOnWindowFocus: false,
+  },
   plugins: [
     expoClient({
       scheme: 'pull-up-client',

@@ -1,3 +1,4 @@
+import CourtCard from '@/components/CourtCard';
 import { NativewindFlatList } from '@/components/NativewindFlatList';
 import { NativewindScrollView } from '@/components/NativewindScrollView';
 import { useLocation } from '@/components/providers/LocationProvider';
@@ -68,7 +69,7 @@ export default function Courts() {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       className="flex-1">
-      <View className="flex w-full flex-col gap-6 p-6">
+      <View className="flex w-full flex-col gap-6 px-4 py-6">
         <View className="flex w-full flex-col gap-3">
           <View className="flex flex-row items-center gap-3">
             <Icon as={SlidersHorizontal} size={18} />
@@ -112,8 +113,10 @@ export default function Courts() {
           <ActivityIndicator />
         ) : courts && courts.length !== 0 ? (
           <NativewindFlatList
+            contentContainerClassName='flex flex-col gap-4 pb-32'
             data={courts}
-            renderItem={({ item }) => <Text>{JSON.stringify(item)}</Text>}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item }) => <CourtCard court={item} />}
             keyExtractor={(item) => item.id.toString()}
           />
         ) : (
@@ -126,7 +129,7 @@ export default function Courts() {
               </EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
-              <Button onPress={() => router.navigate("/add-court")} size="sm">
+              <Button onPress={() => router.navigate('/add-court')} size="sm">
                 <Text>Add Court</Text>
                 <Icon size={16} className="text-primary-foreground" as={PlusCircle} />
               </Button>

@@ -180,6 +180,8 @@ const BatchRatings = z.object({
   ),
 });
 
+// TODO add activity entry
+
 courtSessionsRoute.post(
   "/court-sessions/:sessionId/ratings",
   authMiddleware,
@@ -406,6 +408,8 @@ courtSessionsRoute.post(
     }
   }
 );
+
+// TODO add activity entry
 
 courtSessionsRoute.patch(
   "/court-sessions/:sessionId",

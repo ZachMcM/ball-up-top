@@ -12,7 +12,7 @@ export const PlaceSchema = z.object({
   formattedAddress: z.string(),
 });
 
-export interface Court {
+export interface CourtListEntry {
   id: number;
   name: string;
   aliases: string[];
@@ -24,4 +24,10 @@ export interface Court {
   verified: boolean;
   image: string;
   distance: number;
+  avgPlayerOverall: number;
+  currentActiveSessions: number;
+  activityGraph: {
+    hour: number;
+    avgSessions: number;
+  }[];
 }

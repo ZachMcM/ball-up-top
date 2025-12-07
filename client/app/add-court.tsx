@@ -126,7 +126,7 @@ export default function AddCourt() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       className="flex-1">
       <NativewindScrollView
-        contentContainerClassName="flex w-full flex-col gap-6 p-6"
+        contentContainerClassName="flex w-full flex-col gap-6 px-4 py-6"
         showsHorizontalScrollIndicator={false}>
         <View className="flex w-full flex-row items-center gap-1.5">
           <View className="h-1 flex-1 rounded-full bg-primary" />

@@ -4,8 +4,9 @@ import { createContext, ReactNode, useContext, useEffect, useState } from 'react
 import { AppState } from 'react-native';
 
 interface LocationContextValues {
-  hasLocationPermission: boolean | null;
+  hasLocationPermission: boolean;
   isRequestingPermission: boolean;
+  isCheckingLocationPermission: boolean;
   requestPermission: () => Promise<void>;
   location: Location.LocationObject | null;
   isLocationPending: boolean;
@@ -14,10 +15,20 @@ const LocationContext = createContext<LocationContextValues | null>(null);
 
 export function LocationProvider({ children }: { children: ReactNode }) {
   const { data: currentUserData, isPending: isSessionPending } = authClient.useSession();
-  const [hasLocationPermission, setHasLocationPermission] = useState<boolean | null>(null);
+  const [isCheckingLocationPermission, setIsCheckingLocationPermission] = useState(false);
+  const [hasLocationPermission, setHasLocationPermission] = useState(false);
   const [isRequestingPermission, setIsRequestingPermission] = useState(false);
   const [isLocationPending, setIsLocationPending] = useState(false);
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
+
+  // Reset location permission state when user logs out
+  useEffect(() => {
+    if (currentUserData === null) {
+      setIsCheckingLocationPermission(false);
+      setHasLocationPermission(false);
+      setLocation(null);
+    }
+  }, [currentUserData]);
 
   const updateLocation = async () => {
     const location = await Location.getCurrentPositionAsync();
@@ -37,8 +48,10 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   // Check location permission status
   useEffect(() => {
     const checkLocationPermission = async () => {
+      setIsCheckingLocationPermission(true);
       const { status } = await Location.getForegroundPermissionsAsync();
       setHasLocationPermission(status === 'granted');
+      setIsCheckingLocationPermission(false);
     };
 
     if (!isSessionPending && currentUserData?.user.onboardingStep === 'complete') {
@@ -83,10 +96,11 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     <LocationContext.Provider
       value={{
         isRequestingPermission,
-        requestPermission,
+        isCheckingLocationPermission,
         hasLocationPermission,
         location,
         isLocationPending,
+        requestPermission,
       }}>
       {children}
     </LocationContext.Provider>
