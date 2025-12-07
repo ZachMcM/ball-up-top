@@ -12,6 +12,8 @@ export const placesRoute = Router();
 
 const PlacesParamsSchema = z.object({
   searchQuery: z.string(),
+  lat: z.coerce.number().min(-90).max(90),
+  lng: z.coerce.number().min(-180).max(180),
 });
 
 placesRoute.get("/places", authMiddleware, async (req, res) => {
@@ -21,11 +23,21 @@ placesRoute.get("/places", authMiddleware, async (req, res) => {
       return res.status(400).json({ error: validQueryParams.error.message });
     }
 
-    const { searchQuery: textQuery } = validQueryParams.data;
+    const { searchQuery: textQuery, lat, lng } =
+      validQueryParams.data;
 
     const [response] = await googlePlacesClient.searchText(
       {
         textQuery,
+        locationBias: {
+          circle: {
+            center: {
+              latitude: lat,
+              longitude: lng,
+            },
+            radius: 50000,
+          },
+        },
         regionCode: "us",
         maxResultCount: MAX_RESULTS,
         languageCode: "en-US",

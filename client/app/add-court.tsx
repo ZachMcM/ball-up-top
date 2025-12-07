@@ -1,4 +1,5 @@
 import { NativewindScrollView } from '@/components/NativewindScrollView';
+import { useLocation } from '@/components/providers/LocationProvider';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,7 +18,7 @@ import { cn } from '@/lib/utils';
 import { Place, PlaceSchema } from '@/types/court';
 import { ImagePickerAssetSchema } from '@/types/imagePickerAsset';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Ban, HouseIcon, ImageIcon, MapPin, SunIcon } from 'lucide-react-native';
@@ -57,11 +58,15 @@ export default function AddCourt() {
   const { place: selectedPlace } = watch();
 
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const { mutate: saveCourt, isPending } = useMutation({
     mutationFn: async (values: z.infer<typeof AddCourtSchema>) => await postCourt(values),
     onSuccess: () => {
-      toast.success("Court successfully added! Please check to review it's verification status.");
+      queryClient.invalidateQueries({ queryKey: ['courts'] });
+      toast.success(
+        "Court successfully added! Please check back soon to review it's verification status."
+      );
       router.dismiss();
     },
     onError: (error) => {
@@ -70,15 +75,23 @@ export default function AddCourt() {
     },
   });
 
+  const { location } = useLocation();
+
   const { data: places, isPending: arePlacesPending } = useQuery({
     queryKey: [
       'places',
       {
         searchQuery: debouncedSearchQuery,
+        lat: location?.coords.latitude,
+        lng: location?.coords.longitude,
       },
     ],
     queryFn: async () => {
-      const courts = await getPlaces(debouncedSearchQuery);
+      const courts = await getPlaces(
+        debouncedSearchQuery,
+        location?.coords.latitude!,
+        location?.coords.longitude!
+      );
       return courts;
     },
     staleTime: 1000 * 60,
@@ -157,17 +170,19 @@ export default function AddCourt() {
                 ))}
               </View>
             ) : (
-              <Empty className="border border-dashed border-border">
-                <EmptyHeader>
-                  <EmptyMedia variant="icon" className="rounded-md">
-                    <Icon size={18} as={Ban} />
-                  </EmptyMedia>
-                  <EmptyTitle>No Places Found</EmptyTitle>
-                  <EmptyDescription>
-                    No places were found for that search. Try a different search.
-                  </EmptyDescription>
-                </EmptyHeader>
-              </Empty>
+              searchQuery.trim() !== '' && (
+                <Empty className="border border-dashed border-border">
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon" className="rounded-md">
+                      <Icon size={18} as={Ban} />
+                    </EmptyMedia>
+                    <EmptyTitle>No Places Found</EmptyTitle>
+                    <EmptyDescription>
+                      No places were found for that search. Try a different search.
+                    </EmptyDescription>
+                  </EmptyHeader>
+                </Empty>
+              )
             )}
           </Fragment>
         ) : (

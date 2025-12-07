@@ -63,12 +63,12 @@ export async function patchUserImage(asset: ImagePickerAsset) {
   });
 }
 
-export async function getPlaces(searchQuery: string): Promise<Place[]> {
-  if (searchQuery.trim() === '') {
+export async function getPlaces(searchQuery: string, lat: number, lng: number): Promise<Place[]> {
+  if (!searchQuery) {
     return [];
   }
   return await serverRequest({
-    endpoint: `/places?searchQuery=${searchQuery}`,
+    endpoint: `/places?searchQuery=${searchQuery}&lat=${lat}&lng=${lng}`,
     method: 'GET',
   });
 }

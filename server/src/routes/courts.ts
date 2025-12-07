@@ -15,8 +15,8 @@ import { court, courtSession } from "../db/schema";
 export const courtsRoute = Router();
 
 const CourtSessionPostBodySchema = z.object({
-  lat: z.number(),
-  lng: z.number(),
+  lat: z.number().min(-90).max(90),
+  lng: z.number().min(-180).max(180),
 });
 
 function getDistanceInMeters(
@@ -95,8 +95,8 @@ courtsRoute.post(
 );
 
 const CourtsParamsSchema = z.object({
-  lat: z.coerce.number(),
-  lng: z.coerce.number(),
+  lat: z.coerce.number().min(-90).max(90),
+  lng: z.coerce.number().min(-180).max(180),
   limit: z.coerce.number(),
   searchQuery: z.string().optional(),
   indoor: z.coerce.boolean().optional(),
@@ -208,8 +208,8 @@ const PostCourtsBodySchema = z.object({
   name: z.string().min(1),
   indoor: z.coerce.boolean(),
   googlePlaceId: z.string(),
-  lat: z.coerce.number(),
-  lng: z.coerce.number(),
+  lat: z.coerce.number().min(-90).max(90),
+  lng: z.coerce.number().min(-180).max(180),
   address: z.string(),
   aliases: z
     .string()
