@@ -8,8 +8,7 @@ import {
   EmptyContent,
   EmptyDescription,
   EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
+  EmptyTitle
 } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
@@ -17,7 +16,7 @@ import { Text } from '@/components/ui/text';
 import { getCourts } from '@/lib/endpoints';
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { Ban, PlusCircle, SlidersHorizontal } from 'lucide-react-native';
+import { PlusCircle, SlidersHorizontal } from 'lucide-react-native';
 import { useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { useDebounce } from 'use-debounce';
@@ -113,7 +112,7 @@ export default function Courts() {
           <ActivityIndicator />
         ) : courts && courts.length !== 0 ? (
           <NativewindFlatList
-            contentContainerClassName='flex flex-col gap-4 pb-32'
+            contentContainerClassName="flex flex-col gap-4 pb-32"
             data={courts}
             showsVerticalScrollIndicator={false}
             renderItem={({ item }) => <CourtCard court={item} />}

@@ -1,15 +1,13 @@
-import { Button } from '@/components/ui/button';
-import { Text } from '@/components/ui/text';
-import * as Location from 'expo-location';
-import { ActivityIndicator, Linking, View } from 'react-native';
-import { useState } from 'react';
-import { AlertCircleIcon, AlertTriangle, MapPin } from 'lucide-react-native';
-import { Icon } from '@/components/ui/icon';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useLocation } from '@/components/providers/LocationProvider';
+import { Alert, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
+import { Text } from '@/components/ui/text';
+import { AlertTriangle, MapPin } from 'lucide-react-native';
+import { ActivityIndicator, Linking, View } from 'react-native';
 
 export default function LocationPermission() {
-  const { hasLocationPermission, requestPermission, isRequestingPermission } = useLocation()
+  const { locationPermissionStatus, requestPermission, isRequestingPermission } = useLocation();
 
   return (
     <View className="flex w-full flex-1 flex-col items-center justify-center gap-4 p-8">
@@ -22,7 +20,7 @@ export default function LocationPermission() {
           We need your location to show you nearby basketball courts and help you find games.
         </Text>
       </View>
-      {!hasLocationPermission ? (
+      {locationPermissionStatus === 'denied' ? (
         <>
           <Alert variant="destructive" icon={AlertTriangle}>
             <AlertTitle>

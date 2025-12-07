@@ -63,22 +63,11 @@ export default function RootLayout() {
 
 export function RootNavigatior() {
   const { data: currentUserData, isPending: isSessionPending } = authClient.useSession();
-  const { hasLocationPermission, isCheckingLocationPermission } = useLocation();
+  const { locationPermissionStatus, isLocationPermissionPending } = useLocation();
   const isOnboardingComplete = currentUserData?.user.onboardingStep === 'complete';
 
-  const pathname = usePathname();
-
-  console.log(pathname);
-  console.log('Debug:', {
-    isSessionPending,
-    hasUser: currentUserData !== null,
-    isCheckingLocationPermission,
-    hasLocationPermission,
-    isOnboardingComplete,
-  });
-
   // Show loading screen while checking session OR (when user exists AND checking location)
-  const isLoading = isSessionPending || (currentUserData !== null && isCheckingLocationPermission);
+  const isLoading = isSessionPending || (currentUserData !== null && isLocationPermissionPending);
 
   return (
     <Stack>
@@ -87,7 +76,7 @@ export function RootNavigatior() {
           !isLoading &&
           currentUserData !== null &&
           isOnboardingComplete &&
-          hasLocationPermission === true
+          locationPermissionStatus === 'granted'
         }>
         <Stack.Screen
           name="(tabs)"
@@ -141,7 +130,7 @@ export function RootNavigatior() {
           !isLoading &&
           currentUserData !== null &&
           isOnboardingComplete &&
-          hasLocationPermission === false
+          locationPermissionStatus !== 'granted'
         }>
         <Stack.Screen
           name="location-permission"

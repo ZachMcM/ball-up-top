@@ -4,11 +4,13 @@ import { createContext, ReactNode, useContext, useEffect, useState } from 'react
 import { AppState } from 'react-native';
 
 interface LocationContextValues {
-  hasLocationPermission: boolean;
+  locationPermissionStatus: 'granted' | 'denied' | 'undetermined' | null;
   isRequestingPermission: boolean;
   isCheckingLocationPermission: boolean;
+  isLocationPermissionPending: boolean;
   requestPermission: () => Promise<void>;
   location: Location.LocationObject | null;
+  isUpdatingLocation: boolean;
   isLocationPending: boolean;
 }
 const LocationContext = createContext<LocationContextValues | null>(null);
@@ -16,41 +18,47 @@ const LocationContext = createContext<LocationContextValues | null>(null);
 export function LocationProvider({ children }: { children: ReactNode }) {
   const { data: currentUserData, isPending: isSessionPending } = authClient.useSession();
   const [isCheckingLocationPermission, setIsCheckingLocationPermission] = useState(false);
-  const [hasLocationPermission, setHasLocationPermission] = useState(false);
+  const [locationPermissionStatus, setlocationPermissionStatus] = useState<
+    null | 'granted' | 'denied' | 'undetermined'
+  >(null);
   const [isRequestingPermission, setIsRequestingPermission] = useState(false);
-  const [isLocationPending, setIsLocationPending] = useState(false);
+  const [isUpdatingLocation, setIsUpdatingLocation] = useState(false);
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
+
+  const isLocationPermissionPending =
+    isCheckingLocationPermission && locationPermissionStatus === null;
+
+  const isLocationPending = isUpdatingLocation && location === null;
 
   // Reset location permission state when user logs out
   useEffect(() => {
     if (currentUserData === null) {
-      setIsCheckingLocationPermission(false);
-      setHasLocationPermission(false);
+      setlocationPermissionStatus(null);
       setLocation(null);
     }
   }, [currentUserData]);
 
   const updateLocation = async () => {
+    setIsUpdatingLocation(true);
     const location = await Location.getCurrentPositionAsync();
     setLocation(location);
+    setIsUpdatingLocation(false);
   };
 
   useEffect(() => {
-    if (hasLocationPermission) {
+    if (locationPermissionStatus == 'granted') {
       (async () => {
-        setIsLocationPending(true);
         await updateLocation();
-        setIsLocationPending(false);
       })();
     }
-  }, [isSessionPending, currentUserData?.user.onboardingStep, hasLocationPermission]);
+  }, [isSessionPending, currentUserData?.user.onboardingStep, locationPermissionStatus]);
 
   // Check location permission status
   useEffect(() => {
     const checkLocationPermission = async () => {
       setIsCheckingLocationPermission(true);
       const { status } = await Location.getForegroundPermissionsAsync();
-      setHasLocationPermission(status === 'granted');
+      setlocationPermissionStatus(status);
       setIsCheckingLocationPermission(false);
     };
 
@@ -59,7 +67,6 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       const subscription = AppState.addEventListener('change', (state) => {
         if (state === 'active') {
           checkLocationPermission();
-          updateLocation();
         }
       });
       return () => subscription.remove();
@@ -70,17 +77,17 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     setIsRequestingPermission(true);
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
-      setHasLocationPermission(status === 'granted');
+      setlocationPermissionStatus(status);
     } catch (error) {
       console.error('Error requesting location permission:', error);
-      setHasLocationPermission(false);
+      setlocationPermissionStatus('undetermined');
     } finally {
       setIsRequestingPermission(false);
     }
   };
   // In LocationProvider - update every 5 minutes while app is active
   useEffect(() => {
-    if (!hasLocationPermission) return;
+    if (locationPermissionStatus === 'denied') return;
 
     const interval = setInterval(
       async () => {
@@ -90,15 +97,17 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     ); // 5 minutes
 
     return () => clearInterval(interval);
-  }, [hasLocationPermission]);
+  }, [locationPermissionStatus]);
 
   return (
     <LocationContext.Provider
       value={{
         isRequestingPermission,
         isCheckingLocationPermission,
-        hasLocationPermission,
+        isLocationPermissionPending,
+        locationPermissionStatus,
         location,
+        isUpdatingLocation,
         isLocationPending,
         requestPermission,
       }}>

@@ -21,11 +21,14 @@ export default function Verify() {
   }
 
   async function getNewOtp() {
-    const { data, error } = await authClient.emailOtp.sendVerificationOtp({
+    const { error } = await authClient.emailOtp.sendVerificationOtp({
       email,
       type: 'sign-in',
     });
-    console.log('Response:', data, error);
+    if (error) {
+      console.log('Error:', error);
+      toast.error(error.message ?? 'Error sending OTP');
+    }
   }
 
   const [otp, setOtp] = useState('');

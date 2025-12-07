@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
+import { toast } from 'sonner-native';
 import * as z from 'zod';
 
 const EmailSchema = z.object({
@@ -26,11 +27,14 @@ export default function Index() {
   };
 
   async function sendOTP(email: string) {
-    const { data, error } = await authClient.emailOtp.sendVerificationOtp({
+    const { error } = await authClient.emailOtp.sendVerificationOtp({
       email,
       type: 'sign-in',
     });
-    console.log('Response:', data, error);
+    if (error) {
+      console.log('Error:', error);
+      toast.error(error.message ?? 'Error sending OTP');
+    }
   }
 
   return (
