@@ -29,14 +29,6 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     isCheckingLocationPermission && locationPermissionStatus === null;
 
   const isLocationPending = isUpdatingLocation && location === null;
-  // Reset location permission state when user logs out
-
-  useEffect(() => {
-    if (currentUserData === null) {
-      setlocationPermissionStatus(null);
-      setLocation(null);
-    }
-  }, [currentUserData]);
 
   const updateLocation = async () => {
     setIsUpdatingLocation(true);

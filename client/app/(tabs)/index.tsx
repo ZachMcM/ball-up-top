@@ -8,7 +8,7 @@ import {
   EmptyContent,
   EmptyDescription,
   EmptyHeader,
-  EmptyTitle
+  EmptyTitle,
 } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
@@ -73,6 +73,7 @@ export default function Courts() {
           <View className="flex flex-row items-center gap-3">
             <Icon as={SlidersHorizontal} size={18} />
             <NativewindScrollView
+              keyboardShouldPersistTaps="handled"
               horizontal
               contentContainerClassName="flex flex-row items-center gap-1.5"
               showsHorizontalScrollIndicator={false}>
@@ -128,7 +129,7 @@ export default function Courts() {
               </EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
-              <Button onPress={() => router.navigate('/add-court')} size="sm">
+              <Button onPress={() => router.navigate('/add-court')}>
                 <Text>Add Court</Text>
                 <Icon size={16} className="text-primary-foreground" as={PlusCircle} />
               </Button>

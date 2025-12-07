@@ -6,7 +6,9 @@ export default function Activity() {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       className="flex-1 items-center">
-      <NativewindScrollView contentContainerClassName="flex w-full flex-col gap-6 px-4 py-6"></NativewindScrollView>
+      <NativewindScrollView
+        contentContainerClassName="flex w-full flex-col gap-6 px-4 py-6"
+        keyboardShouldPersistTaps="handled"></NativewindScrollView>
     </KeyboardAvoidingView>
   );
 }

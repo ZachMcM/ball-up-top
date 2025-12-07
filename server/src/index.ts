@@ -20,6 +20,6 @@ app.use(express.json());
 app.use(limiter);
 app.use("/", routes);
 
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, () => {
   logger.info(`Server listening on port ${PORT} in ${process.env.NODE_ENV}`);
 });

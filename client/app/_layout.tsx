@@ -96,11 +96,7 @@ export function RootNavigatior() {
       </Stack.Protected>
       <Stack.Protected guard={!isLoading && currentUserData === null}>
         <Stack.Screen
-          name="(auth)/signin"
-          options={{ title: 'Pull Up', headerBackButtonDisplayMode: 'minimal' }}
-        />
-        <Stack.Screen
-          name="(auth)/verify-otp"
+          name="auth"
           options={{ title: 'Pull Up', headerBackButtonDisplayMode: 'minimal' }}
         />
       </Stack.Protected>

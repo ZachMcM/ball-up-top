@@ -38,6 +38,7 @@ import { Controller, useForm } from 'react-hook-form';
 import {
   ActivityIndicator,
   Image,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -125,6 +126,7 @@ export default function AddCourt() {
   }
 
   function selectPlace(place: Place) {
+    Keyboard.dismiss();
     setValue('place', place);
     setValue('name', place.name);
     setStep(1);
@@ -141,7 +143,8 @@ export default function AddCourt() {
       className="flex-1">
       <NativewindScrollView
         contentContainerClassName="flex w-full flex-col gap-6 px-4 py-6"
-        showsHorizontalScrollIndicator={false}>
+        showsHorizontalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled">
         <View className="flex w-full flex-row items-center gap-1.5">
           <View className="h-1 flex-1 rounded-full bg-primary" />
           <View className={cn('h-1 flex-1 rounded-full bg-muted', step === 1 && 'bg-primary')} />
@@ -345,10 +348,9 @@ export default function AddCourt() {
                   <AlertDialogFooter className="flex flex-row items-center">
                     <AlertDialogCancel>
                       <Text>Cancel</Text>
-                      <Icon size={18} as={XIcon} />
                     </AlertDialogCancel>
                     <AlertDialogAction onPress={handleSubmit((values) => saveCourt(values))}>
-                      <Text>Save</Text>
+                      <Text>Confirm</Text>
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
