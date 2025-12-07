@@ -1,15 +1,46 @@
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { and, eq, sql } from "drizzle-orm";
 import { Router } from "express";
-import { authMiddleware, upload } from "../../utils/middleware";
+import * as z from "zod";
 import { handleError } from "../../utils/handleError";
+import { authMiddleware, upload } from "../../utils/middleware";
+import { r2 } from "../../utils/r2";
+import {
+  MAX_DISTANCE_METERS_FOR_CHECK_IN,
+  MAX_DISTANCE_MI,
+} from "../config/courts";
 import { db } from "../db";
 import { court, courtSession } from "../db/schema";
-import { eq, sql } from "drizzle-orm";
-import * as z from "zod";
-import { MAX_DISTANCE_MI } from "../config/courts";
-import { r2 } from "../../utils/r2";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
 
 export const courtsRoute = Router();
+
+const CourtSessionPostBodySchema = z.object({
+  lat: z.number(),
+  lng: z.number(),
+});
+
+function getDistanceInMeters(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number
+): number {
+  const R = 6371e3;
+  const phi_1 = (lat1 * Math.PI) / 180;
+  const phi_2 = (lat2 * Math.PI) / 180;
+  const delta_phi = ((lat2 - lat1) * Math.PI) / 180;
+  const delta_lambda = ((lng2 - lng1) * Math.PI) / 180;
+
+  const a =
+    Math.sin(delta_phi / 2) * Math.sin(delta_phi / 2) +
+    Math.cos(phi_1) *
+      Math.cos(phi_2) *
+      Math.sin(delta_lambda / 2) *
+      Math.sin(delta_lambda / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c;
+}
 
 courtsRoute.post(
   "/courts/:courtId/sessions",
@@ -20,6 +51,35 @@ courtsRoute.post(
 
       if (!Number.isInteger(courtId)) {
         return res.status(400).json({ error: "Court ID is not an integer." });
+      }
+
+      const validBody = CourtSessionPostBodySchema.safeParse(req.body);
+      if (validBody.error) {
+        return res.status(400).json({ error: validBody.error.message });
+      }
+
+      const { lat, lng } = validBody.data;
+
+      const targetCourt = await db.query.court.findFirst({
+        where: eq(court.id, courtId),
+      });
+
+      if (!targetCourt) {
+        return res.status(404).json({ error: "No court was found" });
+      }
+
+      const distance = getDistanceInMeters(
+        targetCourt.lat,
+        targetCourt.lng,
+        lat,
+        lng
+      );
+
+      if (distance > MAX_DISTANCE_METERS_FOR_CHECK_IN) {
+        return res.status(400).json({
+          error: "You must be at the court to check in",
+          distance: Math.round(distance),
+        });
       }
 
       await db.insert(courtSession).values({
@@ -65,7 +125,61 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
       )
     )`;
 
-    let query = db
+    // Subquery to calculate average sessions per hour of day (all 24 hours represented)
+    const activityByHour = db
+      .select({
+        courtId: sql<number>`court_id`.as("court_id"),
+        activityData: sql<string>`json_agg(
+          json_build_object(
+            'hour', hour,
+            'avgSessions', COALESCE(avg_count, 0)
+          )
+          ORDER BY hour
+        )`.as("activity_data"),
+      })
+      .from(
+        sql`
+        (
+          SELECT
+            c.id as court_id,
+            hours.hour,
+            CASE
+              WHEN COUNT(cs.id) > 0 THEN
+                COUNT(cs.id)::float / COUNT(DISTINCT DATE(cs.start_time))
+              ELSE 0
+            END as avg_count
+          FROM
+            court c
+            CROSS JOIN generate_series(0, 23) as hours(hour)
+            LEFT JOIN court_session cs ON
+              cs.court_id = c.id AND
+              EXTRACT(HOUR FROM cs.start_time)::integer = hours.hour
+          GROUP BY c.id, hours.hour
+        ) as hourly_data
+      `
+      )
+      .groupBy(sql`court_id`)
+      .as("activity_by_hour");
+
+    const conditions = [sql`${distanceFormula} <= ${MAX_DISTANCE_MI}`];
+
+    if (indoor !== undefined) {
+      conditions.push(eq(court.indoor, indoor));
+    }
+    if (verified !== undefined) {
+      conditions.push(eq(court.verified, verified));
+    }
+    if (searchQuery) {
+      conditions.push(
+        sql`(
+          ${court.name} ILIKE ${`%${searchQuery}%`} OR
+          ${court.address} ILIKE ${`%${searchQuery}%`} OR
+          ${sql`array_to_string(${court.aliases}, ' ')`} ILIKE ${`%${searchQuery}%`}
+        )`
+      );
+    }
+
+    const query = db
       .select({
         id: court.id,
         name: court.name,
@@ -76,27 +190,11 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
         verified: court.verified,
         image: court.image,
         distance: distanceFormula,
+        activityGraph: activityByHour.activityData,
       })
       .from(court)
-      .where(sql`${distanceFormula} <= ${MAX_DISTANCE_MI}`)
-      .$dynamic();
-
-    if (indoor !== undefined) {
-      query = query.where(eq(court.indoor, indoor));
-    }
-    if (verified !== undefined) {
-      query = query.where(eq(court.verified, verified));
-    }
-
-    if (searchQuery) {
-      query = query.where(
-        sql`(
-          ${court.name} ILIKE ${`%${searchQuery}%`} OR
-          ${court.address} ILIKE ${`%${searchQuery}%`} OR
-          ${sql`array_to_string(${court.aliases}, ' ')`} ILIKE ${`%${searchQuery}%`}
-        )`
-      );
-    }
+      .leftJoin(activityByHour, eq(court.id, activityByHour.courtId))
+      .where(and(...conditions));
 
     const courts = await query.orderBy(distanceFormula).limit(limit);
 
