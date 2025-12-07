@@ -63,14 +63,16 @@ export default function RootLayout() {
 
 export function RootNavigatior() {
   const { data: currentUserData, isPending: isSessionPending } = authClient.useSession();
-  const { locationPermissionStatus, isLocationPermissionPending } = useLocation();
+  const { locationPermissionStatus } = useLocation();
   const isOnboardingComplete = currentUserData?.user.onboardingStep === 'complete';
 
-  const pathname  = usePathname()
-  console.log(pathname)
+  const pathname = usePathname();
+  console.log(pathname);
 
-  // Show loading screen while checking session OR (when user exists AND checking location)
-  const isLoading = isSessionPending || (currentUserData !== null && isLocationPermissionPending);
+  // Show loading screen while checking session OR (when user exists, completed onboarding, AND location permission hasn't been checked yet)
+  const isLoading =
+    isSessionPending ||
+    (currentUserData !== null && isOnboardingComplete && locationPermissionStatus === null);
 
   return (
     <Stack>
