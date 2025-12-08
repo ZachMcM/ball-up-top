@@ -1,6 +1,6 @@
 import { ImagePickerAsset } from 'expo-image-picker';
 import { authClient } from './auth-client';
-import { Court, Place } from '@/types/court';
+import { CourtListEntry, Place } from '@/types/court';
 import * as z from 'zod';
 import { AddCourtSchema } from '@/app/add-court';
 
@@ -87,7 +87,7 @@ export async function getCourts({
   searchQuery?: string;
   indoor?: boolean;
   verified?: boolean;
-}): Promise<Court[]> {
+}): Promise<CourtListEntry[]> {
   const params = new URLSearchParams();
 
   params.append('lat', lat.toString());

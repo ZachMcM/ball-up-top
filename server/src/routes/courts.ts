@@ -1,14 +1,11 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { Router } from "express";
 import * as z from "zod";
 import { handleError } from "../../utils/handleError";
 import { authMiddleware, upload } from "../../utils/middleware";
 import { r2 } from "../../utils/r2";
-import {
-  MAX_DISTANCE_METERS_FOR_CHECK_IN,
-  MAX_DISTANCE_MI,
-} from "../config/courts";
+import { MAX_DISTANCE_FOR_CHECK_IN, MAX_DISTANCE } from "../config/courts";
 import { db } from "../db";
 import { court, courtSession, user } from "../db/schema";
 import { getDistanceInMeters } from "../../utils/getDistanceMeters";
@@ -46,6 +43,20 @@ courtsRoute.post(
         return res.status(404).json({ error: "No court was found" });
       }
 
+      const preexistingSession = await db.query.courtSession.findFirst({
+        where: and(
+          eq(courtSession.courtId, courtId),
+          isNull(courtSession.endTime),
+          eq(courtSession.userId, res.locals.userId!)
+        ),
+      });
+
+      if (preexistingSession) {
+        return res.status(409).json({
+          error: "You already have an active session. Please checkout first.",
+        });
+      }
+
       const distance = getDistanceInMeters(
         targetCourt.lat,
         targetCourt.lng,
@@ -53,7 +64,7 @@ courtsRoute.post(
         lng
       );
 
-      if (distance > MAX_DISTANCE_METERS_FOR_CHECK_IN) {
+      if (distance > MAX_DISTANCE_FOR_CHECK_IN) {
         return res.status(400).json({
           error: "You must be at the court to check in",
           distance: Math.round(distance),
@@ -100,7 +111,7 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
     // Haversine formula for calculating distance on Earth's surface
     // Returns distance in miles
     const distanceFormula = sql<number>`(
-      3959 * acos(
+      6371000 * acos(
         cos(radians(${lat})) *
         cos(radians(${court.lat})) *
         cos(radians(${court.lng}) - radians(${lng})) +
@@ -161,7 +172,7 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
       .groupBy(courtSession.courtId)
       .as("session_stats");
 
-    const conditions = [sql`${distanceFormula} <= ${MAX_DISTANCE_MI}`];
+    const conditions = [sql`${distanceFormula} <= ${MAX_DISTANCE}`];
 
     if (indoor !== undefined) {
       conditions.push(eq(court.indoor, indoor));

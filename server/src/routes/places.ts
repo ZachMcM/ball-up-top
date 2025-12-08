@@ -3,7 +3,7 @@ import * as z from "zod";
 import { googlePlacesClient } from "../../utils/googlePlacesClient";
 import { handleError } from "../../utils/handleError";
 import { authMiddleware } from "../../utils/middleware";
-import { MAX_RESULTS, MAX_DISTANCE_METERS } from "../config/places";
+import { MAX_RESULTS, MAX_DISTANCE } from "../config/places";
 import { db } from "../db";
 import { inArray } from "drizzle-orm";
 import { court } from "../db/schema";
@@ -38,6 +38,7 @@ placesRoute.get("/places", authMiddleware, async (req, res) => {
             radius: 50000,
           },
         },
+        // TODO
         regionCode: "us",
         maxResultCount: MAX_RESULTS,
         languageCode: "en-US",
@@ -76,7 +77,7 @@ placesRoute.get("/places", authMiddleware, async (req, res) => {
           p.location?.longitude!,
           lat,
           lng
-        ) <= MAX_DISTANCE_METERS
+        ) <= MAX_DISTANCE
     );
 
     return res.json(filteredPlaces);
