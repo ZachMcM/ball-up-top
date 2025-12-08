@@ -1,16 +1,59 @@
 import { CourtListEntry } from '@/types/court';
 import { THEME } from '@/lib/theme';
 import { MapPin, UsersIcon } from 'lucide-react-native';
-import { Image, View } from 'react-native';
+import { Image, Platform, Pressable, View } from 'react-native';
 import { AspectRatio } from './ui/aspect-ratio';
 import { Icon } from './ui/icon';
 import { Text } from './ui/text';
 import { LineChart } from 'react-native-gifted-charts';
 import { useColorScheme } from 'nativewind';
-import { getNormalizedTime } from '@/lib/utils';
+import { Linking } from 'react-native';
 
 export default function CourtCard({ court }: { court: CourtListEntry }) {
   const { colorScheme } = useColorScheme();
+
+  const openDirections = () => {
+    const encodedAddress = encodeURIComponent(court.address);
+
+    const url = Platform.select({
+      ios: `maps:0,0?q=${encodedAddress}`, // Apple Maps
+      android: `geo:0,0?q=${encodedAddress}`, // Google Maps
+    });
+
+    Linking.openURL(url!);
+  };
+
+  const getBusiestHour = () => {
+    let maxIndex = 0;
+    court.activityGraph.forEach(({ avgSessions }, index) => {
+      if (court.activityGraph[maxIndex].avgSessions < avgSessions) {
+        maxIndex = index;
+      }
+    });
+
+    return maxIndex;
+  };
+
+  const getLabel = (hour: number) => {
+    switch (hour + 1) {
+      case 8:
+        return '8am';
+      case 10:
+        return '10am';
+      case 12:
+        return '12pm';
+      case 14:
+        return '2pm';
+      case 16:
+        return '4pm';
+      case 18:
+        return '6pm';
+      case 20:
+        return '8pm';
+      default:
+        return undefined;
+    }
+  };
 
   return (
     <View className="flex flex-col gap-4 rounded-xl border border-border p-4">
@@ -25,10 +68,9 @@ export default function CourtCard({ court }: { court: CourtListEntry }) {
         </AspectRatio>
         <View className="flex flex-1 flex-col">
           <Text className="font-bold">{court.name}</Text>
-          {/* TODO link to maps */}
-          <Text className="text-sm font-medium text-muted-foreground underline">
-            {court.address}
-          </Text>
+          <Pressable onPress={() => openDirections()}>
+            <Text className="text-sm font-medium text-muted-foreground">{court.address}</Text>
+          </Pressable>
         </View>
       </View>
       <View className="flex flex-row items-center justify-between">
@@ -53,22 +95,32 @@ export default function CourtCard({ court }: { court: CourtListEntry }) {
           </View>
         </View>
       </View>
+      <Text className="text-xs font-medium text-muted-foreground">Average activity</Text>
       <LineChart
-        curved
+        isAnimated
         hideYAxisText
-        areaChart
-        height={64}
-        thickness={3}
+        height={48}
+        thickness={2}
         color={THEME[colorScheme!].primary}
-        hideDataPoints
+        dataPointsColor={THEME[colorScheme!].primary}
+        dataPointsRadius={2}
         hideRules
-        scrollToIndex={11}
+        scrollToIndex={getBusiestHour()}
         xAxisThickness={0}
         yAxisThickness={0}
-        xAxisLabelTextStyle={{ color: THEME[colorScheme!].primary }}
+        xAxisLabelTextStyle={{
+          color: THEME[colorScheme!].mutedForeground,
+          fontWeight: 500,
+          width: 96,
+        }}
         data={court.activityGraph.map((entry, i) => ({
-          value: i == 0 ? 0 : Math.random() * 50,
-          label: getNormalizedTime(entry.hour),
+          value:
+            process.env.NODE_ENV == 'development'
+              ? i == 0
+                ? 0
+                : Math.random() * 50
+              : entry.avgSessions,
+          label: getLabel(entry.hour),
         }))}
       />
     </View>
