@@ -8,7 +8,7 @@ import { r2 } from "../../utils/r2";
 import { MAX_DISTANCE_FOR_CHECK_IN, MAX_DISTANCE } from "../config/courts";
 import { db } from "../db";
 import { court, courtSession, user } from "../db/schema";
-import { getDistanceInMeters } from "../../utils/getDistanceMeters";
+import { getDistanceInMiles } from "../../utils/getDistanceMiles";
 
 export const courtsRoute = Router();
 
@@ -57,7 +57,7 @@ courtsRoute.post(
         });
       }
 
-      const distance = getDistanceInMeters(
+      const distance = getDistanceInMiles(
         targetCourt.lat,
         targetCourt.lng,
         lat,
@@ -108,10 +108,10 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
     const { lat, lng, limit, searchQuery, indoor, verified } =
       validQueryParams.data;
 
-    // Haversine formula for calculating distance on Earth's surface
-    // Returns distance in miles
+    // Spherical Law of Cosines formula for calculating distance on Earth's surface
+    // Returns distance in miles (Earth's radius = 3958.8 miles)
     const distanceFormula = sql<number>`(
-      6371000 * acos(
+      3958.8 * acos(
         cos(radians(${lat})) *
         cos(radians(${court.lat})) *
         cos(radians(${court.lng}) - radians(${lng})) +
@@ -215,6 +215,19 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
     res.json(courts);
   } catch (error) {
     handleError(error, res, "GET /courts");
+  }
+});
+
+courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
+  try {
+    const courtId = req.params.id;
+    if (!Number.isInteger(courtId)) {
+      return res.status(400).json({ error: "Invalid court id." });
+    }
+
+    
+  } catch (error) {
+    handleError(error, res, "GET /courts/:id");
   }
 });
 

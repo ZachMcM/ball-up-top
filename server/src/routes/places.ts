@@ -7,7 +7,7 @@ import { MAX_RESULTS, MAX_DISTANCE } from "../config/places";
 import { db } from "../db";
 import { inArray } from "drizzle-orm";
 import { court } from "../db/schema";
-import { getDistanceInMeters } from "../../utils/getDistanceMeters";
+import { getDistanceInMiles } from "../../utils/getDistanceMiles";
 
 export const placesRoute = Router();
 
@@ -72,7 +72,7 @@ placesRoute.get("/places", authMiddleware, async (req, res) => {
     const filteredPlaces = places.filter(
       (p) =>
         !preexistingPlaceIds.includes(p.id!) &&
-        getDistanceInMeters(
+        getDistanceInMiles(
           p.location?.latitude!,
           p.location?.longitude!,
           lat,

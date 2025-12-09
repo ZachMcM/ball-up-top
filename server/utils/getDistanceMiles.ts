@@ -1,10 +1,10 @@
-export function getDistanceInMeters(
+export function getDistanceInMiles(
   lat1: number,
   lng1: number,
   lat2: number,
   lng2: number
 ): number {
-  const R = 6371e3;
+  const R = 3958.8; // Earth's radius in miles
   const phi_1 = (lat1 * Math.PI) / 180;
   const phi_2 = (lat2 * Math.PI) / 180;
   const delta_phi = ((lat2 - lat1) * Math.PI) / 180;

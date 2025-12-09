@@ -35,24 +35,11 @@ export default function CourtCard({ court }: { court: CourtListEntry }) {
   };
 
   const getLabel = (hour: number) => {
-    switch (hour + 1) {
-      case 8:
-        return '8am';
-      case 10:
-        return '10am';
-      case 12:
-        return '12pm';
-      case 14:
-        return '2pm';
-      case 16:
-        return '4pm';
-      case 18:
-        return '6pm';
-      case 20:
-        return '8pm';
-      default:
-        return undefined;
+    if (hour % 2 !== 0) {
+      return undefined;
     }
+
+    return hour === 12 ? '12pm' : hour === 0 ? '12am' : hour > 12 ? `${hour - 12}pm` : `${hour}am`;
   };
 
   return (
@@ -69,7 +56,7 @@ export default function CourtCard({ court }: { court: CourtListEntry }) {
         <View className="flex flex-1 flex-col">
           <Text className="font-bold">{court.name}</Text>
           <Pressable onPress={() => openDirections()}>
-            <Text className="text-sm font-medium text-muted-foreground">{court.address}</Text>
+            <Text className="text-sm font-medium text-muted-foreground underline">{court.address}</Text>
           </Pressable>
         </View>
       </View>
@@ -99,7 +86,7 @@ export default function CourtCard({ court }: { court: CourtListEntry }) {
       <LineChart
         isAnimated
         hideYAxisText
-        height={48}
+        height={42}
         thickness={2}
         color={THEME[colorScheme!].primary}
         dataPointsColor={THEME[colorScheme!].primary}
