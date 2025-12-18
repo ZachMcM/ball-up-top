@@ -37,7 +37,7 @@ const HeightSchema = z.object({
   height: z.string().min(1, 'Please select your height'),
 });
 
-export default function Height() {
+export default function HeightPage() {
   const { data: currentUserData } = authClient.useSession();
 
   const { control, handleSubmit } = useForm<z.infer<typeof HeightSchema>>({

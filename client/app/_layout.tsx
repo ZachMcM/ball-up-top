@@ -1,3 +1,4 @@
+import { CourtSessionProvider } from '@/components/providers/CourtSessionProvider';
 import { LocationProvider, useLocation } from '@/components/providers/LocationProvider';
 import '@/global.css';
 import { authClient } from '@/lib/auth-client';
@@ -41,21 +42,23 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
         <LocationProvider>
-          <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
-            <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-            <RootNavigatior />
-            <Toaster
-              toastOptions={{
-                style: {
-                  backgroundColor: THEME[colorScheme!].popover,
-                  borderColor: THEME[colorScheme!].border,
-                  borderWidth: 1,
-                },
-              }}
-            />
-            <PortalHost />
-          </ThemeProvider>
+          <CourtSessionProvider>
+            <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+              <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+              <RootNavigatior />
+            </ThemeProvider>
+          </CourtSessionProvider>
         </LocationProvider>
+        <Toaster
+          toastOptions={{
+            style: {
+              backgroundColor: THEME[colorScheme!].popover,
+              borderColor: THEME[colorScheme!].border,
+              borderWidth: 1,
+            },
+          }}
+        />
+        <PortalHost />
       </QueryClientProvider>
     </GestureHandlerRootView>
   );
@@ -84,13 +87,6 @@ export function RootNavigatior() {
           name="(tabs)"
           options={{
             headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="add-court"
-          options={{
-            presentation: 'modal',
-            title: 'Add Court',
           }}
         />
       </Stack.Protected>

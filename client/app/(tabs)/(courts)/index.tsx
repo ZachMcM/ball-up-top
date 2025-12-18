@@ -15,13 +15,13 @@ import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { getCourts } from '@/lib/endpoints';
 import { useQuery } from '@tanstack/react-query';
-import { router } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { PlusCircle, SlidersHorizontal } from 'lucide-react-native';
 import { useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { useDebounce } from 'use-debounce';
 
-export default function Courts() {
+export default function CourtsPage() {
   const { location, isLocationPending } = useLocation();
   const [isIndoor, setIsIndoor] = useState<boolean | undefined>(undefined);
   const [isVerified, setIsVerified] = useState<boolean | undefined>(true);
@@ -70,42 +70,38 @@ export default function Courts() {
       className="flex-1">
       <View className="flex w-full flex-col gap-6 px-4 py-6">
         <View className="flex w-full flex-col gap-3">
-          <View className="flex flex-row items-center gap-3">
-            <Icon as={SlidersHorizontal} size={18} />
-            <NativewindScrollView
-              keyboardShouldPersistTaps="handled"
-              horizontal
-              contentContainerClassName="flex flex-row items-center gap-1.5"
-              showsHorizontalScrollIndicator={false}>
-              <Button
-                onPress={() => handleIndoorOutdoorToggle('indoor')}
-                variant={isIndoor ? 'secondary' : 'outline'}
-                size="sm"
-                className="rounded-full border border-border">
-                <Text>Indoor</Text>
-              </Button>
-              <Button
-                onPress={() => handleIndoorOutdoorToggle('outdoor')}
-                variant={isIndoor === false ? 'secondary' : 'outline'}
-                size="sm"
-                className="rounded-full border border-border">
-                <Text>Outdoor</Text>
-              </Button>
-              <Button
-                onPress={() => handleVerifiedToggle()}
-                variant={isVerified ? 'secondary' : 'outline'}
-                size="sm"
-                className="rounded-full border border-border">
-                <Text>Verified</Text>
-              </Button>
-            </NativewindScrollView>
-          </View>
+          <NativewindScrollView
+            keyboardShouldPersistTaps="handled"
+            horizontal
+            contentContainerClassName="flex flex-row items-center gap-1.5"
+            showsHorizontalScrollIndicator={false}>
+            <Button
+              onPress={() => handleIndoorOutdoorToggle('indoor')}
+              variant={isIndoor ? 'secondary' : 'outline'}
+              size="sm"
+              className="rounded-full border border-border">
+              <Text>Indoor</Text>
+            </Button>
+            <Button
+              onPress={() => handleIndoorOutdoorToggle('outdoor')}
+              variant={isIndoor === false ? 'secondary' : 'outline'}
+              size="sm"
+              className="border border-border">
+              <Text>Outdoor</Text>
+            </Button>
+            <Button
+              onPress={() => handleVerifiedToggle()}
+              variant={isVerified ? 'secondary' : 'outline'}
+              size="sm"
+              className="border border-border">
+              <Text>Verified</Text>
+            </Button>
+          </NativewindScrollView>
           <Input
             value={searchQuery}
             onChangeText={(val) => {
               setSearchQuery(val);
             }}
-            className="rounded-full"
             placeholder="Search for a court..."
           />
         </View>
@@ -124,8 +120,7 @@ export default function Courts() {
             <EmptyHeader>
               <EmptyTitle>No Courts Found</EmptyTitle>
               <EmptyDescription>
-                No courts found nearby. Try a different search or adding a new
-                court.
+                No courts found nearby. Try a different search or adding a new court.
               </EmptyDescription>
             </EmptyHeader>
             <EmptyContent>

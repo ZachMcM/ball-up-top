@@ -30,14 +30,14 @@ import { Place, PlaceSchema } from '@/types/court';
 import { ImagePickerAssetSchema } from '@/types/imagePickerAsset';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
-import { useRouter } from 'expo-router';
-import { ArrowLeft, Ban, HouseIcon, ImageIcon, MapPin, SunIcon, XIcon } from 'lucide-react-native';
+import { Stack, useRouter } from 'expo-router';
+import { ArrowLeft, Ban, HouseIcon, ImageIcon, MapPin, SunIcon } from 'lucide-react-native';
 import { Fragment, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   ActivityIndicator,
-  Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -56,7 +56,7 @@ export const AddCourtSchema = z.object({
   name: z.string().min(1),
 });
 
-export default function AddCourt() {
+export default function AddCourtPage() {
   const [step, setStep] = useState<0 | 1>(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery] = useDebounce(searchQuery, 250);
@@ -142,8 +142,8 @@ export default function AddCourt() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       className="flex-1">
       <NativewindScrollView
+        contentInsetAdjustmentBehavior='automatic'
         contentContainerClassName="flex w-full flex-col gap-6 px-4 py-6"
-        showsHorizontalScrollIndicator={false}
         keyboardShouldPersistTaps="handled">
         <View className="flex w-full flex-row items-center gap-1.5">
           <View className="h-1 flex-1 rounded-full bg-primary" />
@@ -230,7 +230,8 @@ export default function AddCourt() {
                           source={{
                             uri: value.uri,
                           }}
-                          className="absolute bottom-0 left-0 right-0 top-0 object-cover"
+                          style={{ width: '100%', height: '100%' }}
+                          className="absolute inset-0 object-cover"
                         />
                       ) : (
                         <Fragment>
@@ -299,7 +300,7 @@ export default function AddCourt() {
                   <View className="flex w-full flex-row items-center gap-2">
                     <Button
                       onPress={() => onChange(true)}
-                      className="flex-1 rounded-xl"
+                      className="flex-1"
                       size="lg"
                       variant={indoor ? 'secondary' : 'outline'}>
                       <Icon size={18} as={HouseIcon} />

@@ -12,7 +12,7 @@ import { useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 import { toast } from 'sonner-native';
 
-export default function ImageScreen() {
+export default function ImagePage() {
   const [selectedAsset, setSelectedAsset] = useState<ImagePicker.ImagePickerAsset | null>(null);
 
   const { mutate: saveImage, isPending } = useMutation({

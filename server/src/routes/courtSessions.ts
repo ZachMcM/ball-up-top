@@ -1,4 +1,15 @@
-import { and, eq, gt, InferSelectModel, isNull, lt, ne, or, sql } from "drizzle-orm";
+import {
+  and,
+  eq,
+  gt,
+  InferSelectModel,
+  isNotNull,
+  isNull,
+  lt,
+  ne,
+  or,
+  sql,
+} from "drizzle-orm";
 import { Router } from "express";
 import { handleError } from "../../utils/handleError";
 import { authMiddleware } from "../../utils/middleware";
@@ -28,8 +39,48 @@ import {
   RUN_COMP_MAX_WT,
   RUN_COMP_MIN_WT,
 } from "../config/ratings";
+import { logger } from "../../utils/logger";
 
 export const courtSessionsRoute = Router();
+
+const CourtSessionsGetSchema = z.object({
+  hasRated: z
+    .enum(["true", "false"])
+    .transform((val) => val === "true")
+    .optional(),
+  isActive: z
+    .enum(["true", "false"])
+    .transform((val) => val === "true")
+    .optional(),
+});
+
+courtSessionsRoute.get("/court-sessions", authMiddleware, async (req, res) => {
+  try {
+    const validQueryParams = CourtSessionsGetSchema.safeParse(req.query);
+    if (validQueryParams.error) {
+      logger.error(validQueryParams.error.message);
+      return res.status(400).json({ error: validQueryParams.error.message });
+    }
+
+    const { hasRated, isActive } = validQueryParams.data;
+
+    const existingCourtSessions = await db.query.courtSession.findMany({
+      where: and(
+        eq(courtSession.userId, res.locals.userId!),
+        isActive !== undefined
+          ? isActive
+            ? isNull(courtSession.endTime)
+            : isNotNull(courtSession.endTime)
+          : undefined,
+        hasRated !== undefined ? eq(courtSession.hasRated, hasRated) : undefined
+      ),
+    });
+
+    return res.json(existingCourtSessions);
+  } catch (error) {
+    handleError(error, res, "GET /court-sessions");
+  }
+});
 
 async function getEncounteredPlayers(
   targetCourtSession: InferSelectModel<typeof courtSession>
@@ -92,7 +143,10 @@ async function getEncounteredPlayers(
 }
 
 function computeExperienceWeight(sessionsPlayed: number, ratingsGiven: number) {
-  const base = Math.max(sessionsPlayed, Math.floor(ratingsGiven / EST_RATINGS_PER_SESS));
+  const base = Math.max(
+    sessionsPlayed,
+    Math.floor(ratingsGiven / EST_RATINGS_PER_SESS)
+  );
   const raw = MIN_EXPERIENCE_WT + Math.log1p(base) / EXPERIENCE_GROWTH_RT;
   return clamp(MIN_EXPERIENCE_WT, MAX_EXPERIENCE_WT, raw);
 }
@@ -215,6 +269,12 @@ courtSessionsRoute.post(
           .json({ error: "Unauthorized for this court session." });
       }
 
+      if (targetCourtSession.hasRated) {
+        return res
+          .status(400)
+          .json({ error: "Session has already been rated." });
+      }
+
       const validBody = BatchRatings.safeParse(req.body);
       if (!validBody.success) {
         return res.status(400).json({ error: validBody.error.message });
@@ -276,11 +336,13 @@ courtSessionsRoute.post(
       );
 
       const { ratings } = validBody.data;
+
       await db.transaction(async (tx) => {
         for (const ratingInput of ratings) {
           const rateeId = ratingInput.userId;
 
           const overlapWeight = encounteredMap.get(rateeId) as number;
+          if (overlapWeight === undefined) continue;
 
           const {
             defenseRating,
@@ -396,12 +458,12 @@ courtSessionsRoute.post(
             finalWeightAppliedPlaymaking: finalWeightPlay,
             finalWeightAppliedShooting: finalWeightSho,
           });
-
-          await tx
-            .update(courtSession)
-            .set({ hasRated: true })
-            .where(eq(courtSession.id, sessionId));
         }
+
+        await tx
+          .update(courtSession)
+          .set({ hasRated: true })
+          .where(eq(courtSession.id, sessionId));
       });
 
       return res.json({ success: true });
@@ -425,11 +487,16 @@ courtSessionsRoute.patch(
       }
 
       const targetCourtSession = await db.query.courtSession.findFirst({
-        where: eq(courtSession.id, sessionId),
+        where: and(
+          eq(courtSession.id, sessionId),
+          isNull(courtSession.endTime)
+        ),
       });
 
       if (!targetCourtSession) {
-        return res.status(404).json({ error: "No court session found." });
+        return res
+          .status(404)
+          .json({ error: "No active court session found." });
       }
 
       if (targetCourtSession.userId !== res.locals.userId) {

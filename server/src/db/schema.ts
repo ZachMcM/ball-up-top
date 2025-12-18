@@ -1,3 +1,4 @@
+import { isNull } from "drizzle-orm";
 import {
   pgTable,
   text,
@@ -7,6 +8,7 @@ import {
   doublePrecision,
   integer,
   serial,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable(
@@ -150,12 +152,16 @@ export const courtSession = pgTable(
       .references(() => court.id),
     startTime: timestamp("start_time").defaultNow().notNull(),
     endTime: timestamp("end_time"),
-    hasRated: boolean("has_rated"),
+    hasRated: boolean("has_rated").notNull().default(false),
   },
   (table) => [
     index("court_session_user_id_idx").on(table.userId),
     index("court_session_court_id_idx").on(table.courtId),
     index("court_session_start_time_idx").on(table.startTime),
+
+    uniqueIndex("one_active_session_per_user")
+      .on(table.userId)
+      .where(isNull(table.endTime)),
   ]
 );
 

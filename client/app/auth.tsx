@@ -17,7 +17,7 @@ const EmailSchema = z.object({
   email: z.email(),
 });
 
-export default function Auth() {
+export default function AuthPage() {
   const [isPending, setIsPending] = useState(false);
   const { countdown, restartCountdown } = useCountdown(30);
   const [step, setStep] = useState<0 | 1>(0);

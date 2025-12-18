@@ -1,8 +1,9 @@
 import { ImagePickerAsset } from 'expo-image-picker';
 import { authClient } from './auth-client';
-import { CourtListEntry, Place } from '@/types/court';
+import { Court, CourtListEntry, CourtSession, Place } from '@/types/court';
 import * as z from 'zod';
-import { AddCourtSchema } from '@/app/add-court';
+import { AddCourtSchema } from '@/app/(tabs)/(courts)/add-court';
+import { User } from '@/types/user';
 
 export type serverRequestParams = {
   endpoint: string;
@@ -141,4 +142,65 @@ export async function postCourt({
     method: 'POST',
     formData,
   });
+}
+
+export async function getCourt(
+  id: number,
+  { lat, lng }: { lat: number; lng: number }
+): Promise<Court> {
+  const court = await serverRequest({
+    endpoint: `/courts/${id}?lat=${lat}&lng=${lng}`,
+    method: 'GET',
+  });
+
+  return court;
+}
+
+export async function getCourtActivePlayers(id: number): Promise<User[]> {
+  const users = await serverRequest({
+    endpoint: `/courts/${id}/active-players`,
+    method: 'GET',
+  });
+
+  return users;
+}
+
+export async function postCourtSession(id: number, coords: { lat: number; lng: number }) {
+  await serverRequest({
+    endpoint: `/courts/${id}/sessions`,
+    method: 'POST',
+    body: JSON.stringify(coords),
+  });
+}
+
+export async function patchCourtSession(id: number) {
+  await serverRequest({
+    endpoint: `/court-sessions/${id}`,
+    method: 'PATCH',
+  });
+}
+
+export async function getCourtSessions({
+  hasRated,
+  isActive,
+}: {
+  hasRated?: boolean;
+  isActive?: boolean;
+}): Promise<CourtSession[]> {
+  const params = new URLSearchParams();
+
+  if (hasRated !== undefined) {
+    params.append('hasRated', hasRated.toString());
+  }
+
+  if (isActive !== undefined) {
+    params.append('isActive', isActive.toString());
+  }
+
+  const courtSessions = await serverRequest({
+    endpoint: `/court-sessions?${params.toString()}`,
+    method: 'GET',
+  });
+
+  return courtSessions;
 }

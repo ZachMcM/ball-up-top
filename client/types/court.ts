@@ -29,8 +29,18 @@ export type CourtListEntry = {
     hour: number;
     avgSessions: number;
   }[];
-}
+};
 
 export type Court = CourtListEntry & {
   currentActiveUsers: User[];
+  leaderboard: User[];
+};
+
+export type CourtSession = {
+  id: number;
+  userId: string;
+  courtId: number;
+  startTime: Date;
+  endTime: Date | null;
+  hasRated: boolean;
 };

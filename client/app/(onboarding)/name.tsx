@@ -16,7 +16,7 @@ const NameSchema = z.object({
   lastName: z.string().min(1, 'Last name is required'),
 });
 
-export default function Name() {
+export default function NamePage() {
   const { data: currentUserData } = authClient.useSession();
 
   const { control, handleSubmit } = useForm<z.infer<typeof NameSchema>>({

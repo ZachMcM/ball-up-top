@@ -6,7 +6,7 @@ import { Text } from '@/components/ui/text';
 import { AlertTriangle, MapPin } from 'lucide-react-native';
 import { ActivityIndicator, Linking, View } from 'react-native';
 
-export default function LocationPermission() {
+export default function LocationPermissionPage() {
   const { locationPermissionStatus, requestPermission, isRequestingPermission } = useLocation();
 
   return (

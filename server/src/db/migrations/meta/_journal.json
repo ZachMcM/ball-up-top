@@ -43,6 +43,13 @@
       "when": 1765085575195,
       "tag": "0005_burly_starfox",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1766558504877,
+      "tag": "0006_rich_mojo",
+      "breakpoints": true
     }
   ]
 }
