@@ -13,7 +13,7 @@ export default function Profile() {
         contentContainerClassName="flex w-full flex-col gap-6 px-4 py-6"
         keyboardShouldPersistTaps="handled">
         <Button variant="destructive" size="lg" onPress={() => authClient.signOut()}>
-          <Text>Sign OUt</Text>
+          <Text>Sign Out</Text>
         </Button>
       </NativewindScrollView>
     </KeyboardAvoidingView>

@@ -1,4 +1,4 @@
-import { and, eq, gt, InferSelectModel, isNull, lt, ne, or } from "drizzle-orm";
+import { and, eq, gt, InferSelectModel, isNull, lt, ne, or, sql } from "drizzle-orm";
 import { Router } from "express";
 import { handleError } from "../../utils/handleError";
 import { authMiddleware } from "../../utils/middleware";
@@ -47,7 +47,9 @@ async function getEncounteredPlayers(
       or(
         isNull(courtSession.endTime),
         gt(courtSession.endTime, targetCourtSession.startTime)
-      )
+      ),
+      // Protect against lingering sessions from previous days
+      sql`DATE(${courtSession.startTime}) = DATE(${targetCourtSession.startTime})`
     ),
     with: {
       user: true,

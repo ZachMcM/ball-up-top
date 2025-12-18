@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { User } from './user';
 
 export type Place = z.infer<typeof PlaceSchema>;
 
@@ -12,11 +13,9 @@ export const PlaceSchema = z.object({
   formattedAddress: z.string(),
 });
 
-export interface CourtListEntry {
+export type CourtListEntry = {
   id: number;
   name: string;
-  aliases: string[];
-  googlePlaceId: string;
   address: string;
   lat: number;
   lng: number;
@@ -31,3 +30,7 @@ export interface CourtListEntry {
     avgSessions: number;
   }[];
 }
+
+export type Court = CourtListEntry & {
+  currentActiveUsers: User[];
+};
