@@ -1,5 +1,13 @@
 import { relations } from "drizzle-orm";
-import { account, court, courtSession, rating, session, user } from "./schema";
+import {
+  account,
+  court,
+  courtBookmark,
+  courtSession,
+  rating,
+  session,
+  user,
+} from "./schema";
 
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
@@ -8,6 +16,7 @@ export const userRelations = relations(user, ({ many }) => ({
   courtSessions: many(courtSession),
   incomingRatings: many(rating, { relationName: "incomingRatings" }),
   outgoingRatings: many(rating, { relationName: "outgoingRatings" }),
+  courtBookmarks: many(courtBookmark),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -51,15 +60,26 @@ export const ratingRelations = relations(rating, ({ one }) => ({
   rater: one(user, {
     fields: [rating.raterId],
     references: [user.id],
-    relationName: "outgoingRatings"
+    relationName: "outgoingRatings",
   }),
   ratee: one(user, {
     fields: [rating.rateeId],
     references: [user.id],
-    relationName: "incomingRatings"
+    relationName: "incomingRatings",
   }),
   raterCourtSession: one(courtSession, {
     fields: [rating.raterCourtSession],
     references: [courtSession.id],
+  }),
+}));
+
+export const courtBookmarkRelations = relations(courtBookmark, ({ one }) => ({
+  user: one(user, {
+    fields: [courtBookmark.userId],
+    references: [user.id],
+  }),
+  court: one(court, {
+    fields: [courtBookmark.courtId],
+    references: [court.id],
   }),
 }));

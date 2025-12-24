@@ -81,13 +81,15 @@ export async function getCourts({
   searchQuery,
   indoor,
   verified,
+  bookmarked,
 }: {
   lat: number;
   lng: number;
   limit?: number;
   searchQuery?: string;
   indoor?: boolean;
-  verified?: boolean;
+  verified?: true;
+  bookmarked?: true;
 }): Promise<CourtListEntry[]> {
   const params = new URLSearchParams();
 
@@ -103,6 +105,9 @@ export async function getCourts({
   }
   if (verified !== undefined) {
     params.append('verified', verified.toString());
+  }
+  if (bookmarked !== undefined) {
+    params.append('bookmarked', bookmarked.toString());
   }
 
   return await serverRequest({
@@ -203,4 +208,18 @@ export async function getCourtSessions({
   });
 
   return courtSessions;
+}
+
+export async function postCourtBookmark(id: number) {
+  await serverRequest({
+    endpoint: `/courts/${id}/bookmark`,
+    method: 'POST',
+  });
+}
+
+export async function deleteCourtBookmark(id: number) {
+  await serverRequest({
+    endpoint: `/courts/${id}/bookmark`,
+    method: 'DELETE',
+  });
 }

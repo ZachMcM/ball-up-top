@@ -9,10 +9,12 @@ import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import UserCard from '@/components/UserCard';
-import { getCourt } from '@/lib/endpoints';
+import { deleteCourtBookmark, getCourt, postCourtBookmark } from '@/lib/endpoints';
+import { THEME } from '@/lib/theme';
 import { getInitials, openDirections } from '@/lib/utils';
+import { Court } from '@/types/court';
 import { User } from '@/types/user';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import {
@@ -28,6 +30,7 @@ import {
   UsersIcon,
   VerifiedIcon,
 } from 'lucide-react-native';
+import { useColorScheme } from 'nativewind';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -37,6 +40,7 @@ import {
   RefreshControl,
   View,
 } from 'react-native';
+import { toast } from 'sonner-native';
 
 export default function CourtPage() {
   const { location } = useLocation();
@@ -64,6 +68,44 @@ export default function CourtPage() {
       }),
     queryKey: ['court', courtId],
   });
+
+  const { mutate: bookmarkCourt } = useMutation({
+    mutationFn: async () => postCourtBookmark(courtId),
+    onSuccess: () => {
+      queryClient.setQueryData(['court', courtId], (old: Court) => ({
+        ...old,
+        isBookmarked: true,
+      }));
+    },
+    onError: (error) => {
+      console.log('Error', error);
+      (toast.error(error.message), { position: 'bottom-center' });
+    },
+  });
+
+  const { mutate: unbookmarkCourt } = useMutation({
+    mutationFn: async () => deleteCourtBookmark(courtId),
+    onSuccess: () => {
+      queryClient.setQueryData(['court', courtId], (old: Court) => ({
+        ...old,
+        isBookmarked: false,
+      }));
+    },
+    onError: (error) => {
+      console.log('Error', error);
+      (toast.error(error.message), { position: 'bottom-center' });
+    },
+  });
+
+  const toggleBookmark = () => {
+    if (court?.isBookmarked) {
+      unbookmarkCourt();
+    } else {
+      bookmarkCourt();
+    }
+  };
+
+  const { colorScheme } = useColorScheme();
 
   const {
     activeCourtSession,
@@ -115,8 +157,10 @@ export default function CourtPage() {
                       {court.verified && (
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button className="size-7" size="icon">
-                              <Icon className="text-primary-foreground" as={VerifiedIcon} />
+                            <Button
+                              className="size-7 bg-blue-500 active:bg-blue-500 dark:bg-blue-600 dark:active:bg-blue-600/90"
+                              size="icon">
+                              <Icon as={VerifiedIcon} className="text-white" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -136,7 +180,6 @@ export default function CourtPage() {
                     </Text>
                   </View>
                 </View>
-                {/* TODO implement bookmarking functionality */}
                 <View className="flex flex-row items-center gap-2">
                   {activeCourtSession && activeCourtSession.courtId == court.id ? (
                     <Button
@@ -177,8 +220,17 @@ export default function CourtPage() {
                       )}
                     </Button>
                   )}
-                  <Button variant="outline" size="icon">
-                    <Icon size={18} as={BookmarkIcon} />
+                  <Button
+                    onPress={toggleBookmark}
+                    variant="outline"
+                    size="icon"
+                    className="size-11">
+                    <Icon
+                      size={20}
+                      fill={court.isBookmarked ? '#f0b100' : undefined}
+                      className="text-yellow-500"
+                      as={BookmarkIcon}
+                    />
                   </Button>
                 </View>
                 <View className="flex flex-1 flex-col gap-4 rounded-xl border border-border p-4">

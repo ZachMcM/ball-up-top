@@ -9,9 +9,53 @@ import { authMiddleware, upload } from "../../utils/middleware";
 import { r2 } from "../../utils/r2";
 import { MAX_DISTANCE, MAX_DISTANCE_FOR_CHECK_IN } from "../config/courts";
 import { db } from "../db";
-import { court, courtSession, user } from "../db/schema";
+import { court, courtBookmark, courtSession, user } from "../db/schema";
 
 export const courtsRoute = Router();
+
+courtsRoute.post("/courts/:id/bookmark", authMiddleware, async (req, res) => {
+  try {
+    const courtId = parseInt(req.params.id);
+
+    if (!Number.isInteger(courtId)) {
+      logger.error("Court ID is not an integer.");
+      return res.status(400).json({ error: "Court ID is not an integer." });
+    }
+
+    await db.insert(courtBookmark).values({
+      courtId,
+      userId: res.locals.userId!,
+    });
+
+    return res.json({ success: true });
+  } catch (error) {
+    handleError(error, res, "POST /courts/:id/bookmark");
+  }
+});
+
+courtsRoute.delete("/courts/:id/bookmark", authMiddleware, async (req, res) => {
+  try {
+    const courtId = parseInt(req.params.id);
+
+    if (!Number.isInteger(courtId)) {
+      logger.error("Court ID is not an integer.");
+      return res.status(400).json({ error: "Court ID is not an integer." });
+    }
+
+    await db
+      .delete(courtBookmark)
+      .where(
+        and(
+          eq(courtBookmark.courtId, courtId),
+          eq(courtBookmark.userId, res.locals.userId!)
+        )
+      );
+
+    return res.json({ success: true });
+  } catch (error) {
+    handleError(error, res, "DELETE /courts/:id/bookmark");
+  }
+});
 
 courtsRoute.get(
   "/courts/:id/active-players",
@@ -85,6 +129,10 @@ courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
         indoor: court.indoor,
         verified: court.verified,
         image: court.image,
+        isBookmarked: sql<boolean>`EXISTS (
+          SELECT 1 FROM court_bookmark
+          WHERE court_id = ${courtId} AND user_id = ${res.locals.userId}
+        )`,
       })
       .from(court)
       .where(eq(court.id, courtId));
@@ -284,11 +332,15 @@ const CourtsParamsSchema = z.object({
   limit: z.coerce.number(),
   searchQuery: z.string().optional(),
   indoor: z
-    .string()
+    .enum(["true", "false"])
     .transform((val) => val === "true")
     .optional(),
   verified: z
-    .string()
+    .enum(["true"])
+    .transform((val) => val === "true")
+    .optional(),
+  bookmarked: z
+    .enum(["true"])
     .transform((val) => val === "true")
     .optional(),
 });
@@ -300,7 +352,7 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
       return res.status(400).json({ error: validQueryParams.error.message });
     }
 
-    const { lat, lng, limit, searchQuery, indoor, verified } =
+    const { lat, lng, limit, searchQuery, indoor, verified, bookmarked } =
       validQueryParams.data;
 
     // Spherical Law of Cosines formula for calculating distance on Earth's surface
@@ -387,6 +439,18 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
       );
     }
 
+    const bookmarkStatus = db
+      .select({
+        courtId: courtBookmark.courtId,
+      })
+      .from(courtBookmark)
+      .where(eq(courtBookmark.userId, res.locals.userId!))
+      .as("bookmark_status");
+
+    if (bookmarked !== undefined) {
+      conditions.push(sql`${bookmarkStatus.courtId} IS NOT NULL`);
+    }
+
     const query = db
       .select({
         id: court.id,
@@ -401,10 +465,12 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
         activityGraph: activityByHour.activityData,
         avgPlayerOverall: sql<number>`COALESCE(${sessionStats.avgPlayerOverall}, 0)::float`,
         currentActiveSessions: sql<number>`COALESCE(${sessionStats.currentActiveSessions}, 0)::integer`,
+        isBookmarked: sql<boolean>`${bookmarkStatus.courtId} IS NOT NULL`,
       })
       .from(court)
       .leftJoin(activityByHour, eq(court.id, activityByHour.courtId))
       .leftJoin(sessionStats, eq(court.id, sessionStats.courtId))
+      .leftJoin(bookmarkStatus, eq(court.id, bookmarkStatus.courtId))
       .where(and(...conditions));
 
     const courts = await query.orderBy(distanceFormula).limit(limit);
@@ -418,7 +484,7 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
 const PostCourtsBodySchema = z.object({
   name: z.string().min(1),
   indoor: z
-    .string()
+    .enum(["true", "false"])
     .transform((val) => val === "true")
     .optional(),
   googlePlaceId: z.string(),

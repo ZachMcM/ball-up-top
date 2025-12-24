@@ -24,7 +24,8 @@ import { useDebounce } from 'use-debounce';
 export default function CourtsPage() {
   const { location, isLocationPending } = useLocation();
   const [isIndoor, setIsIndoor] = useState<boolean | undefined>(undefined);
-  const [isVerified, setIsVerified] = useState<boolean | undefined>(true);
+  const [isVerified, setIsVerified] = useState<true | undefined>(true);
+  const [isBookmarked, setIsBookmarked] = useState<true | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState<string | undefined>(undefined);
   const [debouncedSearchQuery] = useDebounce(searchQuery, 250);
 
@@ -36,6 +37,7 @@ export default function CourtsPage() {
         lng: location?.coords.longitude!,
         isIndoor,
         isVerified,
+        isBookmarked,
         searchQuery: debouncedSearchQuery,
       },
     ],
@@ -45,6 +47,7 @@ export default function CourtsPage() {
         lng: location?.coords.longitude!,
         verified: isVerified,
         indoor: isIndoor,
+        bookmarked: isBookmarked,
         searchQuery: debouncedSearchQuery,
       });
       return courts;
@@ -62,6 +65,10 @@ export default function CourtsPage() {
 
   function handleVerifiedToggle() {
     setIsVerified((prev) => (prev ? undefined : true));
+  }
+
+  function handleBookmarkToggle() {
+    setIsBookmarked((prev) => (prev ? undefined : true));
   }
 
   return (
@@ -96,13 +103,20 @@ export default function CourtsPage() {
               className="border border-border">
               <Text>Verified</Text>
             </Button>
+            <Button
+              onPress={() => handleBookmarkToggle()}
+              variant={isBookmarked ? 'secondary' : 'outline'}
+              size="sm"
+              className="border border-border">
+              <Text>Bookmarked</Text>
+            </Button>
           </NativewindScrollView>
           <Input
             value={searchQuery}
             onChangeText={(val) => {
               setSearchQuery(val);
             }}
-            className='rounded-full'
+            className="rounded-full"
             placeholder="Search for a court..."
           />
         </View>

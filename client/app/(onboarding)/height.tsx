@@ -105,7 +105,7 @@ export default function HeightPage() {
         </Text>
         <View className="flex w-full flex-row items-center gap-2">
           {router.canGoBack() && (
-            <Button size="lg" className='flex-1' onPress={() => router.back()} variant="outline">
+            <Button size="lg" className="flex-1" onPress={() => router.back()} variant="outline">
               <Icon as={ArrowLeftIcon} size={18} />
               <Text>Back</Text>
             </Button>
@@ -113,7 +113,7 @@ export default function HeightPage() {
           <Button
             disabled={isPending}
             size="lg"
-            className='flex-1'
+            className="flex-1"
             onPress={handleSubmit((values) => saveHeight(values.height))}>
             <Text>Continue</Text>
             {isPending && <ActivityIndicator />}

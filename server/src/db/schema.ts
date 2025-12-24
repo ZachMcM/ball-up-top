@@ -140,6 +140,26 @@ export const court = pgTable(
   ]
 );
 
+export const courtBookmark = pgTable(
+  "court_bookmark",
+  {
+    id: serial().primaryKey().notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id),
+    courtId: integer("court_id")
+      .notNull()
+      .references(() => court.id),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("court_bookmark_user_id_court_id_idx").on(
+      table.userId,
+      table.courtId
+    ),
+  ]
+);
+
 export const courtSession = pgTable(
   "court_session",
   {

@@ -50,6 +50,20 @@
       "when": 1766558504877,
       "tag": "0006_rich_mojo",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1766615992497,
+      "tag": "0007_jazzy_harry_osborn",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1766617697506,
+      "tag": "0008_gorgeous_leo",
+      "breakpoints": true
     }
   ]
 }

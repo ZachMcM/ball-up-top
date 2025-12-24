@@ -29,6 +29,7 @@ export type CourtListEntry = {
     hour: number;
     avgSessions: number;
   }[];
+  isBookmarked: boolean
 };
 
 export type Court = CourtListEntry & {
