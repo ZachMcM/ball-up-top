@@ -15,8 +15,8 @@ import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { getCourts } from '@/lib/endpoints';
 import { useQuery } from '@tanstack/react-query';
-import { router, Stack } from 'expo-router';
-import { PlusCircle, SlidersHorizontal } from 'lucide-react-native';
+import { router } from 'expo-router';
+import { PlusCircle } from 'lucide-react-native';
 import { useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { useDebounce } from 'use-debounce';
@@ -102,6 +102,7 @@ export default function CourtsPage() {
             onChangeText={(val) => {
               setSearchQuery(val);
             }}
+            className='rounded-full'
             placeholder="Search for a court..."
           />
         </View>

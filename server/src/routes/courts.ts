@@ -94,14 +94,14 @@ courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
         hours.hour,
         CASE
           WHEN COUNT(cs.id) > 0 THEN
-            COUNT(cs.id)::float / GREATEST(COUNT(DISTINCT DATE(cs.start_time)), 1)
+            COUNT(cs.id)::float / GREATEST(COUNT(DISTINCT DATE(cs.start_time AT TIME ZONE 'UTC')), 1)
           ELSE 0
         END as "avgSessions"
       FROM
         generate_series(0, 23) as hours(hour)
         LEFT JOIN court_session cs ON
           cs.court_id = ${courtId} AND
-          EXTRACT(HOUR FROM cs.start_time)::integer = hours.hour
+          EXTRACT(HOUR FROM cs.start_time AT TIME ZONE 'UTC')::integer = hours.hour
       GROUP BY hours.hour
       ORDER BY hours.hour
     `);
@@ -261,7 +261,7 @@ courtsRoute.post(
 
       if (distance > MAX_DISTANCE_FOR_CHECK_IN) {
         return res.status(400).json({
-          error: "You must be at the court to check in",
+          error: "You must be at the court to check in.",
           distance: Math.round(distance),
         });
       }
@@ -316,6 +316,7 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
     )`;
 
     // Subquery to calculate average sessions per hour of day (all 24 hours represented)
+    // Hours are in UTC - client normalizes to local timezone
     const activityByHour = db
       .select({
         courtId: sql<number>`court_id`.as("court_id"),
@@ -335,7 +336,7 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
             hours.hour,
             CASE
               WHEN COUNT(cs.id) > 0 THEN
-                COUNT(cs.id)::float / COUNT(DISTINCT DATE(cs.start_time))
+                COUNT(cs.id)::float / COUNT(DISTINCT DATE(cs.start_time AT TIME ZONE 'UTC'))
               ELSE 0
             END as avg_count
           FROM
@@ -343,7 +344,7 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
             CROSS JOIN generate_series(0, 23) as hours(hour)
             LEFT JOIN court_session cs ON
               cs.court_id = c.id AND
-              EXTRACT(HOUR FROM cs.start_time)::integer = hours.hour
+              EXTRACT(HOUR FROM cs.start_time AT TIME ZONE 'UTC')::integer = hours.hour
           GROUP BY c.id, hours.hour
         ) as hourly_data
       `

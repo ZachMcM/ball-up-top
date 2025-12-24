@@ -12,14 +12,14 @@ import UserCard from '@/components/UserCard';
 import { getCourt } from '@/lib/endpoints';
 import { getInitials, openDirections } from '@/lib/utils';
 import { User } from '@/types/user';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Image } from 'expo-image';
-import { Link, useLocalSearchParams } from 'expo-router';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import {
+  ArrowLeftFromLineIcon,
   ArrowRight,
+  ArrowRightFromLineIcon,
   BookmarkIcon,
-  CircleCheckIcon,
-  CircleXIcon,
   ClockIcon,
   HouseIcon,
   MapPinIcon,
@@ -28,12 +28,33 @@ import {
   UsersIcon,
   VerifiedIcon,
 } from 'lucide-react-native';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
+import { useState } from 'react';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  RefreshControl,
+  View,
+} from 'react-native';
 
 export default function CourtPage() {
   const { location } = useLocation();
   const searchParams = useLocalSearchParams();
   const courtId = parseInt(searchParams.courtId as string);
+  const queryClient = useQueryClient();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await queryClient.invalidateQueries({ queryKey: ['courtSession', 'isActive'] });
+    await queryClient.invalidateQueries({ queryKey: ['courtSession', 'unrated'] });
+    await queryClient.invalidateQueries({ queryKey: ['court', courtId] });
+    await queryClient.invalidateQueries({ queryKey: ['court', courtId, 'active-players'] });
+    setRefreshing(false);
+  };
+
+  const router = useRouter();
 
   const { data: court, isPending } = useQuery({
     queryFn: async () =>
@@ -60,13 +81,14 @@ export default function CourtPage() {
       <NativewindScrollView
         contentInsetAdjustmentBehavior="automatic"
         contentContainerClassName="flex w-full flex-col gap-4"
-        keyboardShouldPersistTaps="handled">
+        keyboardShouldPersistTaps="handled"
+        refreshControl={<RefreshControl size={0} refreshing={refreshing} onRefresh={onRefresh} />}>
         {isPending ? (
           <ActivityIndicator />
         ) : (
           court && (
             <>
-              <AspectRatio ratio={3 / 1} className="relative overflow-hidden">
+              <AspectRatio ratio={4 / 1} className="relative overflow-hidden">
                 <Image
                   source={{
                     uri: court.image,
@@ -126,7 +148,11 @@ export default function CourtPage() {
                       {isCheckOutPending ? (
                         <ActivityIndicator />
                       ) : (
-                        <Icon className="text-primary-foreground" size={18} as={CircleXIcon} />
+                        <Icon
+                          className="text-primary-foreground"
+                          size={18}
+                          as={ArrowLeftFromLineIcon}
+                        />
                       )}
                     </Button>
                   ) : (
@@ -143,7 +169,11 @@ export default function CourtPage() {
                       {isCheckInPending ? (
                         <ActivityIndicator />
                       ) : (
-                        <Icon className="text-primary-foreground" size={18} as={CircleCheckIcon} />
+                        <Icon
+                          className="text-primary-foreground"
+                          size={18}
+                          as={ArrowRightFromLineIcon}
+                        />
                       )}
                     </Button>
                   )}
@@ -198,16 +228,19 @@ export default function CourtPage() {
                       {court.currentActiveUsers.map((user, i) => (
                         <UserCard key={i} user={user} />
                       ))}
-                      <Link
-                        href={{
-                          pathname: '/(tabs)/(courts)/court/[courtId]/players',
-                          params: { courtId },
-                        }}>
-                        <Button>
-                          <Text>View All</Text>
-                          <Icon as={ArrowRight} className="text-primary-foreground" />
-                        </Button>
-                      </Link>
+                      <Button
+                        onPress={() => {
+                          router.navigate({
+                            pathname: '/(tabs)/(courts)/court/[courtId]/players',
+                            params: { courtId },
+                          });
+                        }}
+                        size="sm"
+                        variant="outline"
+                        className="self-end">
+                        <Text>View All</Text>
+                        <Icon as={ArrowRight} className="text-secondary-foreground" />
+                      </Button>
                     </View>
                   )}
                 </View>
@@ -239,14 +272,13 @@ function LeaderboardCard({ user, index }: { user: User; index: number }) {
             <Text className="text-sm font-bold text-primary-foreground">{index + 1}</Text>
           </View>
         </View>
-        <View className="flex flex-col items-center gap-1.5">
-          <Text className="text-sm font-semibold">{user.name}</Text>
-          <View className="flex flex-row items-center gap-1.5">
-            <View className="flex size-7 items-center justify-center rounded-full border border-border bg-muted/30">
-              <Text className="text-xs font-bold">{user.overall}</Text>
-            </View>
-            <Text className="text-sm font-bold">OVR</Text>
+        <View className="flex flex-row items-center gap-2">
+          <View className="flex size-7 items-center justify-center rounded-full border border-border bg-muted/30">
+            <Text className="text-xs font-bold">{user.overall}</Text>
           </View>
+          <Text className="text-sm font-semibold">
+            {user.name.split(' ')[0][0]}. {user.name.split(' ')[1]}
+          </Text>
         </View>
       </View>
     </Link>

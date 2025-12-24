@@ -37,16 +37,22 @@ export function CourtSessionProvider({ children }: { children: ReactNode }) {
   });
 
   const { mutate: checkIn, isPending: isCheckInPending } = useMutation({
-    mutationFn: async (id: number) =>
+    mutationFn: async (id: number) => {
       await postCourtSession(id, {
         lat: location?.coords.latitude!,
         lng: location?.coords.longitude!,
-      }),
+      });
+      return id;
+    },
     onError: (error) => {
       console.log('Error', error);
       (toast.error(error.message), { position: 'bottom-center' });
     },
-    onSuccess: () => {
+    onSuccess: (courtId) => {
+      queryClient.invalidateQueries({
+        queryKey: ['court', courtId],
+      });
+      queryClient.invalidateQueries({ queryKey: ['court', courtId, 'active-players'] });
       queryClient.invalidateQueries({
         queryKey: ['courtSession', 'isActive'],
       });
@@ -58,12 +64,19 @@ export function CourtSessionProvider({ children }: { children: ReactNode }) {
   });
 
   const { mutate: checkOut, isPending: isCheckOutPending } = useMutation({
-    mutationFn: async () => await patchCourtSession(activeCourtSession?.id!),
+    mutationFn: async () => {
+      await patchCourtSession(activeCourtSession?.id!);
+      return activeCourtSession?.courtId!;
+    },
     onError: (error) => {
       console.log('Error', error);
       (toast.error(error.message), { position: 'bottom-center' });
     },
-    onSuccess: () => {
+    onSuccess: (courtId) => {
+      queryClient.invalidateQueries({
+        queryKey: ['court', courtId],
+      });
+      queryClient.invalidateQueries({ queryKey: ['court', courtId, 'active-players'] });
       queryClient.invalidateQueries({
         queryKey: ['courtSession', 'isActive'],
       });

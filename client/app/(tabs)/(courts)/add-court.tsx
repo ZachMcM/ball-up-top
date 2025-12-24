@@ -33,7 +33,16 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { Stack, useRouter } from 'expo-router';
-import { ArrowLeft, Ban, HouseIcon, ImageIcon, MapPin, SunIcon } from 'lucide-react-native';
+import {
+  ArrowLeft,
+  Ban,
+  CheckIcon,
+  HouseIcon,
+  ImageIcon,
+  MapPin,
+  SaveIcon,
+  SunIcon,
+} from 'lucide-react-native';
 import { Fragment, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
@@ -142,7 +151,7 @@ export default function AddCourtPage() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       className="flex-1">
       <NativewindScrollView
-        contentInsetAdjustmentBehavior='automatic'
+        contentInsetAdjustmentBehavior="automatic"
         contentContainerClassName="flex w-full flex-col gap-6 px-4 py-6"
         keyboardShouldPersistTaps="handled">
         <View className="flex w-full flex-row items-center gap-1.5">
@@ -218,7 +227,7 @@ export default function AddCourtPage() {
                 <View className="flex w-full flex-1 flex-col gap-2">
                   <Pressable onPress={pickImage}>
                     <AspectRatio
-                      ratio={3 / 1}
+                      ratio={4 / 1}
                       className={cn(
                         'rounded-md',
                         value !== undefined
@@ -308,7 +317,7 @@ export default function AddCourtPage() {
                     </Button>
                     <Button
                       onPress={() => onChange(false)}
-                      className="flex-1 rounded-xl"
+                      className="flex-1"
                       size="lg"
                       variant={indoor === false ? 'secondary' : 'outline'}>
                       <Icon size={18} as={SunIcon} />
@@ -336,7 +345,7 @@ export default function AddCourtPage() {
                 <AlertDialogTrigger asChild>
                   <Button disabled={isPending} className="flex-1">
                     <Text>Save</Text>
-                    {isPending && <ActivityIndicator />}
+                    {isPending ? <ActivityIndicator /> : <Icon className='text-primary-foreground' size={18} as={CheckIcon} />}
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>

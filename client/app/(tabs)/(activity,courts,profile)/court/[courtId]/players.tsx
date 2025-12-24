@@ -1,13 +1,16 @@
 import { NativewindFlatList } from '@/components/NativewindFlatList';
+import { useLocation } from '@/components/providers/LocationProvider';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
+import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
-import { getCourtActivePlayers } from '@/lib/endpoints';
+import { getCourt, getCourtActivePlayers } from '@/lib/endpoints';
 import { getInitials } from '@/lib/utils';
 import { User } from '@/types/user';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useLocalSearchParams } from 'expo-router';
+import { UsersIcon } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-native';
 
@@ -32,12 +35,42 @@ export default function CourtPlayersPage() {
     );
   }, [users, searchQuery]);
 
+  const { location } = useLocation();
+
+  const { data: court } = useQuery({
+    queryFn: async () =>
+      getCourt(courtId, {
+        lat: location?.coords.latitude!,
+        lng: location?.coords.longitude!,
+      }),
+    queryKey: ['court', courtId],
+  });
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       className="flex-1">
       <View className="flex w-full flex-col gap-6 px-4 py-6">
-        <Input value={searchQuery} onChangeText={setSearchQuery} placeholder="Search players..." />
+        <View className="flex flex-row items-center justify-between">
+          <View className="flex flex-row items-center gap-1.5">
+            <Icon as={UsersIcon} className="text-muted-foreground" size={16} />
+            <Text className="font-semibold">{court?.currentActiveSessions} Playing</Text>
+          </View>
+          {court?.currentActiveSessions !== 0 && (
+            <View className="flex flex-row items-center gap-1.5">
+              <View className="flex size-8 items-center justify-center rounded-full border border-border bg-muted/30">
+                <Text className="text-sm font-bold">{court?.avgPlayerOverall}</Text>
+              </View>
+              <Text className="font-semibold">Average OVR</Text>
+            </View>
+          )}
+        </View>
+        <Input
+          className="rounded-full"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          placeholder="Search players..."
+        />
         {isPending ? (
           <ActivityIndicator />
         ) : filteredUsers.length !== 0 ? (
