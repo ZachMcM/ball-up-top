@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { getCourts } from '@/lib/endpoints';
 import { useQuery } from '@tanstack/react-query';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { PlusCircle } from 'lucide-react-native';
 import { useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-native';
@@ -26,7 +26,8 @@ export default function CourtsPage() {
   const [isIndoor, setIsIndoor] = useState<boolean | undefined>(undefined);
   const [isVerified, setIsVerified] = useState<true | undefined>(true);
   const [isBookmarked, setIsBookmarked] = useState<true | undefined>(undefined);
-  const [searchQuery, setSearchQuery] = useState<string | undefined>(undefined);
+  // const [searchQuery, setSearchQuery] = useState<string | undefined>(undefined);
+  const { searchQuery } = useLocalSearchParams() as { searchQuery: string };
   const [debouncedSearchQuery] = useDebounce(searchQuery, 250);
 
   const { data: courts, isPending: areCourtsPending } = useQuery({
@@ -111,14 +112,6 @@ export default function CourtsPage() {
               <Text>Bookmarked</Text>
             </Button>
           </NativewindScrollView>
-          <Input
-            value={searchQuery}
-            onChangeText={(val) => {
-              setSearchQuery(val);
-            }}
-            className="rounded-full"
-            placeholder="Search for a court..."
-          />
         </View>
         {isLoading ? (
           <ActivityIndicator />

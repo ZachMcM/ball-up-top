@@ -191,7 +191,7 @@ export async function getCourtSessions({
 }: {
   hasRated?: boolean;
   isActive?: boolean;
-}): Promise<CourtSession[]> {
+}): Promise<CourtSession> {
   const params = new URLSearchParams();
 
   if (hasRated !== undefined) {
@@ -202,12 +202,12 @@ export async function getCourtSessions({
     params.append('isActive', isActive.toString());
   }
 
-  const courtSessions = await serverRequest({
+  const courtSession = await serverRequest({
     endpoint: `/court-sessions?${params.toString()}`,
     method: 'GET',
   });
 
-  return courtSessions;
+  return courtSession;
 }
 
 export async function postCourtBookmark(id: number) {

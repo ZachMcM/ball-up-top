@@ -4,6 +4,7 @@ import { Router } from "express";
 import * as z from "zod";
 import { getDistanceInMiles } from "../../utils/getDistanceMiles";
 import { handleError } from "../../utils/handleError";
+import { invalidateQueries } from "../../utils/invalidateQueries";
 import { logger } from "../../utils/logger";
 import { authMiddleware, upload } from "../../utils/middleware";
 import { r2 } from "../../utils/r2";
@@ -318,6 +319,11 @@ courtsRoute.post(
         userId: res.locals.userId!,
         courtId,
       });
+
+      invalidateQueries(
+        ["court", courtId],
+        ["court", courtId, "active-players"]
+      );
 
       res.json({ success: true });
     } catch (error) {

@@ -1,13 +1,15 @@
 import { CourtSessionProvider } from '@/components/providers/CourtSessionProvider';
+import { InvalidationProvider } from '@/components/providers/InvalidationProvider';
 import { LocationProvider, useLocation } from '@/components/providers/LocationProvider';
 import '@/global.css';
 import { authClient } from '@/lib/auth-client';
 
 import { NAV_THEME, THEME } from '@/lib/theme';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
 import { focusManager, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Stack, usePathname } from 'expo-router';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import { useEffect } from 'react';
@@ -41,30 +43,34 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
-        <LocationProvider>
-          <CourtSessionProvider>
-            <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
-              <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-              <RootNavigatior />
-            </ThemeProvider>
-          </CourtSessionProvider>
-        </LocationProvider>
-        <Toaster
-          toastOptions={{
-            style: {
-              backgroundColor: THEME[colorScheme!].popover,
-              borderColor: THEME[colorScheme!].border,
-              borderWidth: 1,
-            },
-          }}
-        />
-        <PortalHost />
+        <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+          <BottomSheetModalProvider>
+            <InvalidationProvider>
+              <LocationProvider>
+                <CourtSessionProvider>
+                  <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+                  <RootNavigator />
+                </CourtSessionProvider>
+              </LocationProvider>
+            </InvalidationProvider>
+            <Toaster
+              toastOptions={{
+                style: {
+                  backgroundColor: THEME[colorScheme!].popover,
+                  borderColor: THEME[colorScheme!].border,
+                  borderWidth: 1,
+                },
+              }}
+            />
+            <PortalHost />
+          </BottomSheetModalProvider>
+        </ThemeProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>
   );
 }
 
-export function RootNavigatior() {
+export function RootNavigator() {
   const { data: currentUserData, isPending: isSessionPending } = authClient.useSession();
   const { locationPermissionStatus } = useLocation();
   const isOnboardingComplete = currentUserData?.user.onboardingStep === 'complete';
@@ -73,6 +79,9 @@ export function RootNavigatior() {
   const isLoading =
     isSessionPending ||
     (currentUserData !== null && isOnboardingComplete && locationPermissionStatus === null);
+
+  const onboardingStep = currentUserData?.user.onboardingStep!;
+  const showOnboarding = !isLoading && currentUserData !== null && !isOnboardingComplete;
 
   return (
     <Stack>
@@ -96,13 +105,15 @@ export function RootNavigatior() {
           options={{ title: 'Pull Up', headerBackButtonDisplayMode: 'minimal' }}
         />
       </Stack.Protected>
-      <Stack.Protected guard={!isLoading && currentUserData !== null && !isOnboardingComplete}>
+      <Stack.Protected guard={showOnboarding && onboardingStep === 'name'}>
         <Stack.Screen
           name="(onboarding)/name"
           options={{
             title: 'Pull Up',
           }}
         />
+      </Stack.Protected>
+      <Stack.Protected guard={showOnboarding && onboardingStep === 'height'}>
         <Stack.Screen
           name="(onboarding)/height"
           options={{
@@ -110,6 +121,8 @@ export function RootNavigatior() {
             headerBackVisible: false,
           }}
         />
+      </Stack.Protected>
+      <Stack.Protected guard={showOnboarding && onboardingStep === 'image'}>
         <Stack.Screen
           name="(onboarding)/image"
           options={{
@@ -140,6 +153,15 @@ export function RootNavigatior() {
           name="loading"
         />
       </Stack.Protected>
+      {/* <Stack.Protected guard={!!unratedCourtSession}> */}
+      <Stack.Screen
+        options={{
+          presentation: 'modal',
+          title: 'Rate Users',
+        }}
+        name="rate"
+      />
+      {/* </Stack.Protected> */}
     </Stack>
   );
 }

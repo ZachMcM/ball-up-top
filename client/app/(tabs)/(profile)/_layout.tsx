@@ -1,6 +1,8 @@
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 
 export default function ProfileLayout() {
+  const router = useRouter();
+
   return (
     <Stack>
       <Stack.Screen
@@ -22,6 +24,14 @@ export default function ProfileLayout() {
         options={{
           headerTitle: 'Current Players',
           headerBackButtonDisplayMode: 'minimal',
+          headerTransparent: false,
+          headerSearchBarOptions: {
+            onChangeText: (event) => {
+              router.setParams({
+                searchQuery: event.nativeEvent.text,
+              });
+            },
+          },
         }}
       />
     </Stack>

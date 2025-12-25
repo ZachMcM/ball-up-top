@@ -12,7 +12,7 @@ export default function LocationPermissionPage() {
   return (
     <View className="flex w-full flex-1 flex-col items-center justify-center gap-4 p-8">
       <View className="h-20 w-20 items-center justify-center rounded-full bg-primary/10">
-        <Icon as={MapPin} size={40} className="text-primary" />
+        <Icon as={MapPin} size={40} className="text-foreground" />
       </View>
       <View className="items-center gap-2">
         <Text className="text-center text-2xl font-bold">Location Access Needed</Text>

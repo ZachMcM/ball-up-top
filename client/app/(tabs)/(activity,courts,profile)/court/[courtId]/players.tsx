@@ -17,7 +17,7 @@ import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-n
 export default function CourtPlayersPage() {
   const searchParams = useLocalSearchParams();
   const courtId = parseInt(searchParams.courtId as string);
-  const [searchQuery, setSearchQuery] = useState('');
+  const { searchQuery } = useLocalSearchParams() as { searchQuery: string };
 
   const { data: users, isPending } = useQuery({
     queryFn: async () => getCourtActivePlayers(courtId),
@@ -51,26 +51,6 @@ export default function CourtPlayersPage() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       className="flex-1">
       <View className="flex w-full flex-col gap-6 px-4 py-6">
-        <View className="flex flex-row items-center justify-between">
-          <View className="flex flex-row items-center gap-1.5">
-            <Icon as={UsersIcon} className="text-muted-foreground" size={16} />
-            <Text className="font-semibold">{court?.currentActiveSessions} Playing</Text>
-          </View>
-          {court?.currentActiveSessions !== 0 && (
-            <View className="flex flex-row items-center gap-1.5">
-              <View className="flex size-8 items-center justify-center rounded-full border border-border bg-muted/30">
-                <Text className="text-sm font-bold">{court?.avgPlayerOverall}</Text>
-              </View>
-              <Text className="font-semibold">Average OVR</Text>
-            </View>
-          )}
-        </View>
-        <Input
-          className="rounded-full"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholder="Search players..."
-        />
         {isPending ? (
           <ActivityIndicator />
         ) : filteredUsers.length !== 0 ? (

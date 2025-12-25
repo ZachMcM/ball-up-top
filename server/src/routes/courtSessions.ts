@@ -40,6 +40,7 @@ import {
   RUN_COMP_MIN_WT,
 } from "../config/ratings";
 import { logger } from "../../utils/logger";
+import { invalidateQueries } from "../../utils/invalidateQueries";
 
 export const courtSessionsRoute = Router();
 
@@ -64,7 +65,7 @@ courtSessionsRoute.get("/court-sessions", authMiddleware, async (req, res) => {
 
     const { hasRated, isActive } = validQueryParams.data;
 
-    const existingCourtSessions = await db.query.courtSession.findMany({
+    const existingCourtSession = await db.query.courtSession.findFirst({
       where: and(
         eq(courtSession.userId, res.locals.userId!),
         isActive !== undefined
@@ -76,7 +77,7 @@ courtSessionsRoute.get("/court-sessions", authMiddleware, async (req, res) => {
       ),
     });
 
-    return res.json(existingCourtSessions);
+    return res.json(existingCourtSession);
   } catch (error) {
     handleError(error, res, "GET /court-sessions");
   }
@@ -505,13 +506,30 @@ courtSessionsRoute.patch(
           .json({ error: "Unauthorized for this court session." });
       }
 
-      await db
+      const [updatedCourtSession] = await db
         .update(courtSession)
         .set({
           endTime: new Date(),
           hasRated: false,
         })
-        .where(eq(courtSession.id, sessionId));
+        .where(eq(courtSession.id, sessionId))
+        .returning();
+
+      const encounteredPlayers = await getEncounteredPlayers(
+        updatedCourtSession
+      );
+
+      // bypass rating if no encountered players
+      if (encounteredPlayers.length === 0) {
+        await db.update(courtSession).set({
+          hasRated: true,
+        }).where(eq(courtSession.id, sessionId));
+      }
+
+      invalidateQueries(
+        ["court", targetCourtSession.courtId],
+        ["court", targetCourtSession.courtId, "active-players"]
+      );
 
       return res.json({ success: true });
     } catch (error) {

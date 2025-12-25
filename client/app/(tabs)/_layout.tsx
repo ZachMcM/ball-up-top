@@ -1,10 +1,32 @@
+import { SessionFooter, useCourtSession } from '@/components/providers/CourtSessionProvider';
 import { Icon } from '@/components/ui/icon';
-import { Tabs, usePathname } from 'expo-router';
+import { BottomTabBar, BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { Tabs, useRouter } from 'expo-router';
 import { Activity, MapPin, User } from 'lucide-react-native';
+import { useEffect } from 'react';
+import { View } from 'react-native';
+
+function CustomTabBar(props: BottomTabBarProps) {
+  return (
+    <View>
+      <SessionFooter />
+      <BottomTabBar {...props} />
+    </View>
+  );
+}
 
 export default function TabsLayout() {
+  const router = useRouter();
+  const { unratedCourtSession } = useCourtSession();
+
+  useEffect(() => {
+    if (unratedCourtSession) {
+      router.navigate('/rate');
+    }
+  }, [unratedCourtSession]);
+
   return (
-    <Tabs>
+    <Tabs tabBar={(props) => <CustomTabBar {...props} />}>
       <Tabs.Screen
         name="(courts)"
         options={{

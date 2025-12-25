@@ -7,7 +7,7 @@ import { patchUserImage } from '@/lib/endpoints';
 import { useMutation } from '@tanstack/react-query';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { ArrowLeftIcon, User2, UserIcon } from 'lucide-react-native';
+import { ArrowLeftIcon, ImageIcon, User, User2, UserIcon } from 'lucide-react-native';
 import { useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 import { toast } from 'sonner-native';
@@ -57,7 +57,7 @@ export default function ImagePage() {
             <Avatar alt="User Image" className="size-32">
               <AvatarImage source={{ uri: selectedAsset?.uri ?? undefined }} />
               <AvatarFallback className="flex items-center justify-center border-2 border-dashed border-border bg-muted/30">
-                <Icon as={User2} size={56} />
+                <Icon as={ImageIcon} size={56} />
               </AvatarFallback>
             </Avatar>
           </Pressable>

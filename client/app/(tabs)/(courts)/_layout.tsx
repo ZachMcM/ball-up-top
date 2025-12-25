@@ -1,6 +1,8 @@
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 
 export default function CourtsLayout() {
+  const router = useRouter();
+
   return (
     <Stack>
       <Stack.Screen
@@ -8,6 +10,14 @@ export default function CourtsLayout() {
         options={{
           headerTitle: 'Pull Up',
           headerBackButtonDisplayMode: 'minimal',
+          headerTransparent: false,
+          headerSearchBarOptions: {
+            onChangeText: (event) => {
+              router.setParams({
+                searchQuery: event.nativeEvent.text,
+              });
+            },
+          },
         }}
       />
       <Stack.Screen
@@ -22,6 +32,14 @@ export default function CourtsLayout() {
         options={{
           headerTitle: 'Current Players',
           headerBackButtonDisplayMode: 'minimal',
+          headerTransparent: false,
+          headerSearchBarOptions: {
+            onChangeText: (event) => {
+              router.setParams({
+                searchQuery: event.nativeEvent.text,
+              });
+            },
+          },
         }}
       />
       <Stack.Screen

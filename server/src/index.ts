@@ -1,14 +1,27 @@
 import { toNodeHandler } from "better-auth/node";
 import cors from "cors";
 import express from "express";
+import { createServer } from "http";
 import morgan from "morgan";
+import { Server } from "socket.io";
 import { auth } from "../utils/auth";
 import { limiter } from "../utils/limiter";
-import { routes } from "./routes";
 import { logger } from "../utils/logger";
+import { routes } from "./routes";
+import { socketServer } from "./sockets";
 
 const app = express();
 const PORT = parseInt(process.env.PORT!);
+
+const httpServer = createServer(app);
+
+export const io = new Server(httpServer, {
+  cors: {
+    origin: "*",
+  },
+});
+
+socketServer(io);
 
 app.use(cors());
 app.use(morgan("combined"));
@@ -20,6 +33,6 @@ app.use(express.json());
 app.use(limiter);
 app.use("/", routes);
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   logger.info(`Server listening on port ${PORT} in ${process.env.NODE_ENV}`);
 });

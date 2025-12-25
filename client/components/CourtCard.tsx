@@ -48,10 +48,8 @@ export default function CourtCard({ court }: { court: CourtListEntry }) {
                 {court.verified && (
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button
-                        className="size-7 bg-blue-500 active:bg-blue-500 dark:bg-blue-600 dark:active:bg-blue-600/90"
-                        size="icon">
-                        <Icon className="text-white" as={VerifiedIcon} />
+                      <Button className="size-7" size="icon">
+                        <Icon className="text-primary-foreground" as={VerifiedIcon} />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
