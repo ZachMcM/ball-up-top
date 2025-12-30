@@ -3,7 +3,8 @@ import { authClient } from './auth-client';
 import { Court, CourtListEntry, CourtSession, Place } from '@/types/court';
 import * as z from 'zod';
 import { AddCourtSchema } from '@/app/(tabs)/(courts)/add-court';
-import { User } from '@/types/user';
+import { ExtendedUser, User } from '@/types/user';
+import { EncounteredPlayer } from '@/types/encounteredPlayer';
 
 export type serverRequestParams = {
   endpoint: string;
@@ -222,4 +223,46 @@ export async function deleteCourtBookmark(id: number) {
     endpoint: `/courts/${id}/bookmark`,
     method: 'DELETE',
   });
+}
+
+export async function getEncounteredPlayers(
+  courtSessionId: number
+): Promise<EncounteredPlayer[]> {
+  return await serverRequest({
+    endpoint: `/court-sessions/${courtSessionId}/encountered-players`,
+    method: 'GET',
+  });
+}
+
+export async function patchEncounteredPlayer(
+  id: number,
+  data: {
+    defenseRating?: number;
+    finishingRating?: number;
+    shootingRating?: number;
+    playmakingRating?: number;
+    skipped?: boolean;
+  }
+): Promise<void> {
+  await serverRequest({
+    endpoint: `/encountered-players/${id}`,
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function postSessionRatings(sessionId: number): Promise<void> {
+  await serverRequest({
+    endpoint: `/court-sessions/${sessionId}/ratings`,
+    method: 'POST',
+  });
+}
+
+export async function getUser(userId: string): Promise<ExtendedUser> {
+  const user = await serverRequest({
+    endpoint: `/users/${userId}`,
+    method: "GET"
+  })
+
+  return user
 }

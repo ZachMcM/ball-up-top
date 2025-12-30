@@ -7,7 +7,7 @@ import { View, type ViewProps } from 'react-native';
 function Empty({ className, ...props }: ViewProps & React.RefAttributes<View>) {
   return (
     <View
-      className={cn('flex flex-col items-center justify-center gap-6 p-6 rounded-xl', className)}
+      className={cn('flex flex-col items-center justify-center gap-6 rounded-2xl p-6', className)}
       {...props}
     />
   );
@@ -59,9 +59,7 @@ function EmptyDescription({
   className,
   ...props
 }: React.ComponentProps<typeof Text> & React.RefAttributes<Text>) {
-  return (
-    <Text className={cn('text-muted-foreground text-center text-sm', className)} {...props} />
-  );
+  return <Text className={cn('text-center text-sm text-muted-foreground', className)} {...props} />;
 }
 
 function EmptyContent({ className, ...props }: ViewProps & React.RefAttributes<View>) {

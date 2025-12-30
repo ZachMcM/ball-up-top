@@ -1,7 +1,7 @@
 import { THEME } from '@/lib/theme';
 import { useColorScheme } from 'nativewind';
 import { useMemo, useRef } from 'react';
-import { LineChart, LineChartPropsType } from 'react-native-gifted-charts';
+import { BarChart, LineChart, LineChartPropsType } from 'react-native-gifted-charts';
 import { NativewindScrollView } from './NativewindScrollView';
 import { Text } from './ui/text';
 
@@ -48,15 +48,17 @@ export default function ActivityGraph({
     return hour === 12 ? '12pm' : hour === 0 ? '12am' : hour > 12 ? `${hour - 12}pm` : `${hour}am`;
   };
 
-  const doesDataExist = () => localPoints.find((p) => p.avgSessions > 0) !== undefined;
-
-  return doesDataExist() ? (
-    <LineChart
+  return (
+    <BarChart
+      barBorderRadius={4}
+      spacing={8}
+      barWidth={24}
       isAnimated
+      maxValue={Math.max(...points.map((p) => p.avgSessions))}
       hideYAxisText
       height={42}
       thickness={2}
-      color={THEME[colorScheme!].primary}
+      frontColor={THEME[colorScheme!].primary}
       dataPointsColor={THEME[colorScheme!].primary}
       dataPointsRadius={2}
       hideRules
@@ -74,7 +76,5 @@ export default function ActivityGraph({
       }))}
       {...props}
     />
-  ) : (
-    <Text className="text-center text-xs font-medium">No data yet.</Text>
   );
 }

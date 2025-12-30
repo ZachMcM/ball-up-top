@@ -56,7 +56,7 @@ export default function ImagePage() {
           <Pressable onPress={pickImage}>
             <Avatar alt="User Image" className="size-32">
               <AvatarImage source={{ uri: selectedAsset?.uri ?? undefined }} />
-              <AvatarFallback className="flex items-center justify-center border-2 border-dashed border-border bg-muted/30">
+              <AvatarFallback className="flex items-center justify-center border-2 border-dashed border-border dark:bg-muted/30 bg-muted">
                 <Icon as={ImageIcon} size={56} />
               </AvatarFallback>
             </Avatar>

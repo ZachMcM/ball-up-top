@@ -64,6 +64,13 @@
       "when": 1766617697506,
       "tag": "0008_gorgeous_leo",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1767073947240,
+      "tag": "0009_slimy_mandarin",
+      "breakpoints": true
     }
   ]
 }

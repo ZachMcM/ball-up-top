@@ -1,37 +1,34 @@
-import { Stack, useRouter } from 'expo-router';
+import BackButton from '@/components/BackButton';
+import { Stack } from 'expo-router';
 
 export default function ProfileLayout() {
-  const router = useRouter();
-
   return (
     <Stack>
+      <Stack.Screen
+        name="index"
+        options={{
+          headerShown: false,
+        }}
+      />
       <Stack.Screen
         name="user/[userId]"
         options={{
           headerTitle: 'Profile',
-          headerBackButtonDisplayMode: 'minimal',
+          headerLeft: () => <BackButton />,
         }}
       />
       <Stack.Screen
         name="court/[courtId]/index"
         options={{
           headerTitle: 'Court',
-          headerBackButtonDisplayMode: 'minimal',
+          headerLeft: () => <BackButton />,
         }}
       />
       <Stack.Screen
         name="court/[courtId]/players"
         options={{
           headerTitle: 'Current Players',
-          headerBackButtonDisplayMode: 'minimal',
-          headerTransparent: false,
-          headerSearchBarOptions: {
-            onChangeText: (event) => {
-              router.setParams({
-                searchQuery: event.nativeEvent.text,
-              });
-            },
-          },
+          headerLeft: () => <BackButton />,
         }}
       />
     </Stack>

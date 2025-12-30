@@ -1,6 +1,8 @@
 import { clsx, type ClassValue } from 'clsx';
+import { formatDistanceToNow } from "date-fns";
 import { Linking, Platform } from 'react-native';
 import { twMerge } from 'tailwind-merge';
+
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -32,4 +34,13 @@ export function getDistanceInMiles(lat1: number, lng1: number, lat2: number, lng
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
   return R * c;
+}
+
+
+export function timeAgo(date: Date | string): string {
+  const parsedDate =
+    typeof date === "string"
+      ? new Date(date.replace(" ", "T").replace(/(\+\d{2})$/, "$1:00"))
+      : date;
+  return formatDistanceToNow(parsedDate, { addSuffix: true });
 }

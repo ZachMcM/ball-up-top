@@ -14,7 +14,7 @@ import { Router } from "express";
 import { handleError } from "../../utils/handleError";
 import { authMiddleware } from "../../utils/middleware";
 import { db } from "../db";
-import { courtSession, rating, user } from "../db/schema";
+import { courtSession, encounteredPlayer, rating, user } from "../db/schema";
 
 import * as z from "zod";
 import { clamp } from "../../utils/clamp";
@@ -38,6 +38,7 @@ import {
   RATER_MIN_WT,
   RUN_COMP_MAX_WT,
   RUN_COMP_MIN_WT,
+  WEIGHT_E,
 } from "../config/ratings";
 import { logger } from "../../utils/logger";
 import { invalidateQueries } from "../../utils/invalidateQueries";
@@ -225,17 +226,124 @@ courtSessionsRoute.get(
   }
 );
 
-const BatchRatings = z.object({
-  ratings: z.array(
-    z.object({
-      userId: z.string(),
-      defenseRating: z.number().int().min(MIN_OVR).max(MAX_OVR),
-      finishingRating: z.number().int().min(MIN_OVR).max(MAX_OVR),
-      shootingRating: z.number().int().min(MIN_OVR).max(MAX_OVR),
-      playmakingRating: z.number().int().min(MIN_OVR).max(MAX_OVR),
-    })
-  ),
+courtSessionsRoute.get(
+  "/court-sessions/:sessionId/encountered-players",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const sessionId = parseInt(req.params.sessionId);
+
+      if (!Number.isInteger(sessionId)) {
+        return res.status(400).json({ error: "Session ID is not an integer." });
+      }
+
+      const targetCourtSession = await db.query.courtSession.findFirst({
+        where: eq(courtSession.id, sessionId),
+      });
+
+      if (!targetCourtSession) {
+        return res.status(404).json({ error: "No court session found." });
+      }
+
+      if (targetCourtSession.userId !== res.locals.userId) {
+        return res
+          .status(401)
+          .json({ error: "Unauthorized for this court session." });
+      }
+
+      const encounteredPlayersData = await db.query.encounteredPlayer.findMany({
+        where: eq(encounteredPlayer.courtSessionId, sessionId),
+        orderBy: (ep, { asc }) => [asc(ep.displayOrder)],
+      });
+
+      return res.json(encounteredPlayersData);
+    } catch (error) {
+      handleError(
+        error,
+        res,
+        "GET /court-sessions/:sessionId/encountered-players"
+      );
+    }
+  }
+);
+
+const EncounteredPlayerPatchSchema = z.object({
+  defenseRating: z.number().int().min(MIN_OVR).max(MAX_OVR).optional(),
+  finishingRating: z.number().int().min(MIN_OVR).max(MAX_OVR).optional(),
+  shootingRating: z.number().int().min(MIN_OVR).max(MAX_OVR).optional(),
+  playmakingRating: z.number().int().min(MIN_OVR).max(MAX_OVR).optional(),
+  skipped: z.boolean().optional(),
 });
+
+courtSessionsRoute.patch(
+  "/encountered-players/:id",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+
+      if (!Number.isInteger(id)) {
+        return res
+          .status(400)
+          .json({ error: "Encountered player ID is not an integer." });
+      }
+
+      const validBody = EncounteredPlayerPatchSchema.safeParse(req.body);
+      if (!validBody.success) {
+        return res.status(400).json({ error: validBody.error.message });
+      }
+
+      // Fetch the encountered player with its court session
+      const ep = await db.query.encounteredPlayer.findFirst({
+        where: eq(encounteredPlayer.id, id),
+        with: {
+          courtSession: true,
+        },
+      });
+
+      if (!ep) {
+        return res.status(404).json({ error: "Encountered player not found." });
+      }
+
+      // Verify the user owns this court session
+      if (ep.courtSession.userId !== res.locals.userId) {
+        return res
+          .status(401)
+          .json({ error: "Unauthorized for this encountered player." });
+      }
+
+      // Verify session hasn't been rated yet
+      if (ep.courtSession.hasRated) {
+        return res
+          .status(400)
+          .json({ error: "Session has already been rated." });
+      }
+
+      const {
+        defenseRating,
+        finishingRating,
+        shootingRating,
+        playmakingRating,
+        skipped,
+      } = validBody.data;
+
+      await db
+        .update(encounteredPlayer)
+        .set({
+          ...(defenseRating !== undefined && { defenseRating }),
+          ...(finishingRating !== undefined && { finishingRating }),
+          ...(shootingRating !== undefined && { shootingRating }),
+          ...(playmakingRating !== undefined && { playmakingRating }),
+          ...(skipped !== undefined && { skipped }),
+        })
+        .where(eq(encounteredPlayer.id, id));
+
+      return res.json({ success: true });
+    } catch (error) {
+      handleError(error, res, "PATCH /encountered-players/:id");
+    }
+  }
+);
 
 // TODO add activity entry
 
@@ -276,130 +384,80 @@ courtSessionsRoute.post(
           .json({ error: "Session has already been rated." });
       }
 
-      const validBody = BatchRatings.safeParse(req.body);
-      if (!validBody.success) {
-        return res.status(400).json({ error: validBody.error.message });
-      }
+      // Fetch all encountered players for this session
+      const encounteredPlayersData = await db.query.encounteredPlayer.findMany({
+        where: eq(encounteredPlayer.courtSessionId, sessionId),
+      });
 
-      const rater = (await db.query.user.findFirst({
-        where: eq(user.id, res.locals.userId!),
-        columns: {
-          overall: true,
-        },
-        with: {
-          courtSessions: {
-            columns: {
-              id: true,
-            },
-          },
-          outgoingRatings: {
-            columns: {
-              id: true,
-            },
-          },
-        },
-      }))!;
-
-      const encounteredPlayers = await getEncounteredPlayers(
-        targetCourtSession
-      );
-
-      if (encounteredPlayers.length === 0) {
+      if (encounteredPlayersData.length === 0) {
         return res.status(400).json({
           error: "No encountered players found for this session.",
         });
       }
 
-      const encounteredMap = new Map();
-      encounteredPlayers.forEach((p) =>
-        encounteredMap.set(p.user.id, p.overlapWeight)
-      );
-
-      const runCompetitiveness = clamp(
-        RUN_COMP_MIN_WT,
-        RUN_COMP_MAX_WT,
-        encounteredPlayers.reduce(
-          (accum, curr) => accum + curr.user.overall,
-          0
-        ) /
-          encounteredPlayers.length /
-          100
-      );
-
-      const raterWeight = clamp(
-        RATER_MIN_WT,
-        RATER_MAX_WT,
-        rater.overall / 100
-      );
-      const experienceWeight = computeExperienceWeight(
-        rater.courtSessions.length,
-        rater.outgoingRatings.length
-      );
-
-      const { ratings } = validBody.data;
-
       await db.transaction(async (tx) => {
-        for (const ratingInput of ratings) {
-          const rateeId = ratingInput.userId;
-
-          const overlapWeight = encounteredMap.get(rateeId) as number;
-          if (overlapWeight === undefined) continue;
+        for (const ep of encounteredPlayersData) {
+          // Skip if player was skipped or ratings are incomplete
+          if (ep.skipped) continue;
+          if (
+            ep.defenseRating === null ||
+            ep.finishingRating === null ||
+            ep.shootingRating === null ||
+            ep.playmakingRating === null
+          ) {
+            continue;
+          }
 
           const {
             defenseRating,
             finishingRating,
             shootingRating,
             playmakingRating,
-          } = ratingInput;
+          } = ep;
 
+          // Compute outlier weights using frozen ratee ratings and lifetime count
+          const owDef = computeOutlierWeight(
+            defenseRating,
+            ep.rateeDefenseAtTime,
+            ep.rateeLifetimeCount
+          );
+          const owFin = computeOutlierWeight(
+            finishingRating,
+            ep.rateeFinishingAtTime,
+            ep.rateeLifetimeCount
+          );
+          const owSho = computeOutlierWeight(
+            shootingRating,
+            ep.rateeShootingAtTime,
+            ep.rateeLifetimeCount
+          );
+          const owPlay = computeOutlierWeight(
+            playmakingRating,
+            ep.rateePlaymakingAtTime,
+            ep.rateeLifetimeCount
+          );
+
+          // Compute final weights using precomputed combined weight
+          const finalWeightDef = ep.combinedWeight * owDef;
+          const finalWeightFin = ep.combinedWeight * owFin;
+          const finalWeightSho = ep.combinedWeight * owSho;
+          const finalWeightPlay = ep.combinedWeight * owPlay;
+
+          // Fetch ratee's CURRENT (live) ratings for EMA
           const ratee = await tx.query.user.findFirst({
-            where: eq(user.id, rateeId),
+            where: eq(user.id, ep.rateeId),
             columns: {
               defenseRating: true,
               finishingRating: true,
               shootingRating: true,
               playmakingRating: true,
-              overall: true,
               height: true,
             },
           });
 
           if (!ratee) continue;
 
-          const lifetimeCount = await tx
-            .select()
-            .from(courtSession)
-            .where(eq(courtSession.userId, rateeId));
-
-          const owDef = computeOutlierWeight(
-            defenseRating,
-            ratee.defenseRating,
-            lifetimeCount.length
-          );
-          const owFin = computeOutlierWeight(
-            finishingRating,
-            ratee.finishingRating,
-            lifetimeCount.length
-          );
-          const owSho = computeOutlierWeight(
-            shootingRating,
-            ratee.shootingRating,
-            lifetimeCount.length
-          );
-          const owPlay = computeOutlierWeight(
-            playmakingRating,
-            ratee.playmakingRating,
-            lifetimeCount.length
-          );
-
-          const combinedWeights =
-            raterWeight * experienceWeight * runCompetitiveness * overlapWeight;
-
-          const finalWeightDef = combinedWeights * owDef;
-          const finalWeightFin = combinedWeights * owFin;
-          const finalWeightSho = combinedWeights * owSho;
-          const finalWeightPlay = combinedWeights * owPlay;
-
+          // Apply EMA to LIVE ratings
           const newDefense = applyEMA(
             ratee.defenseRating,
             defenseRating,
@@ -442,23 +500,25 @@ courtSessionsRoute.post(
               shootingRating: Math.round(newShooting),
               archetype: newArchetype,
             })
-            .where(eq(user.id, rateeId));
+            .where(eq(user.id, ep.rateeId));
 
           await tx.insert(rating).values({
             raterId: res.locals.userId!,
-            rateeId,
+            rateeId: ep.rateeId,
             raterCourtSession: sessionId,
             shootingRating,
             defenseRating,
             playmakingRating,
             finishingRating,
-            raterOverallAtTime: rater.overall,
-            runCompetitivenessAtTime: runCompetitiveness,
+            raterOverallAtTime: ep.raterOverallAtTime,
+            runCompetitivenessAtTime: ep.runCompetitivenessAtTime,
             finalWeightAppliedDefense: finalWeightDef,
             finalWeightAppliedFinishing: finalWeightFin,
             finalWeightAppliedPlaymaking: finalWeightPlay,
             finalWeightAppliedShooting: finalWeightSho,
           });
+
+          invalidateQueries(["user", ep.rateeId])
         }
 
         await tx
@@ -466,6 +526,11 @@ courtSessionsRoute.post(
           .set({ hasRated: true })
           .where(eq(courtSession.id, sessionId));
       });
+
+      invalidateQueries(
+        ["court", targetCourtSession.courtId],
+        ["court", targetCourtSession.courtId, "active-players"]
+      );
 
       return res.json({ success: true });
     } catch (error) {
@@ -515,15 +580,114 @@ courtSessionsRoute.patch(
         .where(eq(courtSession.id, sessionId))
         .returning();
 
-      const encounteredPlayers = await getEncounteredPlayers(
+      const encounteredPlayersData = await getEncounteredPlayers(
         updatedCourtSession
       );
 
       // bypass rating if no encountered players
-      if (encounteredPlayers.length === 0) {
-        await db.update(courtSession).set({
-          hasRated: true,
-        }).where(eq(courtSession.id, sessionId));
+      if (encounteredPlayersData.length === 0) {
+        await db
+          .update(courtSession)
+          .set({
+            hasRated: true,
+          })
+          .where(eq(courtSession.id, sessionId));
+      } else {
+        // Fetch rater info for weight computation
+        const rater = (await db.query.user.findFirst({
+          where: eq(user.id, res.locals.userId!),
+          columns: {
+            overall: true,
+          },
+          with: {
+            courtSessions: {
+              columns: {
+                id: true,
+              },
+            },
+            outgoingRatings: {
+              columns: {
+                id: true,
+              },
+            },
+          },
+        }))!;
+
+        // Compute session-level weights
+        const runCompetitiveness = clamp(
+          RUN_COMP_MIN_WT,
+          RUN_COMP_MAX_WT,
+          encounteredPlayersData.reduce(
+            (accum, curr) => accum + curr.user.overall,
+            0
+          ) /
+            encounteredPlayersData.length /
+            100
+        );
+
+        const raterWeight = clamp(
+          RATER_MIN_WT,
+          RATER_MAX_WT,
+          rater.overall / 100
+        );
+
+        const experienceWeight = computeExperienceWeight(
+          rater.courtSessions.length,
+          rater.outgoingRatings.length
+        );
+
+        // Create encountered_player rows with precomputed data
+        for (let i = 0; i < encounteredPlayersData.length; i++) {
+          const ep = encounteredPlayersData[i];
+          const ratee = ep.user;
+
+          // Get ratee's lifetime count
+          const lifetimeCount = await db
+            .select()
+            .from(courtSession)
+            .where(eq(courtSession.userId, ratee.id));
+
+          // Compute combined weight (without outlier weight)
+          const combinedWeight = Math.pow(
+            raterWeight *
+              experienceWeight *
+              runCompetitiveness *
+              ep.overlapWeight,
+            WEIGHT_E
+          );
+
+          await db.insert(encounteredPlayer).values({
+            courtSessionId: sessionId,
+            rateeId: ratee.id,
+
+            // Precomputed weights
+            combinedWeight,
+            raterOverallAtTime: rater.overall,
+            runCompetitivenessAtTime: runCompetitiveness,
+
+            // Ratee's ratings at checkout (for outlier detection)
+            rateeDefenseAtTime: ratee.defenseRating,
+            rateeFinishingAtTime: ratee.finishingRating,
+            rateeShootingAtTime: ratee.shootingRating,
+            rateePlaymakingAtTime: ratee.playmakingRating,
+            rateeOverallAtTime: ratee.overall,
+            rateeLifetimeCount: lifetimeCount.length,
+
+            // Ratee display info (frozen for UI)
+            rateeName: ratee.name,
+            rateeImage: ratee.image,
+            rateeArchetype: ratee.archetype,
+            rateeHeight: ratee.height,
+
+            // Draft ratings (null initially)
+            defenseRating: null,
+            finishingRating: null,
+            shootingRating: null,
+            playmakingRating: null,
+            skipped: false,
+            displayOrder: i,
+          });
+        }
       }
 
       invalidateQueries(

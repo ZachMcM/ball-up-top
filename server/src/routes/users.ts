@@ -3,12 +3,101 @@ import { authMiddleware, upload } from "../../utils/middleware";
 import { handleError } from "../../utils/handleError";
 import * as z from "zod";
 import { db } from "../db";
-import { user } from "../db/schema";
+import { user, rating, courtSession, court } from "../db/schema";
 import { r2 } from "../../utils/r2";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
+import { MAX_OVR, MIN_OVR } from "../config/ratings";
 
 export const usersRoute = Router();
+
+function normalizeRatingHistory(
+  ratingHistory: { createdAt: Date; overall: number }[]
+) {
+  if (ratingHistory.length === 0) return [];
+
+  const overalls = ratingHistory.map(({ overall }) => overall);
+  const currMax = Math.max(...overalls);
+  const currMin = Math.min(...overalls);
+
+  // Handle case where all values are the same
+  if (currMax === currMin) {
+    return ratingHistory.map(({ overall, createdAt }) => ({
+      createdAt,
+      overall: (MIN_OVR + MAX_OVR) / 2,
+    }));
+  }
+
+  return ratingHistory.map(({ overall: x, createdAt }) => ({
+    createdAt,
+    overall:
+      ((x - currMin) / (currMax - currMin)) * (MAX_OVR - MIN_OVR) + MIN_OVR,
+  }));
+}
+
+usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    const targetUser = await db.query.user.findFirst({
+      where: eq(user.id, userId),
+      columns: {
+        id: true,
+        name: true,
+        image: true,
+        overall: true,
+        finishingRating: true,
+        playmakingRating: true,
+        defenseRating: true,
+        shootingRating: true,
+        archetype: true,
+        height: true,
+      },
+    });
+
+    if (!targetUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Fetch rating history (ratings received by this user)
+    const ratingHistory = await db
+      .select({
+        overall: rating.raterOverallAtTime,
+        createdAt: rating.createdAt,
+      })
+      .from(rating)
+      .where(eq(rating.rateeId, userId))
+      .orderBy(rating.createdAt);
+
+    // Fetch recent sessions with court info (limit 5)
+    const recentSessions = await db
+      .select({
+        id: courtSession.id,
+        startTime: courtSession.startTime,
+        endTime: courtSession.endTime,
+        court: {
+          id: court.id,
+          name: court.name,
+          image: court.image,
+        },
+      })
+      .from(courtSession)
+      .innerJoin(court, eq(courtSession.courtId, court.id))
+      .where(eq(courtSession.userId, userId))
+      .orderBy(desc(courtSession.startTime))
+      .limit(5);
+
+    const normalizedRatingHistory = normalizeRatingHistory(ratingHistory);
+
+    res.json({
+      ...targetUser,
+      ratingHistory: normalizedRatingHistory,
+      recentSessions,
+    });
+  } catch (error) {
+    handleError(error, res, "GET /users/:id");
+  }
+});
 
 usersRoute.patch(
   "/users/image",

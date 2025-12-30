@@ -17,7 +17,7 @@ import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-n
 export default function CourtPlayersPage() {
   const searchParams = useLocalSearchParams();
   const courtId = parseInt(searchParams.courtId as string);
-  const { searchQuery } = useLocalSearchParams() as { searchQuery: string };
+  const [searchQuery, setSearchQuery] = useState<string | undefined>(undefined);
 
   const { data: users, isPending } = useQuery({
     queryFn: async () => getCourtActivePlayers(courtId),
@@ -26,7 +26,7 @@ export default function CourtPlayersPage() {
 
   const filteredUsers = useMemo(() => {
     if (!users) return [];
-    if (!searchQuery.trim()) return users;
+    if (!searchQuery?.trim()) return users;
 
     const query = searchQuery.toLowerCase();
     return users.filter(
@@ -51,6 +51,12 @@ export default function CourtPlayersPage() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       className="flex-1">
       <View className="flex w-full flex-col gap-6 px-4 py-6">
+        <Input
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          className="rounded-full"
+          placeholder="Search for players..."
+        />
         {isPending ? (
           <ActivityIndicator />
         ) : filteredUsers.length !== 0 ? (
@@ -66,7 +72,7 @@ export default function CourtPlayersPage() {
             <EmptyHeader>
               <EmptyTitle>No Players Found</EmptyTitle>
               <EmptyDescription>
-                {searchQuery.trim()
+                {searchQuery?.trim()
                   ? 'No players match your search.'
                   : 'No players are currently at this court.'}
               </EmptyDescription>
@@ -82,7 +88,7 @@ function UserCard({ user }: { user: User }) {
   return (
     <Link
       href={{
-        pathname: '/(tabs)/(courts)/user/[userId]',
+        pathname: '/user/[userId]',
         params: { userId: user.id },
       }}
       className="w-full">

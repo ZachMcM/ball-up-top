@@ -1,3 +1,4 @@
+import BackButton from '@/components/BackButton';
 import { CourtSessionProvider } from '@/components/providers/CourtSessionProvider';
 import { InvalidationProvider } from '@/components/providers/InvalidationProvider';
 import { LocationProvider, useLocation } from '@/components/providers/LocationProvider';
@@ -56,7 +57,7 @@ export default function RootLayout() {
             <Toaster
               toastOptions={{
                 style: {
-                  backgroundColor: THEME[colorScheme!].popover,
+                  backgroundColor: THEME[colorScheme!].card,
                   borderColor: THEME[colorScheme!].border,
                   borderWidth: 1,
                 },
@@ -102,7 +103,7 @@ export function RootNavigator() {
       <Stack.Protected guard={!isLoading && currentUserData === null}>
         <Stack.Screen
           name="auth"
-          options={{ title: 'Pull Up', headerBackButtonDisplayMode: 'minimal' }}
+          options={{ title: 'Pull Up', headerLeft: () => <BackButton/> }}
         />
       </Stack.Protected>
       <Stack.Protected guard={showOnboarding && onboardingStep === 'name'}>
@@ -153,15 +154,13 @@ export function RootNavigator() {
           name="loading"
         />
       </Stack.Protected>
-      {/* <Stack.Protected guard={!!unratedCourtSession}> */}
       <Stack.Screen
         options={{
           presentation: 'modal',
-          title: 'Rate Users',
+          title: 'Rate Players',
         }}
         name="rate"
       />
-      {/* </Stack.Protected> */}
     </Stack>
   );
 }

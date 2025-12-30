@@ -1,17 +1,24 @@
-import { openDirections } from '@/lib/utils';
 import { CourtListEntry } from '@/types/court';
-import { Image } from 'expo-image';
-import { Link } from 'expo-router';
-import { HouseIcon, MapPin, SunIcon, UsersIcon, VerifiedIcon } from 'lucide-react-native';
-import { Pressable, View } from 'react-native';
-import ActivityGraph from './ActivityGraph';
-import { AspectRatio } from './ui/aspect-ratio';
-import { Button } from './ui/button';
+// import { Image } from 'expo-image';
+import { Link, useRouter } from 'expo-router';
+import {
+  ChevronRight,
+  HouseIcon,
+  MapPinIcon,
+  SunIcon,
+  UsersIcon,
+  VerifiedIcon,
+} from 'lucide-react-native';
+import { Image, View } from 'react-native';
+import { Badge } from './ui/badge';
+import { Card } from './ui/card';
 import { Icon } from './ui/icon';
 import { Text } from './ui/text';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { Button } from './ui/button';
 
 export default function CourtCard({ court }: { court: CourtListEntry }) {
+  const router = useRouter();
+
   return (
     <Link
       href={{
@@ -20,77 +27,61 @@ export default function CourtCard({ court }: { court: CourtListEntry }) {
           courtId: court.id,
         },
       }}>
-      <View className="flex w-full flex-col gap-4 rounded-xl border border-border p-4">
-        <View className="flex flex-row gap-4">
-          <AspectRatio ratio={1 / 1} className="relative h-[72px] overflow-hidden rounded-md">
-            <Image
-              source={{
-                uri: court.image,
-              }}
-              style={{ width: '100%', height: '100%' }}
-              className="absolute inset-0 object-cover"
-            />
-          </AspectRatio>
-          <View className="flex flex-1 flex-col gap-0.5">
-            <View className="flex flex-row items-center justify-between">
-              <Text className="text-lg font-bold">{court.name}</Text>
-              <View className="flex flex-row items-center gap-1.5">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" className="size-7" size="icon">
-                      <Icon as={court.indoor ? HouseIcon : SunIcon} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <Text>Court is {court.indoor ? 'indoor' : 'outdoor'}.</Text>
-                  </TooltipContent>
-                </Tooltip>
-                {court.verified && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button className="size-7" size="icon">
-                        <Icon className="text-primary-foreground" as={VerifiedIcon} />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <Text>Court is verified.</Text>
-                    </TooltipContent>
-                  </Tooltip>
-                )}
-              </View>
-            </View>
-            <Pressable onPress={() => openDirections(court.address)}>
-              <Text className="text-sm font-medium text-muted-foreground">{court.address}</Text>
-            </Pressable>
+      <Card className="flex w-full flex-col gap-0 p-0">
+        <View className="relative aspect-[16/9] w-full overflow-hidden rounded-t-xl bg-muted">
+          <Image
+            source={{
+              uri: court.image,
+            }}
+            className="absolute inset-0 h-full w-full object-cover object-center"
+          />
+          <View className="absolute flex w-full flex-row items-center justify-between p-4">
+            <Badge variant="secondary" className='gap-1.5'>
+              <Icon size={16} className="text-secondary-foreground" as={court.indoor ? HouseIcon : SunIcon} />
+              <Text className='text-sm'>{court.indoor ? 'Indoor' : 'Outdoor'}</Text>
+            </Badge>
+            <Badge variant="secondary">
+              <Text className='text-sm'>{court.distance.toFixed(1)} mi</Text>
+            </Badge>
           </View>
         </View>
-        <View className="flex flex-row items-center justify-between">
-          <View className="flex flex-row items-center gap-1.5">
-            <Icon className="text-muted-foreground" size={16} as={MapPin} />
-            <Text className="text-sm font-medium text-muted-foreground">
-              {court.distance.toFixed(1)} mi
-            </Text>
-          </View>
-          <View className="flex flex-row items-center gap-4">
-            <View className="flex flex-row items-center gap-1.5">
-              <Icon className="text-muted-foreground" size={16} as={UsersIcon} />
-              <Text className="text-sm font-medium text-muted-foreground">
-                {court.currentActiveSessions} Playing
-              </Text>
-            </View>
-            {court.currentActiveSessions !== 0 && (
-              <View className="flex flex-row items-center gap-1.5">
-                <View className="flex size-8 items-center justify-center rounded-full border border-border bg-muted/30">
-                  <Text className="text-sm font-bold">{court.avgPlayerOverall}</Text>
+        <View className="flex flex-row justify-between gap-6 p-4">
+          <View className="flex flex-1 flex-col gap-4">
+            <View className="flex flex-col gap-1">
+              <Text className="font-semibold text-lg">{court.name}</Text>
+              <View className="flex flex-row items-center gap-2">
+                <View className="flex w-full flex-1 flex-row items-center gap-1.5">
+                  <Icon as={MapPinIcon} className="text-muted-foreground" size={14} />
+                  <Text numberOfLines={1} className="flex-1 text-sm text-muted-foreground">
+                    {court.address}
+                  </Text>
                 </View>
-                <Text className="text-sm font-medium">Average OVR</Text>
               </View>
-            )}
+            </View>
+            <Badge className="gap-2 self-start px-2.5 py-1">
+              <Icon as={UsersIcon} size={16} className='text-primary-foreground' />
+              <Text className="text-sm">
+                {court.currentActiveSessions === 0
+                  ? 'No active runs'
+                  : `${court.currentActiveSessions} Playing Now`}
+              </Text>
+            </Badge>
           </View>
+          <Button
+            onPress={() =>
+              router.navigate({
+                pathname: '/(tabs)/(courts)/court/[courtId]',
+                params: {
+                  courtId: court.id,
+                },
+              })
+            }
+            variant="ghost"
+            size="icon">
+            <Icon size={20} as={ChevronRight} />
+          </Button>
         </View>
-        <Text className="text-xs font-medium text-muted-foreground">Average activity</Text>
-        <ActivityGraph height={32} points={court.activityGraph} />
-      </View>
+      </Card>
     </Link>
   );
 }

@@ -1,18 +1,15 @@
 import { getCourt, getCourtSessions, patchCourtSession, postCourtSession } from '@/lib/endpoints';
-import { CourtSession } from '@/types/court';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { toast } from 'sonner-native';
-import { useLocation } from './LocationProvider';
-import { ActivityIndicator, View } from 'react-native';
-import { Text } from '../ui/text';
-import { Button } from '../ui/button';
-import { Icon } from '../ui/icon';
-import { ArrowLeftFromLineIcon, MapPinIcon } from 'lucide-react-native';
 import { getDistanceInMiles } from '@/lib/utils';
-import { useRouter } from 'expo-router';
-import { authClient } from '@/lib/auth-client';
+import { CourtSession } from '@/types/court';
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
+import { toast } from 'sonner-native';
+import { Button } from '../ui/button';
+import { Text } from '../ui/text';
+import { useLocation } from './LocationProvider';
 
 export const MAX_DISTANCE_FOR_CHECK_IN = 0.062; // miles (~100 meters)
 
@@ -65,7 +62,7 @@ export function CourtSessionProvider({ children }: { children: ReactNode }) {
 
       if (distance > MAX_DISTANCE_FOR_CHECK_IN) {
         checkOut();
-        toast('You have been checked out of your current run due to distance.');
+        toast.error('You have been checked out of your current session due to distance.');
       }
     }
   }, [location, activeCourtSession, court]);
@@ -95,6 +92,9 @@ export function CourtSessionProvider({ children }: { children: ReactNode }) {
       queryClient.invalidateQueries({
         queryKey: ['courtSession', 'unrated'],
       });
+      queryClient.invalidateQueries({
+        queryKey: ['courts'],
+      });
       dismissAll();
       dismiss(`court-${courtId}-check-in-modal`);
       toast.success('Successfully checked in.');
@@ -121,6 +121,9 @@ export function CourtSessionProvider({ children }: { children: ReactNode }) {
       });
       queryClient.invalidateQueries({
         queryKey: ['courtSession', 'unrated'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['courts'],
       });
       toast.success('Successfully checked out.');
     },
@@ -197,14 +200,14 @@ export function SessionFooter() {
   const handlePress = () => {
     if (court) {
       router.push({
-        pathname: '/(tabs)/(courts)/court/[courtId]',
+        pathname: '/court/[courtId]',
         params: { courtId: court.id },
       });
     }
   };
 
   return (
-    <View className="border-t border-border bg-card px-4 py-3">
+    <View className="border-t border-border px-4 py-3">
       <View className="flex flex-row items-center justify-between gap-3">
         <View className="flex flex-1 flex-row items-center gap-3" onTouchEnd={handlePress}>
           <View className="flex flex-1 flex-col">
@@ -212,7 +215,7 @@ export function SessionFooter() {
               Playing at {court?.name ?? 'Loading...'}
             </Text>
             <Text className="text-sm font-medium text-muted-foreground">
-              Run Duration: {duration}
+              Session Duration: {duration}
             </Text>
           </View>
         </View>

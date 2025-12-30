@@ -233,3 +233,70 @@ export const rating = pgTable(
     index("rating_created_at_idx").on(table.createdAt),
   ]
 );
+
+export const encounteredPlayer = pgTable(
+  "encountered_player",
+  {
+    id: serial().primaryKey().notNull(),
+
+    courtSessionId: integer("court_session_id")
+      .notNull()
+      .references(() => courtSession.id),
+    rateeId: text("ratee_id")
+      .notNull()
+      .references(() => user.id),
+
+    // === PRECOMPUTED AT CHECKOUT (immutable) ===
+
+    // Combined weight (raterWeight × experienceWeight × runCompetitiveness × overlapWeight)
+    // Does NOT include outlier weight (computed at submit time)
+    combinedWeight: doublePrecision("combined_weight").notNull(),
+
+    // For history/audit in rating table
+    raterOverallAtTime: integer("rater_overall_at_time").notNull(),
+    runCompetitivenessAtTime: doublePrecision(
+      "run_competitiveness_at_time"
+    ).notNull(),
+
+    // Ratee's ratings at checkout (for outlier detection at submit time)
+    rateeDefenseAtTime: integer("ratee_defense_at_time").notNull(),
+    rateeFinishingAtTime: integer("ratee_finishing_at_time").notNull(),
+    rateeShootingAtTime: integer("ratee_shooting_at_time").notNull(),
+    rateePlaymakingAtTime: integer("ratee_playmaking_at_time").notNull(),
+    rateeOverallAtTime: integer("ratee_overall_at_time").notNull(),
+    rateeLifetimeCount: integer("ratee_lifetime_count").notNull(),
+
+    // Ratee display info (frozen for UI)
+    rateeName: text("ratee_name").notNull(),
+    rateeImage: text("ratee_image"),
+    rateeArchetype: text("ratee_archetype").notNull(),
+    rateeHeight: text("ratee_height"),
+
+    // === DRAFT RATINGS (mutable) ===
+
+    // User's rating inputs (nullable until rated)
+    defenseRating: integer("defense_rating"),
+    finishingRating: integer("finishing_rating"),
+    shootingRating: integer("shooting_rating"),
+    playmakingRating: integer("playmaking_rating"),
+
+    // Skip tracking
+    skipped: boolean("skipped").notNull().default(false),
+
+    // Order in the form
+    displayOrder: integer("display_order").notNull(),
+
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("encountered_player_court_session_idx").on(table.courtSessionId),
+    uniqueIndex("encountered_player_court_session_ratee_idx").on(
+      table.courtSessionId,
+      table.rateeId
+    ),
+  ]
+);

@@ -32,8 +32,6 @@ export function InvalidationProvider({ children }: { children: ReactNode }) {
     // Mark as not unmounting when setting up new connection
     isUnmountingRef.current = false;
 
-    console.log('Attempting socket connection to:', `${process.env.EXPO_PUBLIC_SERVER_URL}/invalidation`);
-
     const socket = io(`${process.env.EXPO_PUBLIC_SERVER_URL}/invalidation`, {
       transports: ['websocket'],
       auth: {
@@ -44,28 +42,24 @@ export function InvalidationProvider({ children }: { children: ReactNode }) {
     socketRef.current = socket;
 
     socket.on('connect', () => {
-      console.log('Socket connected successfully');
       if (!isUnmountingRef.current) {
         setIsConnected(true);
       }
     });
 
     socket.on('disconnect', (reason) => {
-      console.log('Socket disconnected:', reason);
       if (!isUnmountingRef.current) {
         setIsConnected(false);
       }
     });
 
     socket.on('connect_error', (error) => {
-      console.log('Socket connect_error:', error.message);
       if (!isUnmountingRef.current) {
         setIsConnected(false);
       }
     });
 
     socket.on('data-invalidated', (queryKey: string[]) => {
-      console.log('User Id', currentUserData.user.id, 'Query Key', queryKey);
       if (!isUnmountingRef.current && queryClientRef.current) {
         queryClientRef.current.invalidateQueries({
           queryKey,
