@@ -59,7 +59,7 @@ export default function AuthPage() {
     });
     if (error) {
       console.log('Error:', error);
-      toast.error(error.message ?? 'Error sending OTP');
+      toast.error(error.message ?? 'Error sending OTP', { position: 'bottom-center' });
     }
   }
 

@@ -247,7 +247,7 @@ export default function RatePage() {
       }
     },
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(error.message, { position: 'bottom-center' });
     },
   });
 
@@ -267,7 +267,7 @@ export default function RatePage() {
       router.dismiss();
     },
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(error.message, { position: 'bottom-center' });
     },
   });
 

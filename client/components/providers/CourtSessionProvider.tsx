@@ -62,7 +62,9 @@ export function CourtSessionProvider({ children }: { children: ReactNode }) {
 
       if (distance > MAX_DISTANCE_FOR_CHECK_IN) {
         checkOut();
-        toast.error('You have been checked out of your current session due to distance.');
+        toast.error('You have been checked out of your current session due to distance.', {
+          position: 'bottom-center',
+        });
       }
     }
   }, [location, activeCourtSession, court]);
@@ -97,7 +99,7 @@ export function CourtSessionProvider({ children }: { children: ReactNode }) {
       });
       dismissAll();
       dismiss(`court-${courtId}-check-in-modal`);
-      toast.success('Successfully checked in.');
+      toast.success('Successfully checked in.', { position: 'bottom-center' });
     },
   });
 
@@ -125,7 +127,7 @@ export function CourtSessionProvider({ children }: { children: ReactNode }) {
       queryClient.invalidateQueries({
         queryKey: ['courts'],
       });
-      toast.success('Successfully checked out.');
+      toast.success('Successfully checked out.', { position: 'bottom-center' });
     },
   });
 

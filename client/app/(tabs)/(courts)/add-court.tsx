@@ -95,7 +95,7 @@ export default function AddCourtPage() {
     },
     onError: (error) => {
       console.log('Error', error);
-      toast.error(error.message);
+      toast.error(error.message, { position: 'bottom-center' });
     },
   });
 
@@ -345,7 +345,11 @@ export default function AddCourtPage() {
                 <AlertDialogTrigger asChild>
                   <Button disabled={isPending} className="flex-1">
                     <Text>Save</Text>
-                    {isPending ? <ActivityIndicator /> : <Icon className='text-primary-foreground' size={18} as={CheckIcon} />}
+                    {isPending ? (
+                      <ActivityIndicator />
+                    ) : (
+                      <Icon className="text-primary-foreground" size={18} as={CheckIcon} />
+                    )}
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
