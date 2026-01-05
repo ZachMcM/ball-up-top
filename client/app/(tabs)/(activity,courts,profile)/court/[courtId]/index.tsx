@@ -61,6 +61,9 @@ export default function CourtPage() {
   const { mutate: bookmarkCourt } = useMutation({
     mutationFn: async () => postCourtBookmark(courtId),
     onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['courts'],
+      });
       queryClient.setQueryData(['court', courtId], (old: Court) => ({
         ...old,
         isBookmarked: true,
@@ -75,6 +78,9 @@ export default function CourtPage() {
   const { mutate: unbookmarkCourt } = useMutation({
     mutationFn: async () => deleteCourtBookmark(courtId),
     onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['courts'],
+      });
       queryClient.setQueryData(['court', courtId], (old: Court) => ({
         ...old,
         isBookmarked: false,
