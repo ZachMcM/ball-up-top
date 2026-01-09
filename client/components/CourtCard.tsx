@@ -58,8 +58,8 @@ export default function CourtCard({ court }: { court: CourtListEntry }) {
                 </View>
               </View>
             </View>
-            <Badge className="gap-2 self-start px-2.5 py-1">
-              <Icon as={UsersIcon} size={16} className='text-primary-foreground' />
+            <Badge variant="secondary" className="gap-2 self-start px-2.5 py-1">
+              <Icon as={UsersIcon} size={16} className='text-primary' />
               <Text className="text-sm">
                 {court.currentActiveSessions === 0
                   ? 'No active runs'

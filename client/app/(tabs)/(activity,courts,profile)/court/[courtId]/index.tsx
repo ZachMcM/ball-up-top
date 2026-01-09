@@ -219,7 +219,12 @@ export default function CourtPage() {
                   </Button>
                 </View>
                 <View className="flex flex-1 flex-col gap-4 rounded-2xl border border-border p-4">
-                  <Text className="font-semibold">ACTIVITY</Text>
+                  <View className="flex flex-col">
+                    <Text className="font-semibold">ACTIVITY</Text>
+                    <Text className="text-sm font-medium text-muted-foreground">
+                      Average players at a given hour
+                    </Text>
+                  </View>
                   {court.activityGraph.filter((point) => point.avgSessions !== 0).length !== 0 ? (
                     <ActivityGraph height={56} points={court.activityGraph} />
                   ) : (
@@ -231,11 +236,11 @@ export default function CourtPage() {
                 <View className="flex flex-1 flex-col gap-4 rounded-2xl border border-border p-4">
                   <View className="flex flex-col">
                     <Text className="font-semibold">CURRENTLY PLAYING</Text>
-                    {court.currentActiveSessions > 1 && (
-                      <Text className="text-sm font-medium text-muted-foreground">
-                        {court.currentActiveSessions} players • ~{court.avgPlayerOverall} overall
-                      </Text>
-                    )}
+                    <Text className="text-sm font-medium text-muted-foreground">
+                      {court.currentActiveSessions > 1
+                        ? `${court.currentActiveSessions} players • ~${court.avgPlayerOverall} overall`
+                        : 'People actively hooping at court'}
+                    </Text>
                   </View>
                   {court.currentActiveSessions !== 0 ? (
                     <View className="flex flex-col gap-3">
@@ -270,7 +275,12 @@ export default function CourtPage() {
                   )}
                 </View>
                 <View className="flex flex-1 flex-col gap-4 rounded-2xl border border-border p-4">
-                  <Text className="font-semibold">COURT LEADERBOARD</Text>
+                  <View className="flex flex-col">
+                    <Text className="font-semibold">COURT LEADERBOARD</Text>
+                    <Text className="text-sm font-medium text-muted-foreground">
+                      Best players from past 30 days
+                    </Text>
+                  </View>
                   {court.leaderboard.length !== 0 ? (
                     <NativewindScrollView
                       contentContainerClassName="flex flex-row items-center gap-6"
@@ -396,8 +406,10 @@ function LeaderboardCard({ user, index }: { user: User; index: number }) {
               <Text>{getInitials(user.name)}</Text>
             </AvatarFallback>
           </Avatar>
-          <View className="absolute -bottom-1 -right-1 size-5 items-center justify-center rounded-full bg-secondary">
-            <Text className="text-sm font-semibold text-secondary-foreground">{index + 1}</Text>
+          <View className="absolute -bottom-1 bg-background rounded-full p-1 -right-1">
+            <View className="size-5 items-center justify-center rounded-full bg-secondary">
+              <Text className="text-sm font-semibold text-secondary-foreground">{index + 1}.</Text>
+            </View>
           </View>
         </View>
         <View className="flex flex-col items-center">

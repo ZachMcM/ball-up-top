@@ -82,7 +82,7 @@ export default function ProfilePage() {
                     <View className="flex flex-col">
                       <Text className="text-xl font-bold">{user.name}</Text>
                       <Text className="font-semibold text-muted-foreground">
-                        {user.height} {user.archetype}
+                        {user.height} • {user.archetype}
                       </Text>
                     </View>
                   </View>

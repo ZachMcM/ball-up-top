@@ -192,6 +192,7 @@ courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
         FROM court_session cs
         INNER JOIN "user" u ON cs.user_id = u.id
         WHERE cs.court_id = ${courtId}
+          AND cs.start_time >= NOW() - INTERVAL '30 days'
         ORDER BY u.id
       ) AS unique_users
       ORDER BY overall DESC
