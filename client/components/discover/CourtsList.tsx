@@ -24,7 +24,7 @@ interface CourtsListProps {
   isIndoor?: boolean;
   isBookmarked?: true;
   isPopular?: true;
-  sortBy?: 'distance' | 'activeCount';
+  sortBy?: 'distance' | 'active_players';
 }
 
 export function CourtsList({
@@ -57,6 +57,7 @@ export function CourtsList({
         popular: isPopular,
         bookmarked: isBookmarked,
         searchQuery: debouncedSearchQuery,
+        sortBy,
       });
       return courts;
     },
@@ -64,24 +65,13 @@ export function CourtsList({
     staleTime: 1000 * 60,
   });
 
-  const sortedCourts = useMemo(() => {
-    if (!courts) return [];
-    if (!sortBy) return courts;
-    return [...courts].sort((a, b) => {
-      if (sortBy === 'distance') {
-        return a.distance - b.distance;
-      }
-      return b.currentActiveSessions - a.currentActiveSessions;
-    });
-  }, [courts, sortBy]);
-
   const isLoading = isLocationPending || areCourtsPending;
 
   if (isLoading) {
     return <ActivityIndicator />;
   }
 
-  if (sortedCourts.length === 0) {
+  if (!courts || courts.length === 0) {
     return (
       <Empty className="border border-dashed border-border">
         <EmptyHeader>
@@ -103,7 +93,7 @@ export function CourtsList({
   return (
     <NativewindFlatList
       contentContainerClassName="flex flex-col gap-4 pb-32"
-      data={sortedCourts}
+      data={courts}
       showsVerticalScrollIndicator={false}
       renderItem={({ item }) => <CourtCard court={item} />}
       keyExtractor={(item) => item.id.toString()}

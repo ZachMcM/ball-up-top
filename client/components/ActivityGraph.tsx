@@ -56,7 +56,7 @@ export default function ActivityGraph({
       isAnimated
       maxValue={Math.max(...points.map((p) => p.avgSessions))}
       hideYAxisText
-      height={42}
+      height={64}
       thickness={2}
       frontColor={THEME[colorScheme!].primary}
       dataPointsColor={THEME[colorScheme!].primary}
@@ -70,9 +70,9 @@ export default function ActivityGraph({
         fontWeight: 500,
         width: 96,
       }}
-      data={localPoints.map((entry) => ({
-        value: entry.avgSessions,
-        label: getLabel(entry.hour),
+      data={localPoints.map((point) => ({
+        value: point.avgSessions,
+        label: getLabel(point.hour),
       }))}
       {...props}
     />

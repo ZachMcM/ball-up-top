@@ -5,35 +5,10 @@ import * as z from "zod";
 import { handleError } from "../../utils/handleError";
 import { authMiddleware, upload } from "../../utils/middleware";
 import { r2 } from "../../utils/r2";
-import { MAX_OVR, MIN_OVR } from "../config/ratings";
 import { db } from "../db";
 import { court, courtSession, rating, user } from "../db/schema";
 
 export const usersRoute = Router();
-
-function normalizeRatingHistory(
-  ratingHistory: { createdAt: Date; overall: number }[]
-) {
-  if (ratingHistory.length === 0) return [];
-
-  const overalls = ratingHistory.map(({ overall }) => overall);
-  const currMax = Math.max(...overalls);
-  const currMin = Math.min(...overalls);
-
-  // Handle case where all values are the same
-  if (currMax === currMin) {
-    return ratingHistory.map(({ overall, createdAt }) => ({
-      createdAt,
-      overall: (MIN_OVR + MAX_OVR) / 2,
-    }));
-  }
-
-  return ratingHistory.map(({ overall: x, createdAt }) => ({
-    createdAt,
-    overall:
-      ((x - currMin) / (currMax - currMin)) * (MAX_OVR - MIN_OVR) + MIN_OVR,
-  }));
-}
 
 usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
   try {
@@ -59,7 +34,6 @@ usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Fetch rating history (ratings received by this user)
     const ratingHistory = await db
       .select({
         overall: rating.rateeNewOverall,
@@ -67,9 +41,9 @@ usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
       })
       .from(rating)
       .where(eq(rating.rateeId, userId))
-      .orderBy(rating.createdAt);
+      .orderBy(rating.createdAt)
+      .limit(25);
 
-    // Fetch recent sessions with court info (limit 5)
     const recentSessions = await db
       .select({
         id: courtSession.id,
@@ -87,11 +61,9 @@ usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
       .orderBy(desc(courtSession.startTime))
       .limit(5);
 
-    const normalizedRatingHistory = normalizeRatingHistory(ratingHistory);
-
     res.json({
       ...targetUser,
-      ratingHistory: normalizedRatingHistory,
+      ratingHistory,
       recentSessions,
     });
   } catch (error) {

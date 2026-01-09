@@ -84,6 +84,7 @@ export async function getCourts({
   verified,
   popular,
   bookmarked,
+  sortBy,
 }: {
   lat: number;
   lng: number;
@@ -93,6 +94,7 @@ export async function getCourts({
   verified?: true;
   popular?: true;
   bookmarked?: true;
+  sortBy?: 'distance' | 'active_players';
 }): Promise<CourtListEntry[]> {
   const params = new URLSearchParams();
 
@@ -114,6 +116,9 @@ export async function getCourts({
   }
   if (bookmarked !== undefined) {
     params.append('bookmarked', bookmarked.toString());
+  }
+  if (sortBy !== undefined) {
+    params.append('sortBy', sortBy);
   }
 
   return await serverRequest({
@@ -271,9 +276,7 @@ export async function deleteCourtBookmark(id: number) {
   });
 }
 
-export async function getEncounteredPlayers(
-  courtSessionId: number
-): Promise<EncounteredPlayer[]> {
+export async function getEncounteredPlayers(courtSessionId: number): Promise<EncounteredPlayer[]> {
   return await serverRequest({
     endpoint: `/court-sessions/${courtSessionId}/encountered-players`,
     method: 'GET',
@@ -307,8 +310,8 @@ export async function postSessionRatings(sessionId: number): Promise<void> {
 export async function getUser(userId: string): Promise<ExtendedUser> {
   const user = await serverRequest({
     endpoint: `/users/${userId}`,
-    method: "GET"
-  })
+    method: 'GET',
+  });
 
-  return user
+  return user;
 }

@@ -21,7 +21,7 @@ interface DiscoverFiltersProps {
     isIndoor?: boolean;
     isBookmarked?: true;
     isPopular?: true;
-    sortBy?: 'distance' | 'activeCount';
+    sortBy?: 'distance' | 'active_players';
   };
   onCourtsFiltersChange: (filters: DiscoverFiltersProps['courtsFilters']) => void;
 
@@ -67,7 +67,14 @@ export function DiscoverFilters({
       onPlayersFiltersChange(tempPlayersFilters);
     }
     bottomSheetRef.current?.dismiss();
-  }, [activeTab, tempCourtsFilters, tempPlayersFilters, bottomSheetRef, onCourtsFiltersChange, onPlayersFiltersChange]);
+  }, [
+    activeTab,
+    tempCourtsFilters,
+    tempPlayersFilters,
+    bottomSheetRef,
+    onCourtsFiltersChange,
+    onPlayersFiltersChange,
+  ]);
 
   const handleResetFilters = useCallback(() => {
     if (activeTab === 'courts') {

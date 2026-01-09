@@ -21,7 +21,7 @@ export default function DiscoverPage() {
     isIndoor?: boolean;
     isBookmarked?: true;
     isPopular?: true;
-    sortBy?: 'distance' | 'activeCount';
+    sortBy?: 'distance' | 'active_players';
   }>({});
 
   // Players filter state

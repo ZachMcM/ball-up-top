@@ -4,8 +4,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Icon } from '@/components/ui/icon';
-import { VerticalRatingBar } from '@/components/ui/vertical-rating-bar';
 import { Text } from '@/components/ui/text';
+import { VerticalRatingBar } from '@/components/ui/vertical-rating-bar';
 import { authClient } from '@/lib/auth-client';
 import { getUser } from '@/lib/endpoints';
 import { THEME } from '@/lib/theme';
@@ -52,6 +52,17 @@ export default function ProfilePage() {
 
   const { data: currentUserData } = authClient.useSession();
 
+  const getHighestOvr = () => {
+    let maxIndex = 0;
+    user?.ratingHistory.forEach((point, i) => {
+      if (user.ratingHistory[0].overall < point.overall) {
+        maxIndex = i;
+      }
+    });
+
+    return maxIndex;
+  };
+
   return (
     <>
       <Stack.Screen
@@ -91,7 +102,7 @@ export default function ProfilePage() {
                     <Text className="text-sm font-medium text-muted-foreground">Overall</Text>
                   </View>
                 </View>
-                <View className="flex flex-1 flex-col gap-6 rounded-2xl border border-border p-4">
+                <View className="flex flex-1 flex-col gap-4 rounded-2xl border border-border p-4">
                   <Text className="text-lg font-semibold">RATINGS</Text>
                   <View className="flex flex-row">
                     {RATING_CATEGORIES.map(({ key, label }) => (
@@ -99,39 +110,48 @@ export default function ProfilePage() {
                     ))}
                   </View>
                 </View>
-                <View className="flex flex-1 flex-col gap-6 rounded-2xl border border-border p-4">
+                <View className="flex flex-1 flex-col gap-4 rounded-2xl border border-border p-4">
                   <Text className="text-lg font-semibold">RATING HISTORY</Text>
                   {user.ratingHistory.length > 0 ? (
                     <LineChart
                       isAnimated
                       hideYAxisText
-                      height={64}
+                      height={56}
                       thickness={2}
                       color={THEME[colorScheme!].primary}
                       dataPointsColor={THEME[colorScheme!].primary}
-                      dataPointsRadius={3}
+                      dataPointsRadius={2.5}
                       hideRules
                       xAxisThickness={0}
                       yAxisThickness={0}
                       spacing={96}
-                      dataPointLabelShiftY={6}
+                      scrollToIndex={getHighestOvr()}
+                      dataPointLabelShiftY={-14}
+                      dataPointLabelShiftX={8}
+                      yAxisOffset={45}
                       xAxisLabelTextStyle={{
                         color: THEME[colorScheme!].mutedForeground,
                         fontWeight: 500,
                         width: 96,
                         marginLeft: 32,
+                        fontSize: 12,
                       }}
                       maxValue={99}
                       data={user.ratingHistory.map((entry) => ({
                         value: entry.overall,
                         label: timeAgo(entry.createdAt),
+                        dataPointLabelComponent: () => (
+                          <Text className="text-xs font-medium text-muted-foreground">
+                            {entry.overall}
+                          </Text>
+                        ),
                       }))}
                     />
                   ) : (
                     <Text className="text-center text-xs font-medium">No ratings data yet.</Text>
                   )}
                 </View>
-                <View className="flex flex-col gap-6 rounded-2xl border border-border p-4">
+                <View className="flex flex-col gap-4 rounded-2xl border border-border p-4">
                   <Text className="text-lg font-semibold">RECENT SESSIONS</Text>
                   {user.recentSessions.length > 0 ? (
                     <View className="flex flex-col gap-3">
@@ -174,7 +194,7 @@ export default function ProfilePage() {
                   )}
                 </View>
                 {user.id === currentUserData?.user.id && (
-                  <View className="flex flex-1 flex-col gap-6 rounded-2xl border border-border p-4">
+                  <View className="flex flex-1 flex-col gap-4 rounded-2xl border border-border p-4">
                     <Text className="text-lg font-semibold">Settings</Text>
                     <Button variant="destructive" className="justify-start">
                       <Icon className="text-destructive" as={LogOutIcon} />

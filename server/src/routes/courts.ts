@@ -1,5 +1,5 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { and, eq, isNull, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, or, sql } from "drizzle-orm";
 import { Router } from "express";
 import * as z from "zod";
 import { getDistanceInMiles } from "../../utils/getDistanceMiles";
@@ -8,7 +8,11 @@ import { invalidateQueries } from "../../utils/invalidateQueries";
 import { logger } from "../../utils/logger";
 import { authMiddleware, upload } from "../../utils/middleware";
 import { r2 } from "../../utils/r2";
-import { MAX_DISTANCE, MAX_DISTANCE_FOR_CHECK_IN, POPULAR_THRESHOLD } from "../config/courts";
+import {
+  MAX_DISTANCE,
+  MAX_DISTANCE_FOR_CHECK_IN,
+  POPULAR_THRESHOLD,
+} from "../config/courts";
 import { db } from "../db";
 import { court, courtBookmark, courtSession, user } from "../db/schema";
 
@@ -262,7 +266,9 @@ courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
       activityGraph: activityResult.rows,
       avgPlayerOverall: Number(sessionStats?.avgPlayerOverall ?? 0),
       currentActiveSessions: Number(sessionStats?.currentActiveSessions ?? 0),
-      avgPlayersPerDay: Number(avgPlayersPerDayResult.rows[0]?.avgPlayersPerDay ?? 0),
+      popular:
+        Number(avgPlayersPerDayResult.rows[0]?.avgPlayersPerDay ?? 0) >
+        POPULAR_THRESHOLD,
       currentActiveUsers: activeUsers,
       leaderboard: leaderboardResult.rows,
     });
@@ -368,6 +374,7 @@ const CourtsParamsSchema = z.object({
     .enum(["true"])
     .transform((val) => val === "true")
     .optional(),
+  sortBy: z.enum(["distance", "active_players"]).optional().default("distance"),
 });
 
 courtsRoute.get("/courts", authMiddleware, async (req, res) => {
@@ -377,8 +384,17 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
       return res.status(400).json({ error: validQueryParams.error.message });
     }
 
-    const { lat, lng, limit, searchQuery, indoor, verified, popular, bookmarked } =
-      validQueryParams.data;
+    const {
+      lat,
+      lng,
+      limit,
+      searchQuery,
+      indoor,
+      verified,
+      popular,
+      bookmarked,
+      sortBy,
+    } = validQueryParams.data;
 
     // Spherical Law of Cosines formula for calculating distance on Earth's surface
     // Returns distance in miles (Earth's radius = 3958.8 miles)
@@ -397,7 +413,9 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
     const avgPlayersPerDayStats = db
       .select({
         courtId: sql<number>`court_id`.as("court_id"),
-        avgPlayersPerDay: sql<number>`AVG(daily_players)`.as("avg_players_per_day"),
+        avgPlayersPerDay: sql<number>`AVG(daily_players)`.as(
+          "avg_players_per_day"
+        ),
       })
       .from(
         sql`(
@@ -482,12 +500,21 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
         isBookmarked: sql<boolean>`${bookmarkStatus.courtId} IS NOT NULL`,
       })
       .from(court)
-      .leftJoin(avgPlayersPerDayStats, eq(court.id, avgPlayersPerDayStats.courtId))
+      .leftJoin(
+        avgPlayersPerDayStats,
+        eq(court.id, avgPlayersPerDayStats.courtId)
+      )
       .leftJoin(sessionStats, eq(court.id, sessionStats.courtId))
       .leftJoin(bookmarkStatus, eq(court.id, bookmarkStatus.courtId))
-      .where(and(...conditions));
+      .where(and(...conditions))
+      .orderBy(
+        sortBy === "active_players"
+          ? desc(sql`COALESCE(${sessionStats.currentActiveSessions}, 0)`)
+          : asc(distanceFormula)
+      )
+      .limit(limit);
 
-    const courts = await query.limit(limit);
+    const courts = await query;
 
     res.json(courts);
   } catch (error) {

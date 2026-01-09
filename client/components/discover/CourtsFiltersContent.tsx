@@ -9,7 +9,7 @@ interface CourtsFiltersContentProps {
     isIndoor?: boolean;
     isBookmarked?: true;
     isPopular?: true;
-    sortBy?: 'distance' | 'activeCount';
+    sortBy?: 'distance' | 'active_players';
   };
   onChange: (filters: CourtsFiltersContentProps['filters']) => void;
 }
@@ -105,16 +105,16 @@ export function CourtsFiltersContent({ filters, onChange }: CourtsFiltersContent
           onPress={() =>
             onChange({
               ...filters,
-              sortBy: sortBy === 'activeCount' ? undefined : 'activeCount',
+              sortBy: sortBy === 'active_players' ? undefined : 'active_players',
             })
           }
           className="flex flex-row items-center justify-between py-3">
           <Text className="text-base">Most Players</Text>
           <View
             className={`size-6 items-center justify-center rounded-full border-2 ${
-              sortBy === 'activeCount' ? 'border-primary' : 'border-muted-foreground'
+              sortBy === 'active_players' ? 'border-primary' : 'border-muted-foreground'
             }`}>
-            {sortBy === 'activeCount' && <View className="size-3.5 rounded-full bg-primary" />}
+            {sortBy === 'active_players' && <View className="size-3.5 rounded-full bg-primary" />}
           </View>
         </Pressable>
       </View>
