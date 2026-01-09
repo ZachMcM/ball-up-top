@@ -95,7 +95,7 @@ export function CourtSessionProvider({ children }: { children: ReactNode }) {
         queryKey: ['courtSession', 'unrated'],
       });
       queryClient.invalidateQueries({
-        queryKey: ['courts'],
+        queryKey: ['discover', 'courts'],
       });
       dismissAll();
       dismiss(`court-${courtId}-check-in-modal`);
@@ -125,7 +125,7 @@ export function CourtSessionProvider({ children }: { children: ReactNode }) {
         queryKey: ['courtSession', 'unrated'],
       });
       queryClient.invalidateQueries({
-        queryKey: ['courts'],
+        queryKey: ['discover', 'courts'],
       });
       toast.success('Successfully checked out.', { position: 'bottom-center' });
     },

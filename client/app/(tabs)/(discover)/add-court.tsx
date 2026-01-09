@@ -84,7 +84,7 @@ export default function AddCourtPage() {
   const { mutate: saveCourt, isPending } = useMutation({
     mutationFn: async (values: z.infer<typeof AddCourtSchema>) => await postCourt(values),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['courts'] });
+      queryClient.invalidateQueries({ queryKey: ['discover', 'courts'] });
       toast.success(
         "Court successfully added! Please check back soon to review it's verification status.",
         {

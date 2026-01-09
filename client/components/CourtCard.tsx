@@ -31,7 +31,7 @@ export default function CourtCard({ court }: { court: CourtListEntry }) {
   return (
     <Link
       href={{
-        pathname: '/(tabs)/(courts)/court/[courtId]',
+        pathname: '/(tabs)/(discover)/court/[courtId]',
         params: {
           courtId: court.id,
         },

@@ -7,7 +7,7 @@ export default function CourtsLayout() {
       <Stack.Screen
         name="index"
         options={{
-          headerTitle: 'Courts',
+          headerTitle: 'Discover',
         }}
       />
       <Stack.Screen

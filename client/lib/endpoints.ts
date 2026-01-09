@@ -2,8 +2,8 @@ import { ImagePickerAsset } from 'expo-image-picker';
 import { authClient } from './auth-client';
 import { Court, CourtListEntry, CourtSession, Place } from '@/types/court';
 import * as z from 'zod';
-import { AddCourtSchema } from '@/app/(tabs)/(courts)/add-court';
-import { ExtendedUser, User } from '@/types/user';
+import { AddCourtSchema } from '@/app/(tabs)/(discover)/add-court';
+import { ExtendedUser, PlayerListEntry, User } from '@/types/user';
 import { EncounteredPlayer } from '@/types/encounteredPlayer';
 
 export type serverRequestParams = {
@@ -118,6 +118,52 @@ export async function getCourts({
 
   return await serverRequest({
     endpoint: `/courts?${params.toString()}`,
+    method: 'GET',
+  });
+}
+
+export async function getPlayers({
+  limit = 25,
+  searchQuery,
+  archetypes,
+  minHeight,
+  maxHeight,
+  minOverall,
+  sortBy,
+}: {
+  limit?: number;
+  searchQuery?: string;
+  archetypes?: string[];
+  minHeight?: number;
+  maxHeight?: number;
+  minOverall?: number;
+  sortBy?: 'most_active' | 'overall_desc' | 'overall_asc';
+}): Promise<PlayerListEntry[]> {
+  const params = new URLSearchParams();
+
+  params.append('limit', limit.toString());
+
+  if (searchQuery !== undefined && searchQuery !== '') {
+    params.append('searchQuery', searchQuery);
+  }
+  if (archetypes !== undefined && archetypes.length > 0) {
+    params.append('archetypes', archetypes.join(','));
+  }
+  if (minHeight !== undefined) {
+    params.append('minHeight', minHeight.toString());
+  }
+  if (maxHeight !== undefined) {
+    params.append('maxHeight', maxHeight.toString());
+  }
+  if (minOverall !== undefined) {
+    params.append('minOverall', minOverall.toString());
+  }
+  if (sortBy !== undefined) {
+    params.append('sortBy', sortBy);
+  }
+
+  return await serverRequest({
+    endpoint: `/players?${params.toString()}`,
     method: 'GET',
   });
 }

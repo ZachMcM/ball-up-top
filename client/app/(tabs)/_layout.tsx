@@ -2,7 +2,7 @@ import { SessionFooter, useCourtSession } from '@/components/providers/CourtSess
 import { Icon } from '@/components/ui/icon';
 import { BottomTabBar, BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Tabs, usePathname, useRouter } from 'expo-router';
-import { Activity, MapPin, User } from 'lucide-react-native';
+import { Activity, Search, User } from 'lucide-react-native';
 import { useEffect, useRef } from 'react';
 import { View } from 'react-native';
 
@@ -61,11 +61,11 @@ export default function TabsLayout() {
   return (
     <Tabs tabBar={(props) => <CustomTabBar {...props} />}>
       <Tabs.Screen
-        name="(courts)"
+        name="(discover)"
         options={{
           headerShown: false,
-          title: 'Courts',
-          tabBarIcon: ({ color }) => <Icon as={MapPin} size={18} color={color} />,
+          title: 'Discover',
+          tabBarIcon: ({ color }) => <Icon as={Search} size={18} color={color} />,
         }}
       />
       <Tabs.Screen

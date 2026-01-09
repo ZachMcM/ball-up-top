@@ -64,7 +64,7 @@ export default function CourtPage() {
     mutationFn: async () => postCourtBookmark(courtId),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['courts'],
+        queryKey: ['discover', 'courts'],
       });
       queryClient.setQueryData(['court', courtId], (old: Court) => ({
         ...old,
@@ -81,7 +81,7 @@ export default function CourtPage() {
     mutationFn: async () => deleteCourtBookmark(courtId),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['courts'],
+        queryKey: ['discover', 'courts'],
       });
       queryClient.setQueryData(['court', courtId], (old: Court) => ({
         ...old,
@@ -101,7 +101,7 @@ export default function CourtPage() {
       bookmarkCourt();
     }
     queryClient.invalidateQueries({
-      queryKey: ['courts'],
+      queryKey: ['discover', 'courts'],
     });
   };
 
@@ -266,10 +266,7 @@ export default function CourtPage() {
                           </Text>
                           <Button
                             onPress={() => {
-                              router.navigate({
-                                pathname: '/court/[courtId]/players',
-                                params: { courtId },
-                              });
+                              router.push(`/court/${courtId}/players` as any);
                             }}
                             size="sm"
                             variant="outline"
@@ -405,11 +402,7 @@ export default function CourtPage() {
 
 function LeaderboardCard({ user, index }: { user: User; index: number }) {
   return (
-    <Link
-      href={{
-        pathname: '/user/[userId]',
-        params: { userId: user.id },
-      }}>
+    <Link href={`/user/${user.id}` as any}>
       <View className="flex flex-col items-center gap-2">
         <View className="relative">
           <Avatar className="size-14" alt={`${user.name}'s image`}>
