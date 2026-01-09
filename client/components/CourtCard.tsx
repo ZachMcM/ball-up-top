@@ -1,12 +1,12 @@
 import { CourtListEntry } from '@/types/court';
-// import { Image } from 'expo-image';
 import { Link } from 'expo-router';
 import {
   HomeIcon,
+  MapPinIcon,
   StarIcon,
   SunIcon,
   UsersIcon,
-  VerifiedIcon
+  VerifiedIcon,
 } from 'lucide-react-native';
 import { Image, View } from 'react-native';
 import { AspectRatio } from './ui/aspect-ratio';
@@ -14,6 +14,18 @@ import { Badge } from './ui/badge';
 import { Card } from './ui/card';
 import { Icon } from './ui/icon';
 import { Text } from './ui/text';
+
+function getCityState(address: string): string {
+  const parts = address.split(',').map((p) => p.trim());
+  if (parts.length >= 2) {
+    const city = parts[parts.length - 2];
+    const stateZip = parts[parts.length - 1];
+    // Extract just the state abbreviation (first 2 letters after trimming)
+    const state = stateZip.split(' ')[0];
+    return `${city}, ${state}`;
+  }
+  return address;
+}
 
 export default function CourtCard({ court }: { court: CourtListEntry }) {
   return (
@@ -34,12 +46,20 @@ export default function CourtCard({ court }: { court: CourtListEntry }) {
             className="absolute inset-0 object-cover"
           />
         </AspectRatio>
-        <View className="flex flex-col gap-1">
-          <View className="flex flex-row items-center justify-between">
-            <Text className="text-lg font-semibold">{court.name}</Text>
-            <Text className="font-medium text-muted-foreground">
-              {court.distance.toFixed(1)} mi
-            </Text>
+        <View className="flex flex-col gap-2">
+          <View className="flex flex-col">
+            <View className="flex flex-row items-center justify-between">
+              <Text className="text-lg font-semibold">{court.name}</Text>
+              <Text className="font-medium text-muted-foreground">
+                {court.distance.toFixed(1)} mi
+              </Text>
+            </View>
+            <View className="flex flex-row items-center gap-1.5">
+              <Icon as={MapPinIcon} className="text-muted-foreground" size={14} />
+              <Text className="text-sm font-medium text-muted-foreground" numberOfLines={1}>
+                {getCityState(court.address)}
+              </Text>
+            </View>
           </View>
           <View className="flex flex-row items-center gap-2">
             <Icon as={UsersIcon} size={16} className="text-muted-foreground" />

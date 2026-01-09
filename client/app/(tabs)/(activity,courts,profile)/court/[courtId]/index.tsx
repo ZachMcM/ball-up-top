@@ -36,7 +36,7 @@ import {
   SunIcon,
   UsersIcon,
   VerifiedIcon,
-  XIcon
+  XIcon,
 } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { useCallback, useRef } from 'react';
@@ -172,15 +172,13 @@ export default function CourtPage() {
                 <View className="flex flex-col gap-4">
                   <View className="flex flex-1 flex-col gap-1">
                     <Text className="flex-1 text-2xl font-bold">{court.name}</Text>
-                    <Text className="font-medium text-muted-foreground" numberOfLines={1}>
-                      {court.address}
-                    </Text>
                     <View className="flex flex-row items-center gap-1.5">
                       <Icon className="text-muted-foreground" size={16} as={MapPinIcon} />
-                      <Text className="font-medium text-muted-foreground" numberOfLines={1}>
-                        {court.distance.toFixed(1)} mi
-                      </Text>
+                      <Text className="font-medium text-muted-foreground">{court.address}</Text>
                     </View>
+                    <Text className="font-medium text-muted-foreground">
+                      {court.distance.toFixed(1)} mi
+                    </Text>
                   </View>
                   <View className="flex flex-row items-center gap-1">
                     {court.popular && (
