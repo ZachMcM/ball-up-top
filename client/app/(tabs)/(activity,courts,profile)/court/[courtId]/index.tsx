@@ -29,12 +29,14 @@ import {
   ArrowRightIcon,
   BookmarkIcon,
   ClockIcon,
-  HouseIcon,
+  HomeIcon,
   MapPinIcon,
   MapPinnedIcon,
+  StarIcon,
   SunIcon,
   UsersIcon,
-  XIcon,
+  VerifiedIcon,
+  XIcon
 } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { useCallback, useRef } from 'react';
@@ -158,7 +160,7 @@ export default function CourtPage() {
           ) : (
             court && (
               <>
-                <AspectRatio ratio={2 / 1} className="relative overflow-hidden rounded-2xl">
+                <AspectRatio ratio={16 / 9} className="relative overflow-hidden rounded-2xl">
                   <Image
                     source={{
                       uri: court.image,
@@ -166,25 +168,37 @@ export default function CourtPage() {
                     style={{ width: '100%', height: '100%' }}
                     className="absolute inset-0 object-cover"
                   />
-                  <Badge variant="secondary" className="absolute left-3 top-3 gap-1.5">
-                    <Icon
-                      size={16}
-                      className="text-secondary-foreground"
-                      as={court.indoor ? HouseIcon : SunIcon}
-                    />
-                    <Text className="text-sm">{court.indoor ? 'Indoor' : 'Outdoor'}</Text>
-                  </Badge>
                 </AspectRatio>
-                <View className="flex flex-1 flex-col gap-1">
-                  <Text className="flex-1 text-2xl font-bold">{court.name}</Text>
-                  <Text className="font-medium text-muted-foreground" numberOfLines={1}>
-                    {court.address}
-                  </Text>
-                  <View className="flex flex-row items-center gap-1.5">
-                    <Icon className="text-muted-foreground" size={16} as={MapPinIcon} />
+                <View className="flex flex-col gap-4">
+                  <View className="flex flex-1 flex-col gap-1">
+                    <Text className="flex-1 text-2xl font-bold">{court.name}</Text>
                     <Text className="font-medium text-muted-foreground" numberOfLines={1}>
-                      {court.distance.toFixed(1)} mi
+                      {court.address}
                     </Text>
+                    <View className="flex flex-row items-center gap-1.5">
+                      <Icon className="text-muted-foreground" size={16} as={MapPinIcon} />
+                      <Text className="font-medium text-muted-foreground" numberOfLines={1}>
+                        {court.distance.toFixed(1)} mi
+                      </Text>
+                    </View>
+                  </View>
+                  <View className="flex flex-row items-center gap-1">
+                    {court.popular && (
+                      <Badge variant="outline">
+                        <Icon size={12} as={StarIcon} />
+                        <Text>Popular</Text>
+                      </Badge>
+                    )}
+                    <Badge variant="outline" className="self-start">
+                      <Icon size={12} as={court.indoor ? HomeIcon : SunIcon} />
+                      <Text>{court.indoor ? 'Indoor' : 'Outdoor'}</Text>
+                    </Badge>
+                    {court.verified && (
+                      <Badge variant="outline">
+                        <Icon size={12} as={VerifiedIcon} />
+                        <Text>Verified</Text>
+                      </Badge>
+                    )}
                   </View>
                 </View>
                 <View className="flex w-full flex-1 flex-row items-center gap-2">
@@ -406,7 +420,7 @@ function LeaderboardCard({ user, index }: { user: User; index: number }) {
               <Text>{getInitials(user.name)}</Text>
             </AvatarFallback>
           </Avatar>
-          <View className="absolute -bottom-1 bg-background rounded-full p-1 -right-1">
+          <View className="absolute -bottom-1 -right-1 rounded-full bg-background p-1">
             <View className="size-5 items-center justify-center rounded-full bg-secondary">
               <Text className="text-sm font-semibold text-secondary-foreground">{index + 1}.</Text>
             </View>

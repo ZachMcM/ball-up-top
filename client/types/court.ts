@@ -25,14 +25,15 @@ export type CourtListEntry = {
   distance: number;
   avgPlayerOverall: number;
   currentActiveSessions: number;
+  popular: boolean;
+  isBookmarked: boolean;
+};
+
+export type Court = CourtListEntry & {
   activityGraph: {
     hour: number;
     avgSessions: number;
   }[];
-  isBookmarked: boolean
-};
-
-export type Court = CourtListEntry & {
   currentActiveUsers: User[];
   leaderboard: User[];
 };

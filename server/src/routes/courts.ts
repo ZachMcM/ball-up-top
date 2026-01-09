@@ -8,7 +8,7 @@ import { invalidateQueries } from "../../utils/invalidateQueries";
 import { logger } from "../../utils/logger";
 import { authMiddleware, upload } from "../../utils/middleware";
 import { r2 } from "../../utils/r2";
-import { MAX_DISTANCE, MAX_DISTANCE_FOR_CHECK_IN } from "../config/courts";
+import { MAX_DISTANCE, MAX_DISTANCE_FOR_CHECK_IN, POPULAR_THRESHOLD } from "../config/courts";
 import { db } from "../db";
 import { court, courtBookmark, courtSession, user } from "../db/schema";
 
@@ -170,6 +170,17 @@ courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
         )
       );
 
+    // Calculate average players per day: count unique players per day, then average
+    const avgPlayersPerDayQuery = db.execute<{ avgPlayersPerDay: number }>(sql`
+      SELECT COALESCE(AVG(daily_players), 0) as "avgPlayersPerDay"
+      FROM (
+        SELECT COUNT(DISTINCT user_id)::float as daily_players
+        FROM court_session
+        WHERE court_id = ${courtId}
+        GROUP BY DATE(start_time)
+      ) as daily_counts
+    `);
+
     const leaderboardQuery = db.execute<{
       id: string;
       name: string;
@@ -227,12 +238,14 @@ courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
       [targetCourt],
       activityResult,
       [sessionStats],
+      avgPlayersPerDayResult,
       activeUsers,
       leaderboardResult,
     ] = await Promise.all([
       courtQuery,
       activityQuery,
       sessionStatsQuery,
+      avgPlayersPerDayQuery,
       activeUsersQuery,
       leaderboardQuery,
     ]);
@@ -249,6 +262,7 @@ courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
       activityGraph: activityResult.rows,
       avgPlayerOverall: Number(sessionStats?.avgPlayerOverall ?? 0),
       currentActiveSessions: Number(sessionStats?.currentActiveSessions ?? 0),
+      avgPlayersPerDay: Number(avgPlayersPerDayResult.rows[0]?.avgPlayersPerDay ?? 0),
       currentActiveUsers: activeUsers,
       leaderboard: leaderboardResult.rows,
     });
@@ -346,6 +360,10 @@ const CourtsParamsSchema = z.object({
     .enum(["true"])
     .transform((val) => val === "true")
     .optional(),
+  popular: z
+    .enum(["true"])
+    .transform((val) => val === "true")
+    .optional(),
   bookmarked: z
     .enum(["true"])
     .transform((val) => val === "true")
@@ -359,7 +377,7 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
       return res.status(400).json({ error: validQueryParams.error.message });
     }
 
-    const { lat, lng, limit, searchQuery, indoor, verified, bookmarked } =
+    const { lat, lng, limit, searchQuery, indoor, verified, popular, bookmarked } =
       validQueryParams.data;
 
     // Spherical Law of Cosines formula for calculating distance on Earth's surface
@@ -374,42 +392,25 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
       )
     )`;
 
-    // Subquery to calculate average sessions per hour of day (all 24 hours represented)
-    // Hours are in UTC - client normalizes to local timezone
-    const activityByHour = db
+    // Subquery to calculate average players per day at each court
+    // Counts unique players per day, then averages across days with activity
+    const avgPlayersPerDayStats = db
       .select({
         courtId: sql<number>`court_id`.as("court_id"),
-        activityData: sql<string>`json_agg(
-          json_build_object(
-            'hour', hour,
-            'avgSessions', COALESCE(avg_count, 0)
-          )
-          ORDER BY hour
-        )`.as("activity_data"),
+        avgPlayersPerDay: sql<number>`AVG(daily_players)`.as("avg_players_per_day"),
       })
       .from(
-        sql`
-        (
+        sql`(
           SELECT
-            c.id as court_id,
-            hours.hour,
-            CASE
-              WHEN COUNT(cs.id) > 0 THEN
-                COUNT(cs.id)::float / COUNT(DISTINCT DATE(cs.start_time AT TIME ZONE 'UTC'))
-              ELSE 0
-            END as avg_count
-          FROM
-            court c
-            CROSS JOIN generate_series(0, 23) as hours(hour)
-            LEFT JOIN court_session cs ON
-              cs.court_id = c.id AND
-              EXTRACT(HOUR FROM cs.start_time AT TIME ZONE 'UTC')::integer = hours.hour
-          GROUP BY c.id, hours.hour
-        ) as hourly_data
-      `
+            court_id,
+            DATE(start_time) as session_date,
+            COUNT(DISTINCT user_id)::float as daily_players
+          FROM court_session
+          GROUP BY court_id, DATE(start_time)
+        ) as daily_counts`
       )
       .groupBy(sql`court_id`)
-      .as("activity_by_hour");
+      .as("avg_players_per_day_stats");
 
     // Subquery to calculate average player overall rating and current active sessions
     // Only count sessions that started today and have no end time (protection against lingering sessions)
@@ -458,6 +459,12 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
       conditions.push(sql`${bookmarkStatus.courtId} IS NOT NULL`);
     }
 
+    if (popular !== undefined) {
+      conditions.push(
+        sql`COALESCE(${avgPlayersPerDayStats.avgPlayersPerDay}, 0) > ${POPULAR_THRESHOLD}`
+      );
+    }
+
     const query = db
       .select({
         id: court.id,
@@ -469,18 +476,18 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
         verified: court.verified,
         image: court.image,
         distance: distanceFormula,
-        activityGraph: activityByHour.activityData,
+        popular: sql<boolean>`COALESCE(${avgPlayersPerDayStats.avgPlayersPerDay}, 0) > ${POPULAR_THRESHOLD}`,
         avgPlayerOverall: sql<number>`COALESCE(${sessionStats.avgPlayerOverall}, 0)::float`,
         currentActiveSessions: sql<number>`COALESCE(${sessionStats.currentActiveSessions}, 0)::integer`,
         isBookmarked: sql<boolean>`${bookmarkStatus.courtId} IS NOT NULL`,
       })
       .from(court)
-      .leftJoin(activityByHour, eq(court.id, activityByHour.courtId))
+      .leftJoin(avgPlayersPerDayStats, eq(court.id, avgPlayersPerDayStats.courtId))
       .leftJoin(sessionStats, eq(court.id, sessionStats.courtId))
       .leftJoin(bookmarkStatus, eq(court.id, bookmarkStatus.courtId))
       .where(and(...conditions));
 
-    const courts = await query.orderBy(distanceFormula).limit(limit);
+    const courts = await query.limit(limit);
 
     res.json(courts);
   } catch (error) {

@@ -82,6 +82,7 @@ export async function getCourts({
   searchQuery,
   indoor,
   verified,
+  popular,
   bookmarked,
 }: {
   lat: number;
@@ -90,6 +91,7 @@ export async function getCourts({
   searchQuery?: string;
   indoor?: boolean;
   verified?: true;
+  popular?: true;
   bookmarked?: true;
 }): Promise<CourtListEntry[]> {
   const params = new URLSearchParams();
@@ -106,6 +108,9 @@ export async function getCourts({
   }
   if (verified !== undefined) {
     params.append('verified', verified.toString());
+  }
+  if (popular !== undefined) {
+    params.append('popular', popular.toString());
   }
   if (bookmarked !== undefined) {
     params.append('bookmarked', bookmarked.toString());
