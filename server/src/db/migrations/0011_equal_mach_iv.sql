@@ -1,0 +1,1 @@
+ALTER TABLE "rating" ALTER COLUMN "ratee_new_overall" DROP DEFAULT;

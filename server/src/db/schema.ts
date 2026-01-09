@@ -223,7 +223,7 @@ export const rating = pgTable(
     finalWeightAppliedFinishing: doublePrecision(
       "final_weight_applied_finishing"
     ).notNull(),
-
+    rateeNewOverall: integer("ratee_new_overall").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [

@@ -255,10 +255,10 @@ export default function CourtPage() {
                     </Text>
                   </View>
                   {court.currentActiveSessions !== 0 ? (
-                    <View className="flex flex-col gap-6">
+                    <View className="flex flex-col gap-3">
                       {court.currentActiveUsers.map((user, i) => (
                         <UserItem
-                          // className="rounded-2xl border border-border bg-card px-4 py-3"
+                          className="rounded-2xl border border-border bg-card px-4 py-3"
                           key={i}
                           user={user}
                         />

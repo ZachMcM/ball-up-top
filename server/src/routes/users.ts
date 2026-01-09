@@ -62,7 +62,7 @@ usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
     // Fetch rating history (ratings received by this user)
     const ratingHistory = await db
       .select({
-        overall: rating.raterOverallAtTime,
+        overall: rating.rateeNewOverall,
         createdAt: rating.createdAt,
       })
       .from(rating)

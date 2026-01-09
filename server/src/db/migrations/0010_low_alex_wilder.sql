@@ -1,0 +1,1 @@
+ALTER TABLE "rating" ADD COLUMN "ratee_new_overall" integer DEFAULT 60 NOT NULL;

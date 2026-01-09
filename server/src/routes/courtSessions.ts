@@ -511,6 +511,7 @@ courtSessionsRoute.post(
             playmakingRating,
             finishingRating,
             raterOverallAtTime: ep.raterOverallAtTime,
+            rateeNewOverall: Math.round(newOverall),
             runCompetitivenessAtTime: ep.runCompetitivenessAtTime,
             finalWeightAppliedDefense: finalWeightDef,
             finalWeightAppliedFinishing: finalWeightFin,
@@ -518,7 +519,7 @@ courtSessionsRoute.post(
             finalWeightAppliedShooting: finalWeightSho,
           });
 
-          invalidateQueries(["user", ep.rateeId])
+          invalidateQueries(["user", ep.rateeId]);
         }
 
         await tx
