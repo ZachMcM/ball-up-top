@@ -4,15 +4,15 @@ import { PlayersList } from '@/components/discover/PlayersList';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Text } from '@/components/ui/text';
+import { cn } from '@/lib/utils';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { SlidersHorizontal } from 'lucide-react-native';
 import { useMemo, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 
 export default function DiscoverPage() {
-  const [activeTab, setActiveTab] = useState<string>('courts');
+  const [activeTab, setActiveTab] = useState<'courts' | 'players'>('courts');
   const [searchQuery, setSearchQuery] = useState<string | undefined>(undefined);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
@@ -26,9 +26,8 @@ export default function DiscoverPage() {
 
   // Players filter state
   const [playersFilters, setPlayersFilters] = useState<{
-    archetypes?: string[];
-    minHeight?: number;
-    maxHeight?: number;
+    minHeight?: string;
+    maxHeight?: string;
     minOverall?: number;
     sortBy?: 'most_active' | 'overall_desc' | 'overall_asc';
   }>({});
@@ -43,9 +42,7 @@ export default function DiscoverPage() {
       return count;
     } else {
       let count = 0;
-      if (playersFilters.archetypes && playersFilters.archetypes.length > 0) count++;
-      if (playersFilters.minHeight !== undefined || playersFilters.maxHeight !== undefined)
-        count++;
+      if (playersFilters.minHeight !== undefined || playersFilters.maxHeight !== undefined) count++;
       if (playersFilters.minOverall !== undefined) count++;
       if (playersFilters.sortBy) count++;
       return count;
@@ -58,6 +55,18 @@ export default function DiscoverPage() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         className="flex-1">
         <View className="flex w-full flex-col gap-4 px-4 py-6">
+          <View className="flex w-full flex-row items-center justify-between rounded-full bg-muted/30 p-1">
+            <Pressable
+              onPress={() => setActiveTab('courts')}
+              className={cn('flex-1 rounded-full p-2', activeTab == 'courts' && 'bg-secondary')}>
+              <Text className="text-center font-semibold text-sm">Courts</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setActiveTab('players')}
+              className={cn('flex-1 rounded-full p-2', activeTab == 'players' && 'bg-secondary')}>
+              <Text className="text-center font-semibold text-sm">Players</Text>
+            </Pressable>
+          </View>
           <View className="flex flex-row items-center gap-2">
             <Input
               value={searchQuery}
@@ -80,28 +89,13 @@ export default function DiscoverPage() {
               )}
             </Button>
           </View>
-
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="w-full">
-              <TabsTrigger value="courts" className="flex-1">
-                <Text>Courts</Text>
-              </TabsTrigger>
-              <TabsTrigger value="players" className="flex-1">
-                <Text>Players</Text>
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="courts">
-              <CourtsList searchQuery={searchQuery} {...courtsFilters} />
-            </TabsContent>
-
-            <TabsContent value="players">
-              <PlayersList searchQuery={searchQuery} {...playersFilters} />
-            </TabsContent>
-          </Tabs>
+          {activeTab === 'courts' ? (
+            <CourtsList searchQuery={searchQuery} {...courtsFilters} />
+          ) : (
+            <PlayersList searchQuery={searchQuery} {...playersFilters} />
+          )}
         </View>
       </KeyboardAvoidingView>
-
       <DiscoverFilters
         activeTab={activeTab as 'courts' | 'players'}
         bottomSheetRef={bottomSheetModalRef}

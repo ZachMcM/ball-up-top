@@ -2,15 +2,14 @@ import { NativewindFlatList } from '@/components/NativewindFlatList';
 import { useLocation } from '@/components/providers/LocationProvider';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
-import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
+import UserItem from '@/components/UserItem';
 import { getCourt, getCourtActivePlayers } from '@/lib/endpoints';
 import { getInitials } from '@/lib/utils';
 import { User } from '@/types/user';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useLocalSearchParams } from 'expo-router';
-import { UsersIcon } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-native';
 
@@ -64,7 +63,7 @@ export default function CourtPlayersPage() {
             contentContainerClassName="flex flex-col gap-6 pb-32"
             data={filteredUsers}
             showsVerticalScrollIndicator={false}
-            renderItem={({ item }) => <UserCard user={item} />}
+            renderItem={({ item }) => <UserItem user={item} />}
             keyExtractor={(item) => item.id.toString()}
           />
         ) : (

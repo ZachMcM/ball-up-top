@@ -31,13 +31,3 @@ export type ExtendedUser = User & {
   ratingHistory: RatingHistoryPoint[],
   recentSessions: UserSession[]
 }
-
-export type PlayerListEntry = {
-  id: string;
-  name: string;
-  image: string;
-  height: string;
-  archetype: string;
-  overall: number;
-  sessionsCount30Days: number;
-}

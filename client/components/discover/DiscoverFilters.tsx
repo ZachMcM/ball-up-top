@@ -15,7 +15,7 @@ import { PlayersFiltersContent } from './PlayersFiltersContent';
 
 interface DiscoverFiltersProps {
   activeTab: 'courts' | 'players';
-  bottomSheetRef: React.RefObject<BottomSheetModal>;
+  bottomSheetRef: React.RefObject<BottomSheetModal | null>;
 
   courtsFilters: {
     isIndoor?: boolean;
@@ -26,9 +26,8 @@ interface DiscoverFiltersProps {
   onCourtsFiltersChange: (filters: DiscoverFiltersProps['courtsFilters']) => void;
 
   playersFilters: {
-    archetypes?: string[];
-    minHeight?: number;
-    maxHeight?: number;
+    minHeight?: string;
+    maxHeight?: string;
     minOverall?: number;
     sortBy?: 'most_active' | 'overall_desc' | 'overall_asc';
   };

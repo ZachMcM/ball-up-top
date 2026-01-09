@@ -39,7 +39,6 @@ export function CourtsList({
 
   const { data: courts, isPending: areCourtsPending } = useQuery({
     queryKey: [
-      'discover',
       'courts',
       {
         lat: location?.coords.latitude!,

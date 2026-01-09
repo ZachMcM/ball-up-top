@@ -1,13 +1,13 @@
-import { Router } from "express";
-import { authMiddleware, upload } from "../../utils/middleware";
-import { handleError } from "../../utils/handleError";
-import * as z from "zod";
-import { db } from "../db";
-import { user, rating, courtSession, court } from "../db/schema";
-import { r2 } from "../../utils/r2";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { eq, desc } from "drizzle-orm";
+import { and, desc, eq, gte, ilike, lte, sql } from "drizzle-orm";
+import { Router } from "express";
+import * as z from "zod";
+import { handleError } from "../../utils/handleError";
+import { authMiddleware, upload } from "../../utils/middleware";
+import { r2 } from "../../utils/r2";
 import { MAX_OVR, MIN_OVR } from "../config/ratings";
+import { db } from "../db";
+import { court, courtSession, rating, user } from "../db/schema";
 
 export const usersRoute = Router();
 
@@ -151,3 +151,83 @@ usersRoute.patch(
     }
   }
 );
+
+const PlayersParamsSchema = z.object({
+  limit: z.coerce.number().default(25),
+  searchQuery: z.string().optional(),
+  minHeight: z.string().optional(),
+  maxHeight: z.string().optional(),
+  minOverall: z.coerce.number().optional(),
+  sortBy: z
+    .enum(["most_active", "overall_desc", "overall_asc"])
+    .optional()
+    .default("overall_desc"),
+});
+
+usersRoute.get("/users", authMiddleware, async (req, res) => {
+  try {
+    const validQueryParams = PlayersParamsSchema.safeParse(req.query);
+    if (!validQueryParams.success) {
+      return res.status(400).json({ error: validQueryParams.error.message });
+    }
+
+    const { limit, searchQuery, minHeight, maxHeight, minOverall, sortBy } =
+      validQueryParams.data;
+
+    const conditions = [];
+
+    if (searchQuery) {
+      conditions.push(ilike(user.name, searchQuery));
+    }
+
+    if (minOverall !== undefined) {
+      conditions.push(gte(user.overall, minOverall));
+    }
+
+    if (minHeight !== undefined) {
+      conditions.push(gte(user.height, minHeight));
+    }
+    if (maxHeight !== undefined) {
+      conditions.push(lte(user.height, maxHeight));
+    }
+
+    const query = db
+      .select({
+        id: user.id,
+        name: user.name,
+        image: user.image,
+        height: user.height,
+        archetype: user.archetype,
+        overall: user.overall,
+        finishingRating: user.finishingRating,
+        defenseRating: user.defenseRating,
+        playmakingRating: user.playmakingRating,
+        shootingRating: user.shootingRating,
+      })
+      .from(user)
+      .leftJoin(courtSession, sql`${courtSession.userId} = ${user.id}`)
+      .where(conditions.length > 0 ? and(...conditions) : undefined)
+      .groupBy(
+        user.id,
+        user.name,
+        user.image,
+        user.height,
+        user.archetype,
+        user.overall
+      );
+
+    if (sortBy === "most_active") {
+      query.orderBy(sql`sessions_count_30_days DESC`);
+    } else if (sortBy === "overall_desc") {
+      query.orderBy(sql`${user.overall} DESC`);
+    } else if (sortBy === "overall_asc") {
+      query.orderBy(sql`${user.overall} ASC`);
+    }
+
+    const players = await query.limit(limit);
+
+    res.json(players);
+  } catch (error) {
+    handleError(error, res, "GET /players");
+  }
+});

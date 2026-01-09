@@ -1,28 +1,21 @@
 import { NativewindFlatList } from '@/components/NativewindFlatList';
-import UserCard from '@/components/UserCard';
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from '@/components/ui/empty';
-import { getPlayers } from '@/lib/endpoints';
+import UserItem from '@/components/UserItem';
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
+import { getUsers } from '@/lib/endpoints';
 import { useQuery } from '@tanstack/react-query';
 import { ActivityIndicator } from 'react-native';
 import { useDebounce } from 'use-debounce';
 
 interface PlayersListProps {
   searchQuery?: string;
-  archetypes?: string[];
-  minHeight?: number;
-  maxHeight?: number;
+  minHeight?: string;
+  maxHeight?: string;
   minOverall?: number;
   sortBy?: 'most_active' | 'overall_desc' | 'overall_asc';
 }
 
 export function PlayersList({
   searchQuery,
-  archetypes,
   minHeight,
   maxHeight,
   minOverall,
@@ -32,11 +25,9 @@ export function PlayersList({
 
   const { data: players, isPending: arePlayersPending } = useQuery({
     queryKey: [
-      'discover',
       'players',
       {
         searchQuery: debouncedSearchQuery,
-        archetypes,
         minHeight,
         maxHeight,
         minOverall,
@@ -44,9 +35,8 @@ export function PlayersList({
       },
     ],
     queryFn: async () => {
-      const players = await getPlayers({
+      const players = await getUsers({
         searchQuery: debouncedSearchQuery,
-        archetypes,
         minHeight,
         maxHeight,
         minOverall,
@@ -76,10 +66,10 @@ export function PlayersList({
 
   return (
     <NativewindFlatList
-      contentContainerClassName="flex flex-col gap-4 pb-32"
+      contentContainerClassName="flex flex-col gap-6 pb-32"
       data={players}
       showsVerticalScrollIndicator={false}
-      renderItem={({ item }) => <UserCard user={item} />}
+      renderItem={({ item }) => <UserItem user={item} />}
       keyExtractor={(item) => item.id}
     />
   );

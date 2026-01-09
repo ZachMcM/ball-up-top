@@ -81,7 +81,7 @@ export default function AuthPage() {
                     placeholder="johndoe@example.com"
                     onBlur={onBlur}
                     onChangeText={onChange}
-                    className={cn(error && 'border-destructive')}
+                    className={cn(error && 'border-destructive', "rounded-full")}
                     textContentType="emailAddress"
                     autoComplete="email"
                     value={value}
@@ -116,6 +116,7 @@ export default function AuthPage() {
               autoComplete="sms-otp"
               textContentType="oneTimeCode"
               onSubmitEditing={onSubmitOtp}
+              className='rounded-full'
             />
             <Button
               variant="link"

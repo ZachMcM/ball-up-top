@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
-import UserCard from '@/components/UserCard';
+import UserItem from '@/components/UserItem';
 import { deleteCourtBookmark, getCourt, postCourtBookmark } from '@/lib/endpoints';
 import { THEME } from '@/lib/theme';
 import { getInitials, openDirections } from '@/lib/utils';
@@ -64,7 +64,7 @@ export default function CourtPage() {
     mutationFn: async () => postCourtBookmark(courtId),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['discover', 'courts'],
+        queryKey: ['courts'],
       });
       queryClient.setQueryData(['court', courtId], (old: Court) => ({
         ...old,
@@ -81,7 +81,7 @@ export default function CourtPage() {
     mutationFn: async () => deleteCourtBookmark(courtId),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['discover', 'courts'],
+        queryKey: ['courts'],
       });
       queryClient.setQueryData(['court', courtId], (old: Court) => ({
         ...old,
@@ -101,7 +101,7 @@ export default function CourtPage() {
       bookmarkCourt();
     }
     queryClient.invalidateQueries({
-      queryKey: ['discover', 'courts'],
+      queryKey: ['courts'],
     });
   };
 
@@ -172,13 +172,13 @@ export default function CourtPage() {
                 <View className="flex flex-col gap-4">
                   <View className="flex flex-1 flex-col gap-1">
                     <Text className="flex-1 text-2xl font-bold">{court.name}</Text>
+                    <Text className="font-medium text-muted-foreground">{court.address}</Text>
                     <View className="flex flex-row items-center gap-1.5">
                       <Icon className="text-muted-foreground" size={16} as={MapPinIcon} />
-                      <Text className="font-medium text-muted-foreground">{court.address}</Text>
+                      <Text className="font-medium text-muted-foreground">
+                        {court.distance.toFixed(1)} mi
+                      </Text>
                     </View>
-                    <Text className="font-medium text-muted-foreground">
-                      {court.distance.toFixed(1)} mi
-                    </Text>
                   </View>
                   <View className="flex flex-row items-center gap-1">
                     {court.popular && (
@@ -230,7 +230,7 @@ export default function CourtPage() {
                     <Text>Directions</Text>
                   </Button>
                 </View>
-                <View className="flex flex-1 flex-col gap-4 rounded-2xl border border-border p-4">
+                <View className="flex flex-1 flex-col gap-6 rounded-2xl border border-border p-4">
                   <View className="flex flex-col">
                     <Text className="font-semibold">ACTIVITY</Text>
                     <Text className="text-sm font-medium text-muted-foreground">
@@ -245,19 +245,23 @@ export default function CourtPage() {
                     </Text>
                   )}
                 </View>
-                <View className="flex flex-1 flex-col gap-4 rounded-2xl border border-border p-4">
+                <View className="flex flex-1 flex-col gap-6 rounded-2xl border border-border p-4">
                   <View className="flex flex-col">
                     <Text className="font-semibold">CURRENTLY PLAYING</Text>
                     <Text className="text-sm font-medium text-muted-foreground">
                       {court.currentActiveSessions > 1
-                        ? `${court.currentActiveSessions} players • ~${court.avgPlayerOverall} overall`
+                        ? `${court.currentActiveSessions} players • ~${court.avgPlayerOverall.toFixed(0)} overall`
                         : 'People actively hooping at court'}
                     </Text>
                   </View>
                   {court.currentActiveSessions !== 0 ? (
-                    <View className="flex flex-col gap-3">
+                    <View className="flex flex-col gap-6">
                       {court.currentActiveUsers.map((user, i) => (
-                        <UserCard key={i} user={user} />
+                        <UserItem
+                          // className="rounded-2xl border border-border bg-card px-4 py-3"
+                          key={i}
+                          user={user}
+                        />
                       ))}
                       {court.currentActiveSessions > court.currentActiveUsers.length && (
                         <>
@@ -283,7 +287,7 @@ export default function CourtPage() {
                     </Text>
                   )}
                 </View>
-                <View className="flex flex-1 flex-col gap-4 rounded-2xl border border-border p-4">
+                <View className="flex flex-1 flex-col gap-6 rounded-2xl border border-border p-4">
                   <View className="flex flex-col">
                     <Text className="font-semibold">COURT LEADERBOARD</Text>
                     <Text className="text-sm font-medium text-muted-foreground">

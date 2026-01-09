@@ -1,10 +1,10 @@
-import { ImagePickerAsset } from 'expo-image-picker';
-import { authClient } from './auth-client';
-import { Court, CourtListEntry, CourtSession, Place } from '@/types/court';
-import * as z from 'zod';
 import { AddCourtSchema } from '@/app/(tabs)/(discover)/add-court';
-import { ExtendedUser, PlayerListEntry, User } from '@/types/user';
+import { Court, CourtListEntry, CourtSession, Place } from '@/types/court';
 import { EncounteredPlayer } from '@/types/encounteredPlayer';
+import { ExtendedUser, User } from '@/types/user';
+import { ImagePickerAsset } from 'expo-image-picker';
+import * as z from 'zod';
+import { authClient } from './auth-client';
 
 export type serverRequestParams = {
   endpoint: string;
@@ -122,10 +122,9 @@ export async function getCourts({
   });
 }
 
-export async function getPlayers({
+export async function getUsers({
   limit = 25,
   searchQuery,
-  archetypes,
   minHeight,
   maxHeight,
   minOverall,
@@ -133,12 +132,11 @@ export async function getPlayers({
 }: {
   limit?: number;
   searchQuery?: string;
-  archetypes?: string[];
-  minHeight?: number;
-  maxHeight?: number;
+  minHeight?: string;
+  maxHeight?: string;
   minOverall?: number;
   sortBy?: 'most_active' | 'overall_desc' | 'overall_asc';
-}): Promise<PlayerListEntry[]> {
+}): Promise<User[]> {
   const params = new URLSearchParams();
 
   params.append('limit', limit.toString());
@@ -146,14 +144,11 @@ export async function getPlayers({
   if (searchQuery !== undefined && searchQuery !== '') {
     params.append('searchQuery', searchQuery);
   }
-  if (archetypes !== undefined && archetypes.length > 0) {
-    params.append('archetypes', archetypes.join(','));
-  }
   if (minHeight !== undefined) {
-    params.append('minHeight', minHeight.toString());
+    params.append('minHeight', minHeight);
   }
   if (maxHeight !== undefined) {
-    params.append('maxHeight', maxHeight.toString());
+    params.append('maxHeight', maxHeight);
   }
   if (minOverall !== undefined) {
     params.append('minOverall', minOverall.toString());
@@ -163,7 +158,7 @@ export async function getPlayers({
   }
 
   return await serverRequest({
-    endpoint: `/players?${params.toString()}`,
+    endpoint: `/users?${params.toString()}`,
     method: 'GET',
   });
 }

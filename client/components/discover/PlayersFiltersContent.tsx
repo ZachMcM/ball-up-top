@@ -1,102 +1,94 @@
-import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
+import {
+  NativeSelectScrollView,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Text } from '@/components/ui/text';
-import { CheckIcon } from 'lucide-react-native';
 import { Pressable, View } from 'react-native';
 
 interface PlayersFiltersContentProps {
   filters: {
-    archetypes?: string[];
-    minHeight?: number;
-    maxHeight?: number;
+    minHeight?: string;
+    maxHeight?: string;
     minOverall?: number;
     sortBy?: 'most_active' | 'overall_desc' | 'overall_asc';
   };
   onChange: (filters: PlayersFiltersContentProps['filters']) => void;
 }
 
-const ARCHETYPES = [
-  'Unranked',
-  'Two-Way Star',
-  'Floor General',
-  'Defensive Anchor',
-  '3-Level Scorer',
-  'Lockdown Defender',
-  'Stretch Big',
-  'Rim Protector',
-  'Sharpshooter',
-  'Slasher',
-  'Facilitator',
-  'Paint Beast',
-];
+const generateHeightOptions = () => {
+  const options: { label: string; value: string }[] = [];
+  for (let feet = 4; feet <= 8; feet++) {
+    const maxInches = feet === 8 ? 0 : 11;
+    for (let inches = 0; inches <= maxInches; inches++) {
+      const label = `${feet}'${inches}"`;
+      options.push({ label, value: label });
+    }
+  }
+  return options;
+};
+
+const HEIGHT_OPTIONS = generateHeightOptions();
 
 export function PlayersFiltersContent({ filters, onChange }: PlayersFiltersContentProps) {
-  const { archetypes = [], minHeight, maxHeight, minOverall, sortBy } = filters;
-
-  const toggleArchetype = (archetype: string) => {
-    const newArchetypes = archetypes.includes(archetype)
-      ? archetypes.filter((a) => a !== archetype)
-      : [...archetypes, archetype];
-
-    onChange({
-      ...filters,
-      archetypes: newArchetypes.length > 0 ? newArchetypes : undefined,
-    });
-  };
+  const { minHeight, maxHeight, minOverall, sortBy } = filters;
 
   return (
     <>
-      <View className="flex flex-col gap-2 border-b border-border px-4 py-5">
-        <Text className="text-lg font-bold">Archetypes</Text>
-        {ARCHETYPES.map((archetype) => (
-          <Pressable
-            key={archetype}
-            onPress={() => toggleArchetype(archetype)}
-            className="flex flex-row items-center justify-between py-3">
-            <Text className="text-base">{archetype}</Text>
-            <View
-              className={`size-6 items-center justify-center rounded-md border-2 ${
-                archetypes.includes(archetype)
-                  ? 'border-primary bg-primary'
-                  : 'border-muted-foreground'
-              }`}>
-              {archetypes.includes(archetype) && (
-                <Icon as={CheckIcon} size={16} className="text-primary-foreground" />
-              )}
-            </View>
-          </Pressable>
-        ))}
-      </View>
       <View className="flex flex-col gap-4 border-b border-border px-4 py-5">
-        <Text className="text-lg font-bold">Height Range (inches)</Text>
+        <Text className="text-lg font-bold">Height Range</Text>
         <View className="flex flex-row gap-2">
           <View className="flex-1">
             <Text className="mb-2 text-sm text-muted-foreground">Min</Text>
-            <Input
-              keyboardType="numeric"
-              placeholder="60"
-              value={minHeight?.toString() ?? ''}
-              onChangeText={(text) =>
+            <Select
+              value={minHeight ? { value: minHeight, label: minHeight } : undefined}
+              onValueChange={(option) =>
                 onChange({
                   ...filters,
-                  minHeight: text ? parseInt(text, 10) : undefined,
+                  minHeight: option?.value,
                 })
-              }
-            />
+              }>
+              <SelectTrigger className="w-full rounded-full">
+                <SelectValue placeholder="Select min" />
+              </SelectTrigger>
+              <SelectContent>
+                <NativeSelectScrollView>
+                  {HEIGHT_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} label={option.label} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </NativeSelectScrollView>
+              </SelectContent>
+            </Select>
           </View>
           <View className="flex-1">
             <Text className="mb-2 text-sm text-muted-foreground">Max</Text>
-            <Input
-              keyboardType="numeric"
-              placeholder="90"
-              value={maxHeight?.toString() ?? ''}
-              onChangeText={(text) =>
+            <Select
+              value={maxHeight ? { value: maxHeight, label: maxHeight } : undefined}
+              onValueChange={(option) =>
                 onChange({
                   ...filters,
-                  maxHeight: text ? parseInt(text, 10) : undefined,
+                  maxHeight: option?.value,
                 })
-              }
-            />
+              }>
+              <SelectTrigger className="w-full rounded-full">
+                <SelectValue placeholder="Select max" />
+              </SelectTrigger>
+              <SelectContent>
+                <NativeSelectScrollView>
+                  {HEIGHT_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} label={option.label} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </NativeSelectScrollView>
+              </SelectContent>
+            </Select>
           </View>
         </View>
       </View>
@@ -105,6 +97,7 @@ export function PlayersFiltersContent({ filters, onChange }: PlayersFiltersConte
         <Input
           keyboardType="numeric"
           placeholder="60"
+          className='rounded-full'
           value={minOverall?.toString() ?? ''}
           onChangeText={(text) =>
             onChange({

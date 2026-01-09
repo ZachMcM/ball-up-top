@@ -7,7 +7,7 @@ import { patchUserImage } from '@/lib/endpoints';
 import { useMutation } from '@tanstack/react-query';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { ArrowLeftIcon, ImageIcon, User, User2, UserIcon } from 'lucide-react-native';
+import { ArrowLeftIcon, ImageIcon } from 'lucide-react-native';
 import { useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 import { toast } from 'sonner-native';
