@@ -27,7 +27,7 @@ export default function UserCard({ user }: { user: User }) {
           </Avatar>
           <View className="flex flex-col">
             <Text className="font-semibold">{user.name}</Text>
-            <Text className="text-sm font-medium text-muted-foreground">{user.archetype}</Text>
+            <Text className="text-sm font-medium text-muted-foreground">{user.height} • {user.archetype}</Text>
           </View>
         </View>
         <View className="flex flex-col items-center">
