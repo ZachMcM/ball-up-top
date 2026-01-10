@@ -2,6 +2,7 @@ import {
   and,
   eq,
   gt,
+  inArray,
   InferSelectModel,
   isNotNull,
   isNull,
@@ -14,7 +15,13 @@ import { Router } from "express";
 import { handleError } from "../../utils/handleError";
 import { authMiddleware } from "../../utils/middleware";
 import { db } from "../db";
-import { courtSession, encounteredPlayer, rating, user } from "../db/schema";
+import {
+  activity,
+  courtSession,
+  encounteredPlayer,
+  rating,
+  user,
+} from "../db/schema";
 
 import * as z from "zod";
 import { clamp } from "../../utils/clamp";
@@ -345,7 +352,52 @@ courtSessionsRoute.patch(
   }
 );
 
-// TODO add activity entry
+async function handleRatingsActivity(ratingIds: number[]) {
+  await db.transaction(async (tx) => {
+    const targetRatings = await tx.query.rating.findMany({
+      where: inArray(rating.id, ratingIds),
+    });
+
+    for (const {
+      id: ratingId,
+      rateeId: userId,
+      rateeOldArchetype: oldArchetype,
+      rateeNewArchetype: newArchetype,
+      rateeOldOverall: oldOverall,
+      rateeNewOverall: newOverall,
+    } of targetRatings) {
+      await tx.insert(activity).values({
+        userId,
+        type: "rating_received",
+        ratingId,
+      });
+
+      if (oldArchetype !== newArchetype) {
+        await tx.insert(activity).values({
+          userId,
+          type: "archetype_changed",
+          ratingId,
+        });
+      }
+
+      if (
+        (oldOverall < 70 && newOverall >= 70) ||
+        (oldOverall < 75 && newOverall >= 75) ||
+        (oldOverall < 80 && newOverall >= 80) ||
+        (oldOverall < 85 && newOverall <= 85) ||
+        (oldOverall < 90 && newOverall >= 90)
+      ) {
+        await tx.insert(activity).values({
+          userId,
+          type: "rating_milestone",
+          ratingId,
+        });
+      }
+
+      // TODO possibly invalidate queries here
+    }
+  });
+}
 
 courtSessionsRoute.post(
   "/court-sessions/:sessionId/ratings",
@@ -394,6 +446,8 @@ courtSessionsRoute.post(
           error: "No encountered players found for this session.",
         });
       }
+
+      const ratingIds: number[] = [];
 
       await db.transaction(async (tx) => {
         for (const ep of encounteredPlayersData) {
@@ -447,6 +501,8 @@ courtSessionsRoute.post(
           const ratee = await tx.query.user.findFirst({
             where: eq(user.id, ep.rateeId),
             columns: {
+              overall: true,
+              archetype: true,
               defenseRating: true,
               finishingRating: true,
               shootingRating: true,
@@ -502,22 +558,33 @@ courtSessionsRoute.post(
             })
             .where(eq(user.id, ep.rateeId));
 
-          await tx.insert(rating).values({
-            raterId: res.locals.userId!,
-            rateeId: ep.rateeId,
-            raterCourtSession: sessionId,
-            shootingRating,
-            defenseRating,
-            playmakingRating,
-            finishingRating,
-            raterOverallAtTime: ep.raterOverallAtTime,
-            rateeNewOverall: Math.round(newOverall),
-            runCompetitivenessAtTime: ep.runCompetitivenessAtTime,
-            finalWeightAppliedDefense: finalWeightDef,
-            finalWeightAppliedFinishing: finalWeightFin,
-            finalWeightAppliedPlaymaking: finalWeightPlay,
-            finalWeightAppliedShooting: finalWeightSho,
-          });
+          const [newRating] = await tx
+            .insert(rating)
+            .values({
+              raterId: res.locals.userId!,
+              rateeId: ep.rateeId,
+              raterCourtSession: sessionId,
+
+              shootingRating,
+              defenseRating,
+              playmakingRating,
+              finishingRating,
+
+              raterOverallAtTime: ep.raterOverallAtTime,
+              runCompetitivenessAtTime: ep.runCompetitivenessAtTime,
+              finalWeightAppliedDefense: finalWeightDef,
+              finalWeightAppliedFinishing: finalWeightFin,
+              finalWeightAppliedPlaymaking: finalWeightPlay,
+              finalWeightAppliedShooting: finalWeightSho,
+
+              rateeOldOverall: ratee.overall,
+              rateeNewOverall: Math.round(newOverall),
+              rateeOldArchetype: ratee.archetype,
+              rateeNewArchetype: newArchetype,
+            })
+            .returning({ id: rating.id });
+
+          ratingIds.push(newRating.id);
 
           invalidateQueries(["user", ep.rateeId]);
         }
@@ -533,14 +600,20 @@ courtSessionsRoute.post(
         ["court", targetCourtSession.courtId, "active-players"]
       );
 
-      return res.json({ success: true });
+      res.json({ success: true });
+
+      handleRatingsActivity(ratingIds).catch((error) => {
+        logger.error("Failed to create rating activities", {
+          error,
+          ratingIds,
+          userId: res.locals.userId,
+        });
+      });
     } catch (error) {
       handleError(error, res, "POST /court-sessions/:sessionId/ratings");
     }
   }
 );
-
-// TODO add activity entry
 
 courtSessionsRoute.patch(
   "/court-sessions/:sessionId",
@@ -642,11 +715,11 @@ courtSessionsRoute.patch(
           const ep = encounteredPlayersData[i];
           const ratee = ep.user;
 
-          // Get ratee's lifetime count
+          // Get ratee's lifetime rating count (not session count)
           const lifetimeCount = await db
             .select()
-            .from(courtSession)
-            .where(eq(courtSession.userId, ratee.id));
+            .from(rating)
+            .where(eq(rating.rateeId, ratee.id));
 
           // Compute combined weight (without outlier weight)
           const combinedWeight = Math.pow(
@@ -696,7 +769,21 @@ courtSessionsRoute.patch(
         ["court", targetCourtSession.courtId, "active-players"]
       );
 
-      return res.json({ success: true });
+      res.json({ success: true });
+
+      db.insert(activity)
+        .values({
+          userId: res.locals.userId!,
+          type: "session_completed",
+          courtSessionId: targetCourtSession.courtId,
+        })
+        .catch((error) => {
+          logger.error("Failed to create session completed activity", {
+            error,
+            courtSessionId: targetCourtSession.id,
+            userId: res.locals.userId,
+          });
+        });
     } catch (error) {
       handleError(error, res, "PATCH /court-sessions/:sessionId");
     }

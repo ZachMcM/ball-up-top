@@ -85,7 +85,12 @@ export default function CourtPlayersPage() {
 
 function UserCard({ user }: { user: User }) {
   return (
-    <Link href={`/user/${user.id}` as any} className="w-full">
+    <Link
+      href={{
+        pathname: '/user/[userId]',
+        params: { userId: user.id },
+      }}
+      className="w-full">
       <View className="flex w-full flex-row items-center justify-between">
         <View className="flex flex-row items-center gap-2">
           <Avatar className="size-10" alt={`${user.name}'s image`}>

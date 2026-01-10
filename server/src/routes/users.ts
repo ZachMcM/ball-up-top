@@ -1,14 +1,65 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { and, desc, eq, gte, ilike, lte, sql } from "drizzle-orm";
+import {
+  and,
+  desc,
+  eq,
+  gte,
+  ilike,
+  InferSelectModel,
+  lte,
+  sql,
+} from "drizzle-orm";
 import { Router } from "express";
 import * as z from "zod";
 import { handleError } from "../../utils/handleError";
 import { authMiddleware, upload } from "../../utils/middleware";
 import { r2 } from "../../utils/r2";
 import { db } from "../db";
-import { court, courtSession, rating, user } from "../db/schema";
+import { activity, court, courtSession, rating, user } from "../db/schema";
 
 export const usersRoute = Router();
+
+usersRoute.get("/users/activity", authMiddleware, async (_, res) => {
+  try {
+    const activityEntries = await db.query.activity.findMany({
+      where: and(
+        eq(activity.userId, res.locals.userId!),
+        sql`${activity.createdAt} >= NOW() - INTERVAL '30 days'`
+      ),
+      orderBy: desc(activity.createdAt),
+      with: {
+        court: true,
+        courtSession: {
+          with: {
+            court: true,
+          },
+        },
+        rating: {
+          with: {
+            rater: {
+              columns: {
+                id: true,
+                name: true,
+                image: true,
+                overall: true,
+                archetype: true,
+                height: true,
+                shootingRating: true,
+                finishingRating: true,
+                defenseRating: true,
+                playmakingRating: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    res.json(activityEntries);
+  } catch (error) {
+    handleError(error, res, "GET /users/activity");
+  }
+});
 
 usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
   try {

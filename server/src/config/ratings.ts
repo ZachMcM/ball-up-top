@@ -28,10 +28,10 @@ export const OVERLAP_DIFF_THRESH_2 = 20
 export const OVERLAP_DIFF_THRESH_2_WT = 0.5
 
 // magic numbers for computing experience weight
-export const MIN_EXPERIENCE_WT = 0.8
+export const MIN_EXPERIENCE_WT = 0.6
 export const MAX_EXPERIENCE_WT = 1.1
 export const EXPERIENCE_GROWTH_RT = 4
 
 export const EST_RATINGS_PER_SESS = 8
 
-export const WEIGHT_E = 0.075
+export const WEIGHT_E = 0.025

@@ -1,18 +1,18 @@
 import { cn, getInitials } from '@/lib/utils';
-import { PlayerListEntry, User } from '@/types/user';
+import { User } from '@/types/user';
 import { Link } from 'expo-router';
 import { View, ViewProps } from 'react-native';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Card } from './ui/card';
 import { Text } from './ui/text';
 
-export default function UserItem({
-  user,
-  className,
-  ...props
-}: { user: User } & ViewProps) {
+export default function UserItem({ user, className, ...props }: { user: User } & ViewProps) {
   return (
-    <Link href={`/user/${user.id}` as any} className="w-full">
+    <Link
+      href={{
+        pathname: '/user/[userId]',
+        params: { userId: user.id },
+      }}
+      className="w-full">
       <View
         className={cn('flex w-full flex-row items-center justify-between', className)}
         {...props}>

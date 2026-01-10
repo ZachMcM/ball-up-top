@@ -196,7 +196,10 @@ export default function ProfilePage() {
                 {user.id === currentUserData?.user.id && (
                   <View className="flex flex-1 flex-col gap-4 rounded-2xl border border-border p-4">
                     <Text className="text-lg font-semibold">Settings</Text>
-                    <Button variant="destructive" className="justify-start">
+                    <Button
+                      variant="destructive"
+                      onPress={() => authClient.signOut()}
+                      className="justify-start">
                       <Icon className="text-destructive" as={LogOutIcon} />
                       <Text>Log Out</Text>
                     </Button>

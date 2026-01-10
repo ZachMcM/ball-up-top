@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import {
   account,
+  activity,
   court,
   courtBookmark,
   courtSession,
@@ -59,7 +60,7 @@ export const courtSessionRelations = relations(
   })
 );
 
-export const ratingRelations = relations(rating, ({ one }) => ({
+export const ratingRelations = relations(rating, ({ one, many }) => ({
   rater: one(user, {
     fields: [rating.raterId],
     references: [user.id],
@@ -100,3 +101,18 @@ export const encounteredPlayerRelations = relations(
     }),
   })
 );
+
+export const activityRelations = relations(activity, ({ one }) => ({
+  rating: one(rating, {
+    fields: [activity.ratingId],
+    references: [rating.id],
+  }),
+  courtSession: one(courtSession, {
+    fields: [activity.courtSessionId],
+    references: [courtSession.id],
+  }),
+  court: one(court, {
+    fields: [activity.courtId],
+    references: [court.id],
+  }),
+}));

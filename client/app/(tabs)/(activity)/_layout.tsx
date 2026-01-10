@@ -5,7 +5,7 @@ export default function ActivityLayout() {
   return (
     <Stack>
       <Stack.Screen
-        name="activity"
+        name="index"
         options={{
           title: 'Activity',
         }}

@@ -1,0 +1,21 @@
+export type Rating = {
+  id: number;
+  createdAt: Date;
+  finishingRating: number;
+  playmakingRating: number;
+  defenseRating: number;
+  shootingRating: number;
+  raterId: string;
+  rateeId: string;
+  raterCourtSession: number;
+  raterOverallAtTime: number;
+  runCompetitivenessAtTime: number;
+  finalWeightAppliedShooting: number;
+  finalWeightAppliedPlaymaking: number;
+  finalWeightAppliedDefense: number;
+  finalWeightAppliedFinishing: number;
+  rateeNewOverall: number;
+  rateeOldOverall: number;
+  rateeOldArchetype: string;
+  rateeNewArchetype: string;
+};

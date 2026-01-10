@@ -267,7 +267,10 @@ export default function CourtPage() {
                           </Text>
                           <Button
                             onPress={() => {
-                              router.push(`/court/${courtId}/players` as any);
+                              router.push({
+                                pathname: '/court/[courtId]/players',
+                                params: { courtId },
+                              });
                             }}
                             size="sm"
                             variant="outline"
@@ -403,7 +406,11 @@ export default function CourtPage() {
 
 function LeaderboardCard({ user, index }: { user: User; index: number }) {
   return (
-    <Link href={`/user/${user.id}` as any}>
+    <Link
+      href={{
+        pathname: '/user/[userId]',
+        params: { userId: user.id },
+      }}>
       <View className="flex flex-col items-center gap-2">
         <View className="relative">
           <Avatar className="size-14" alt={`${user.name}'s image`}>

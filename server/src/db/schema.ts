@@ -9,6 +9,7 @@ import {
   integer,
   serial,
   uniqueIndex,
+  json,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable(
@@ -207,6 +208,7 @@ export const rating = pgTable(
     finishingRating: integer("finishing_rating").notNull(),
 
     raterOverallAtTime: integer("rater_overall_at_time").notNull(),
+
     runCompetitivenessAtTime: doublePrecision(
       "run_competitiveness_at_time"
     ).notNull(),
@@ -223,7 +225,13 @@ export const rating = pgTable(
     finalWeightAppliedFinishing: doublePrecision(
       "final_weight_applied_finishing"
     ).notNull(),
+
     rateeNewOverall: integer("ratee_new_overall").notNull(),
+    rateeOldOverall: integer("ratee_old_overall").notNull(),
+
+    rateeOldArchetype: text("ratee_old_archetype").notNull(),
+    rateeNewArchetype: text("ratee_new_archetype").notNull(),
+
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
@@ -264,7 +272,7 @@ export const encounteredPlayer = pgTable(
     rateeShootingAtTime: integer("ratee_shooting_at_time").notNull(),
     rateePlaymakingAtTime: integer("ratee_playmaking_at_time").notNull(),
     rateeOverallAtTime: integer("ratee_overall_at_time").notNull(),
-    rateeLifetimeCount: integer("ratee_lifetime_count").notNull(),
+    rateeLifetimeCount: integer("ratee_lifetime_count").notNull(), // Count of ratings received, not sessions
 
     // Ratee display info (frozen for UI)
     rateeName: text("ratee_name").notNull(),
@@ -300,3 +308,27 @@ export const encounteredPlayer = pgTable(
     ),
   ]
 );
+
+export const activity = pgTable("activity", {
+  id: serial().primaryKey().notNull(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id)
+    .notNull(),
+  type: text()
+    .$type<
+      | "rating_received"
+      | "session_completed"
+      | "rating_milestone"
+      | "archetype_changed"
+      | "court_activity"
+    >()
+    .notNull(),
+
+  ratingId: integer("rating_id").references(() => rating.id),
+  courtSessionId: integer("court_session_id").references(() => courtSession.id),
+  courtId: integer("court_id").references(() => court.id),
+
+  read: boolean("read").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

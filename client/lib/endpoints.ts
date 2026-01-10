@@ -5,6 +5,8 @@ import { ExtendedUser, User } from '@/types/user';
 import { ImagePickerAsset } from 'expo-image-picker';
 import * as z from 'zod';
 import { authClient } from './auth-client';
+import { Activity } from '@/types/activity';
+import { Rating } from '@/types/rating';
 
 export type serverRequestParams = {
   endpoint: string;
@@ -314,4 +316,13 @@ export async function getUser(userId: string): Promise<ExtendedUser> {
   });
 
   return user;
+}
+
+export async function getActivity(): Promise<Activity[]> {
+  const activityList = await serverRequest({
+    endpoint: '/users/activity',
+    method: 'GET',
+  });
+
+  return activityList;
 }
