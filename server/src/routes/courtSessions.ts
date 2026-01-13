@@ -384,7 +384,7 @@ async function handleRatingsActivity(ratingIds: number[]) {
         (oldOverall < 70 && newOverall >= 70) ||
         (oldOverall < 75 && newOverall >= 75) ||
         (oldOverall < 80 && newOverall >= 80) ||
-        (oldOverall < 85 && newOverall <= 85) ||
+        (oldOverall < 85 && newOverall >= 85) ||
         (oldOverall < 90 && newOverall >= 90)
       ) {
         await tx.insert(activity).values({
@@ -775,7 +775,7 @@ courtSessionsRoute.patch(
         .values({
           userId: res.locals.userId!,
           type: "session_completed",
-          courtSessionId: targetCourtSession.courtId,
+          courtSessionId: targetCourtSession.id,
         })
         .catch((error) => {
           logger.error("Failed to create session completed activity", {

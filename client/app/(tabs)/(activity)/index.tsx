@@ -1,4 +1,4 @@
-import { NativewindFlatList } from '@/components/NativewindFlatList';
+import { NativewindSectionList } from '@/components/NativewindSectionList';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,8 +21,8 @@ import { Award, BanIcon, MapPin, TrendingUp } from 'lucide-react-native';
 import { useMemo } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 
-type GroupedActivity = {
-  section: 'Today' | 'Yesterday' | 'Last 7 Days' | 'Last 30 Days';
+type ActivitySection = {
+  title: 'Today' | 'Yesterday' | 'Last 7 Days' | 'Last 30 Days';
   data: Activity[];
 };
 
@@ -34,7 +34,7 @@ export default function ActivityPage() {
 
   const router = useRouter();
 
-  const groupedActivities = useMemo(() => {
+  const activitySections = useMemo(() => {
     if (!activityList) return [];
 
     const today: Activity[] = [];
@@ -60,13 +60,13 @@ export default function ActivityPage() {
       }
     });
 
-    const grouped: GroupedActivity[] = [];
-    if (today.length > 0) grouped.push({ section: 'Today', data: today });
-    if (yesterday.length > 0) grouped.push({ section: 'Yesterday', data: yesterday });
-    if (last7Days.length > 0) grouped.push({ section: 'Last 7 Days', data: last7Days });
-    if (last30Days.length > 0) grouped.push({ section: 'Last 30 Days', data: last30Days });
+    const sections: ActivitySection[] = [];
+    if (today.length > 0) sections.push({ title: 'Today', data: today });
+    if (yesterday.length > 0) sections.push({ title: 'Yesterday', data: yesterday });
+    if (last7Days.length > 0) sections.push({ title: 'Last 7 Days', data: last7Days });
+    if (last30Days.length > 0) sections.push({ title: 'Last 30 Days', data: last30Days });
 
-    return grouped;
+    return sections;
   }, [activityList]);
 
   return (
@@ -98,21 +98,17 @@ export default function ActivityPage() {
             </Empty>
           </View>
         ) : (
-          <NativewindFlatList
+          <NativewindSectionList
             contentContainerClassName="pb-32"
-            data={groupedActivities}
+            sections={activitySections}
             showsVerticalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <View>
-                <View className="px-4 py-3">
-                  <Text className="text-base font-bold">{item.section}</Text>
-                </View>
-                {item.data.map((activity) => (
-                  <ActivityRow key={activity.id} activity={activity} />
-                ))}
+            renderSectionHeader={({ section }) => (
+              <View className="px-4 py-3">
+                <Text className="text-base font-bold">{section.title}</Text>
               </View>
             )}
-            keyExtractor={(item) => item.section}
+            renderItem={({ item }) => <ActivityRow activity={item} />}
+            keyExtractor={(item) => item.id.toString()}
           />
         )}
       </View>
