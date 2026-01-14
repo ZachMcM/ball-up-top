@@ -323,7 +323,7 @@ export default function CourtPage() {
           backgroundColor: THEME[colorScheme!].background,
         }}
         handleIndicatorStyle={{ backgroundColor: THEME[colorScheme!].muted }}>
-        <BottomSheetView className="flex flex-1 flex-col gap-3.5 px-4 py-6">
+        <BottomSheetView className="flex flex-1 flex-col gap-3.5 px-4 py-8">
           <View className="flex flex-row items-center justify-between">
             <Text className="text-2xl font-bold">Check In</Text>
             <Button

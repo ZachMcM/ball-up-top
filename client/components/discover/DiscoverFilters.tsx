@@ -101,7 +101,7 @@ export function DiscoverFilters({
       }}
       handleIndicatorStyle={{ backgroundColor: THEME[colorScheme!].muted }}>
       <BottomSheetScrollView className="flex flex-1 flex-col">
-        <View className="flex flex-row items-center justify-between border-b border-border px-4 py-4">
+        <View className="flex flex-row items-center justify-between border-b border-border p-4">
           <Pressable className="flex-1" onPress={handleDismissModal}>
             <Text className="text-left text-base font-medium">Close</Text>
           </Pressable>

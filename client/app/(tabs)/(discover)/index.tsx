@@ -58,12 +58,12 @@ export default function DiscoverPage() {
           <View className="flex w-full flex-row items-center justify-between rounded-full bg-muted/30 p-1">
             <Pressable
               onPress={() => setActiveTab('courts')}
-              className={cn('flex-1 rounded-full p-2', activeTab == 'courts' && 'bg-secondary')}>
+              className={cn('flex-1 rounded-full p-2', activeTab == 'courts' && 'dark:bg-secondary bg-muted')}>
               <Text className="text-center font-semibold text-sm">Courts</Text>
             </Pressable>
             <Pressable
               onPress={() => setActiveTab('players')}
-              className={cn('flex-1 rounded-full p-2', activeTab == 'players' && 'bg-secondary')}>
+              className={cn('flex-1 rounded-full p-2', activeTab == 'players' && 'dark:bg-secondary bg-muted')}>
               <Text className="text-center font-semibold text-sm">Players</Text>
             </Pressable>
           </View>

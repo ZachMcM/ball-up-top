@@ -214,6 +214,8 @@ usersRoute.get("/users", authMiddleware, async (req, res) => {
       conditions.push(lte(user.height, maxHeight));
     }
 
+    const sessionsCount30Days = sql<number>`COUNT(CASE WHEN ${courtSession.startTime} >= NOW() - INTERVAL '30 days' THEN 1 END)`.as('sessions_count_30_days');
+
     const query = db
       .select({
         id: user.id,
@@ -226,6 +228,7 @@ usersRoute.get("/users", authMiddleware, async (req, res) => {
         defenseRating: user.defenseRating,
         playmakingRating: user.playmakingRating,
         shootingRating: user.shootingRating,
+        sessionsCount30Days,
       })
       .from(user)
       .leftJoin(courtSession, sql`${courtSession.userId} = ${user.id}`)
@@ -240,7 +243,7 @@ usersRoute.get("/users", authMiddleware, async (req, res) => {
       );
 
     if (sortBy === "most_active") {
-      query.orderBy(sql`sessions_count_30_days DESC`);
+      query.orderBy(sql`${sessionsCount30Days} DESC`);
     } else if (sortBy === "overall_desc") {
       query.orderBy(sql`${user.overall} DESC`);
     } else if (sortBy === "overall_asc") {

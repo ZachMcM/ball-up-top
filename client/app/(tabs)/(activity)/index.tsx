@@ -83,7 +83,7 @@ export default function ActivityPage() {
             <Empty className="border border-dashed border-border">
               <EmptyHeader>
                 <EmptyMedia variant="icon">
-                  <Icon size={20} as={BanIcon} className="text-secondary-foreground" />
+                  <Icon size={22} as={BanIcon} className="text-secondary-foreground" />
                 </EmptyMedia>
                 <EmptyTitle>No Activity</EmptyTitle>
                 <EmptyDescription>
@@ -145,7 +145,7 @@ function RatingReceivedRow({ activity }: { activity: Activity }) {
         params: { userId: rater.id },
       }}>
       <View className="flex flex-row items-center gap-3 px-4 py-3">
-        <Avatar alt={rater.name} className="size-11">
+        <Avatar alt={rater.name} className="size-12">
           <AvatarImage source={{ uri: rater.image }} />
           <AvatarFallback>
             <Text>{rater.name.substring(0, 2).toUpperCase()}</Text>
@@ -180,9 +180,15 @@ function SessionCompletedRow({ activity }: { activity: Activity }) {
 
   const startTime = new Date(session.startTime);
   const endTime = session.endTime ? new Date(session.endTime) : null;
-  const duration = endTime
-    ? Math.round((endTime.getTime() - startTime.getTime()) / (1000 * 60))
-    : 0;
+  const durationStr = (() => {
+    if (!endTime) return '';
+    const minutes = Math.round((endTime.getTime() - startTime.getTime()) / (1000 * 60));
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    if (h === 0) return `${m}m`;
+    if (m === 0) return `${h}h`;
+    return `${h}h ${m}m`;
+  })();
 
   return (
     <Link
@@ -191,21 +197,19 @@ function SessionCompletedRow({ activity }: { activity: Activity }) {
         params: { courtId: court.id },
       }}>
       <View className="flex flex-row items-center gap-3 px-4 py-3">
-        <Avatar alt={court.name} className="size-11 rounded-lg">
+        <Avatar alt={court.name} className="size-12 rounded-lg">
           <AvatarImage source={{ uri: court.image }} />
           <AvatarFallback>
-            <Icon as={MapPin} size={20} />
+            <Icon as={MapPin} size={22} />
           </AvatarFallback>
         </Avatar>
         <View className="flex-1">
           <Text className="leading-5">
-            <Text>Session completed at </Text>
-            <Text className="font-bold">{court.name}</Text>
+            <Text>You played at</Text>
+            <Text className="font-bold"> {court.name} </Text>
+            <Text>for {durationStr}</Text>
           </Text>
           <Text className="text-sm text-muted-foreground">{timeAgo(session.startTime)}</Text>
-        </View>
-        <View className="items-end">
-          <Text className="text-sm font-semibold">{duration}m</Text>
         </View>
       </View>
     </Link>
@@ -218,8 +222,8 @@ function RatingMilestoneRow({ activity }: { activity: Activity }) {
 
   return (
     <View className="flex flex-row items-center gap-3 px-4 py-3">
-      <View className="size-11 items-center justify-center rounded-full border border-border bg-muted/30">
-        <Icon as={Award} size={20} />
+      <View className="size-12 items-center justify-center rounded-full border border-border bg-muted/30">
+        <Icon as={Award} size={22} />
       </View>
       <View className="flex-1">
         <Text className="leading-5">
@@ -238,8 +242,8 @@ function ArchetypeChangedRow({ activity }: { activity: Activity }) {
 
   return (
     <View className="flex flex-row items-center gap-3 px-4 py-3">
-      <View className="size-11 items-center justify-center rounded-full border border-border bg-muted/30">
-        <Icon as={TrendingUp} size={20} />
+      <View className="size-12 items-center justify-center rounded-full border border-border bg-muted/30">
+        <Icon as={TrendingUp} size={22} />
       </View>
       <View className="flex-1">
         <Text className="leading-5">
@@ -275,10 +279,10 @@ function CourtActivityRow({ activity }: { activity: Activity }) {
           </Text>
           <Text className="text-sm text-muted-foreground">{timeAgo(activity.createdAt)}</Text>
         </View>
-        <Avatar alt={court.name} className="size-11 rounded-lg">
+        <Avatar alt={court.name} className="size-12 rounded-lg">
           <AvatarImage source={{ uri: court.image }} />
           <AvatarFallback>
-            <Icon as={MapPin} size={20} />
+            <Icon as={MapPin} size={22} />
           </AvatarFallback>
         </Avatar>
       </View>
