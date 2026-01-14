@@ -102,6 +102,7 @@ export default function ActivityPage() {
             contentContainerClassName="pb-32"
             sections={activitySections}
             showsVerticalScrollIndicator={false}
+            stickySectionHeadersEnabled={false}
             renderSectionHeader={({ section }) => (
               <View className="px-4 py-3">
                 <Text className="text-base font-bold">{section.title}</Text>
