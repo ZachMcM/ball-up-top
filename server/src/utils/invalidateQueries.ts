@@ -1,4 +1,4 @@
-import { io } from "../src";
+import { io } from "..";
 import { logger } from "./logger";
 
 export function invalidateQueries(...keys: (string | number)[][]) {

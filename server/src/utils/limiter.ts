@@ -1,7 +1,7 @@
 import rateLimit from "express-rate-limit";
 import RedisStore from "rate-limit-redis";
 import { redis } from "./redis";
-import { MAX_REQS_PER_WINDOW } from "../src/config/rate-limiter";
+import { MAX_REQS_PER_WINDOW } from "../config/rate-limiter";
 
 export const limiter = rateLimit({
   store: new RedisStore({

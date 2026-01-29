@@ -4,9 +4,9 @@ import { redisConnection } from "../queues";
 import { NotificationJobData } from "../queues/notifications.queue";
 import { db } from "../db";
 import { activity, court, courtSession, notificationCourt, rating, user } from "../db/schema";
-import { sendPushNotification, sendPushNotifications } from "../../utils/pushNotifications";
-import { logger } from "../../utils/logger";
-import { invalidateQueriesForUser, invalidateQueriesForUsers } from "../../utils/invalidateQueries";
+import { sendPushNotification, sendPushNotifications } from "../utils/pushNotifications";
+import { logger } from "../utils/logger";
+import { invalidateQueriesForUser, invalidateQueriesForUsers } from "../utils/invalidateQueries";
 import { COURT_NOTI_THRESHOLD } from "../config/courts";
 
 async function processNotificationJob(job: Job<NotificationJobData>) {

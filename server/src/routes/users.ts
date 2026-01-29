@@ -11,12 +11,12 @@ import {
 } from "drizzle-orm";
 import { Router } from "express";
 import * as z from "zod";
-import { handleError } from "../../utils/handleError";
-import { authMiddleware, upload } from "../../utils/middleware";
-import { r2 } from "../../utils/r2";
+import { handleError } from "../utils/handleError";
+import { authMiddleware, upload } from "../utils/middleware";
+import { r2 } from "../utils/r2";
 import { db } from "../db";
 import { activity, court, courtSession, rating, user } from "../db/schema";
-import { invalidateQueries } from "../../utils/invalidateQueries";
+import { invalidateQueries } from "../utils/invalidateQueries";
 
 export const usersRoute = Router();
 

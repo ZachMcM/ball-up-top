@@ -2,7 +2,7 @@ import { expo } from "@better-auth/expo";
 import { betterAuth } from "better-auth";
 import { emailOTP, phoneNumber } from "better-auth/plugins";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "../src/db";
+import { db } from "../db";
 import { resend } from "./resend";
 
 export const auth = betterAuth({

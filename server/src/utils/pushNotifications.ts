@@ -1,7 +1,7 @@
 import { Expo, ExpoPushMessage, ExpoPushTicket } from "expo-server-sdk";
 import { eq, inArray } from "drizzle-orm";
-import { db } from "../src/db";
-import { user } from "../src/db/schema";
+import { db } from "../db";
+import { user } from "../db/schema";
 import { logger } from "./logger";
 
 const expo = new Expo();

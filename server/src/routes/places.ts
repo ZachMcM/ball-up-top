@@ -1,13 +1,13 @@
 import { Router } from "express";
 import * as z from "zod";
-import { googlePlacesClient } from "../../utils/googlePlacesClient";
-import { handleError } from "../../utils/handleError";
-import { authMiddleware } from "../../utils/middleware";
+import { googlePlacesClient } from "../utils/googlePlacesClient";
+import { handleError } from "../utils/handleError";
+import { authMiddleware } from "../utils/middleware";
 import { MAX_RESULTS, MAX_DISTANCE } from "../config/places";
 import { db } from "../db";
 import { inArray } from "drizzle-orm";
 import { court } from "../db/schema";
-import { getDistanceInMiles } from "../../utils/getDistanceMiles";
+import { getDistanceInMiles } from "../utils/getDistanceMiles";
 
 export const placesRoute = Router();
 

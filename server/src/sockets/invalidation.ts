@@ -1,4 +1,4 @@
-import { logger } from "../../utils/logger";
+import { logger } from "../utils/logger";
 import { Socket } from "socket.io";
 import { io } from "..";
 

@@ -11,8 +11,8 @@ import {
   sql,
 } from "drizzle-orm";
 import { Router } from "express";
-import { handleError } from "../../utils/handleError";
-import { authMiddleware } from "../../utils/middleware";
+import { handleError } from "../utils/handleError";
+import { authMiddleware } from "../utils/middleware";
 import { db } from "../db";
 import {
   courtSession,
@@ -22,8 +22,8 @@ import {
 } from "../db/schema";
 
 import * as z from "zod";
-import { clamp } from "../../utils/clamp";
-import { generateArchetype } from "../../utils/generateArchetype";
+import { clamp } from "../utils/clamp";
+import { generateArchetype } from "../utils/generateArchetype";
 import {
   EST_RATINGS_PER_SESS,
   EXPERIENCE_GROWTH_RT,
@@ -45,8 +45,8 @@ import {
   RUN_COMP_MIN_WT,
   WEIGHT_E,
 } from "../config/ratings";
-import { logger } from "../../utils/logger";
-import { invalidateQueries } from "../../utils/invalidateQueries";
+import { logger } from "../utils/logger";
+import { invalidateQueries } from "../utils/invalidateQueries";
 import { notificationsQueue } from "../queues/notifications.queue";
 
 export const courtSessionsRoute = Router();
