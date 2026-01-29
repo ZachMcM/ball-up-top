@@ -2,7 +2,6 @@ import {
   and,
   eq,
   gt,
-  inArray,
   InferSelectModel,
   isNotNull,
   isNull,
@@ -16,7 +15,6 @@ import { handleError } from "../../utils/handleError";
 import { authMiddleware } from "../../utils/middleware";
 import { db } from "../db";
 import {
-  activity,
   courtSession,
   encounteredPlayer,
   rating,
@@ -49,6 +47,7 @@ import {
 } from "../config/ratings";
 import { logger } from "../../utils/logger";
 import { invalidateQueries } from "../../utils/invalidateQueries";
+import { notificationsQueue } from "../queues/notifications.queue";
 
 export const courtSessionsRoute = Router();
 
@@ -352,53 +351,6 @@ courtSessionsRoute.patch(
   }
 );
 
-async function handleRatingsActivity(ratingIds: number[]) {
-  await db.transaction(async (tx) => {
-    const targetRatings = await tx.query.rating.findMany({
-      where: inArray(rating.id, ratingIds),
-    });
-
-    for (const {
-      id: ratingId,
-      rateeId: userId,
-      rateeOldArchetype: oldArchetype,
-      rateeNewArchetype: newArchetype,
-      rateeOldOverall: oldOverall,
-      rateeNewOverall: newOverall,
-    } of targetRatings) {
-      await tx.insert(activity).values({
-        userId,
-        type: "rating_received",
-        ratingId,
-      });
-
-      if (oldArchetype !== newArchetype) {
-        await tx.insert(activity).values({
-          userId,
-          type: "archetype_changed",
-          ratingId,
-        });
-      }
-
-      if (
-        (oldOverall < 70 && newOverall >= 70) ||
-        (oldOverall < 75 && newOverall >= 75) ||
-        (oldOverall < 80 && newOverall >= 80) ||
-        (oldOverall < 85 && newOverall >= 85) ||
-        (oldOverall < 90 && newOverall >= 90)
-      ) {
-        await tx.insert(activity).values({
-          userId,
-          type: "rating_milestone",
-          ratingId,
-        });
-      }
-
-      // TODO possibly invalidate queries here
-    }
-  });
-}
-
 courtSessionsRoute.post(
   "/court-sessions/:sessionId/ratings",
   authMiddleware,
@@ -602,13 +554,13 @@ courtSessionsRoute.post(
 
       res.json({ success: true });
 
-      handleRatingsActivity(ratingIds).catch((error) => {
-        logger.error("Failed to create rating activities", {
-          error,
+      // Queue ratings activity processing
+      if (ratingIds.length > 0) {
+        notificationsQueue.add("ratings_activity", {
+          type: "ratings_activity",
           ratingIds,
-          userId: res.locals.userId,
         });
-      });
+      }
     } catch (error) {
       handleError(error, res, "POST /court-sessions/:sessionId/ratings");
     }
@@ -771,19 +723,12 @@ courtSessionsRoute.patch(
 
       res.json({ success: true });
 
-      db.insert(activity)
-        .values({
-          userId: res.locals.userId!,
-          type: "session_completed",
-          courtSessionId: targetCourtSession.id,
-        })
-        .catch((error) => {
-          logger.error("Failed to create session completed activity", {
-            error,
-            courtSessionId: targetCourtSession.id,
-            userId: res.locals.userId,
-          });
-        });
+      // Queue session completed activity
+      notificationsQueue.add("session_completed", {
+        type: "session_completed",
+        userId: res.locals.userId!,
+        courtSessionId: targetCourtSession.id,
+      });
     } catch (error) {
       handleError(error, res, "PATCH /court-sessions/:sessionId");
     }

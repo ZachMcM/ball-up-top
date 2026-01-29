@@ -19,8 +19,8 @@ export default function BackButton() {
   }
 
   return (
-    <Button onPress={() => router.back()} variant="secondary" size="icon" className='size-9'>
-      <Icon size={20} as={ArrowLeft} />
+    <Button onPress={() => router.back()} variant="secondary" size="icon" className='size-8'>
+      <Icon size={18} as={ArrowLeft} />
     </Button>
   );
 }

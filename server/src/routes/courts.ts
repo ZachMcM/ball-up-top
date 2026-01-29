@@ -14,7 +14,8 @@ import {
   POPULAR_THRESHOLD,
 } from "../config/courts";
 import { db } from "../db";
-import { court, courtBookmark, courtSession, user } from "../db/schema";
+import { court, courtBookmark, courtSession, notificationCourt, user } from "../db/schema";
+import { notificationsQueue } from "../queues/notifications.queue";
 
 export const courtsRoute = Router();
 
@@ -136,6 +137,10 @@ courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
         image: court.image,
         isBookmarked: sql<boolean>`EXISTS (
           SELECT 1 FROM court_bookmark
+          WHERE court_id = ${courtId} AND user_id = ${res.locals.userId}
+        )`,
+        isNotificationEnabled: sql<boolean>`EXISTS (
+          SELECT 1 FROM notification_court
           WHERE court_id = ${courtId} AND user_id = ${res.locals.userId}
         )`,
       })
@@ -347,6 +352,13 @@ courtsRoute.post(
       );
 
       res.json({ success: true });
+
+      // Queue court threshold check for notifications
+      notificationsQueue.add("court_threshold_check", {
+        type: "court_threshold_check",
+        courtId,
+        checkingInUserId: res.locals.userId!,
+      });
     } catch (error) {
       handleError(error, res, "POST /courts/:courtId/sessions");
     }
@@ -616,3 +628,47 @@ courtsRoute.post(
     }
   }
 );
+
+courtsRoute.post("/courts/:id/notifications", authMiddleware, async (req, res) => {
+  try {
+    const courtId = parseInt(req.params.id);
+
+    if (!Number.isInteger(courtId)) {
+      logger.error("Court ID is not an integer.");
+      return res.status(400).json({ error: "Court ID is not an integer." });
+    }
+
+    await db.insert(notificationCourt).values({
+      courtId,
+      userId: res.locals.userId!,
+    });
+
+    return res.json({ success: true });
+  } catch (error) {
+    handleError(error, res, "POST /courts/:id/notifications");
+  }
+});
+
+courtsRoute.delete("/courts/:id/notifications", authMiddleware, async (req, res) => {
+  try {
+    const courtId = parseInt(req.params.id);
+
+    if (!Number.isInteger(courtId)) {
+      logger.error("Court ID is not an integer.");
+      return res.status(400).json({ error: "Court ID is not an integer." });
+    }
+
+    await db
+      .delete(notificationCourt)
+      .where(
+        and(
+          eq(notificationCourt.courtId, courtId),
+          eq(notificationCourt.userId, res.locals.userId!)
+        )
+      );
+
+    return res.json({ success: true });
+  } catch (error) {
+    handleError(error, res, "DELETE /courts/:id/notifications");
+  }
+});

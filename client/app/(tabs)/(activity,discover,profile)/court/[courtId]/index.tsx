@@ -9,7 +9,13 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import UserItem from '@/components/UserItem';
-import { deleteCourtBookmark, getCourt, postCourtBookmark } from '@/lib/endpoints';
+import {
+  deleteCourtBookmark,
+  deleteCourtNotification,
+  getCourt,
+  postCourtBookmark,
+  postCourtNotification,
+} from '@/lib/endpoints';
 import { THEME } from '@/lib/theme';
 import { getInitials, openDirections } from '@/lib/utils';
 import { Court } from '@/types/court';
@@ -27,6 +33,7 @@ import {
   ArrowLeftIcon,
   ArrowRight,
   ArrowRightIcon,
+  BellIcon,
   BookmarkIcon,
   ClockIcon,
   HomeIcon,
@@ -105,6 +112,42 @@ export default function CourtPage() {
     });
   };
 
+  const { mutate: enableNotification } = useMutation({
+    mutationFn: async () => postCourtNotification(courtId),
+    onSuccess: () => {
+      queryClient.setQueryData(['court', courtId], (old: Court) => ({
+        ...old,
+        isNotificationEnabled: true,
+      }));
+    },
+    onError: (error) => {
+      console.log('Error', error);
+      toast.error(error.message);
+    },
+  });
+
+  const { mutate: disableNotification } = useMutation({
+    mutationFn: async () => deleteCourtNotification(courtId),
+    onSuccess: () => {
+      queryClient.setQueryData(['court', courtId], (old: Court) => ({
+        ...old,
+        isNotificationEnabled: false,
+      }));
+    },
+    onError: (error) => {
+      console.log('Error', error);
+      toast.error(error.message);
+    },
+  });
+
+  const toggleNotification = () => {
+    if (court?.isNotificationEnabled) {
+      disableNotification();
+    } else {
+      enableNotification();
+    }
+  };
+
   const { colorScheme } = useColorScheme();
 
   const {
@@ -138,13 +181,22 @@ export default function CourtPage() {
         options={{
           headerTitle: court?.name ?? 'Court',
           headerRight: () => (
-            <Pressable onPress={toggleBookmark}>
-              <Icon
-                size={24}
-                fill={court?.isBookmarked ? THEME[colorScheme!].primary : undefined}
-                as={BookmarkIcon}
-              />
-            </Pressable>
+            <View className="flex-row gap-3">
+              <Pressable onPress={toggleNotification}>
+                <Icon
+                  size={22}
+                  fill={court?.isNotificationEnabled ? THEME[colorScheme!].primary : undefined}
+                  as={BellIcon}
+                />
+              </Pressable>
+              <Pressable onPress={toggleBookmark}>
+                <Icon
+                  size={22}
+                  fill={court?.isBookmarked ? THEME[colorScheme!].primary : undefined}
+                  as={BookmarkIcon}
+                />
+              </Pressable>
+            </View>
           ),
         }}
       />

@@ -326,3 +326,32 @@ export async function getActivity(): Promise<Activity[]> {
 
   return activityList;
 }
+
+export async function patchExpoPushToken(expoPushToken: string): Promise<void> {
+  await serverRequest({
+    endpoint: '/users/expoPushToken',
+    method: 'PATCH',
+    body: JSON.stringify({ expoPushToken }),
+  });
+}
+
+export async function patchActivityRead(): Promise<void> {
+  await serverRequest({
+    endpoint: '/users/activity/read',
+    method: 'PATCH',
+  });
+}
+
+export async function postCourtNotification(courtId: number): Promise<void> {
+  await serverRequest({
+    endpoint: `/courts/${courtId}/notifications`,
+    method: 'POST',
+  });
+}
+
+export async function deleteCourtNotification(courtId: number): Promise<void> {
+  await serverRequest({
+    endpoint: `/courts/${courtId}/notifications`,
+    method: 'DELETE',
+  });
+}

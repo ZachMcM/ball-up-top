@@ -2,6 +2,7 @@ import BackButton from '@/components/BackButton';
 import { CourtSessionProvider } from '@/components/providers/CourtSessionProvider';
 import { InvalidationProvider } from '@/components/providers/InvalidationProvider';
 import { LocationProvider, useLocation } from '@/components/providers/LocationProvider';
+import { PushNotificationProvider } from '@/components/providers/PushNotificationProvider';
 import '@/global.css';
 import { authClient } from '@/lib/auth-client';
 
@@ -48,10 +49,12 @@ export default function RootLayout() {
           <BottomSheetModalProvider>
             <InvalidationProvider>
               <LocationProvider>
-                <CourtSessionProvider>
-                  <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-                  <RootNavigator />
-                </CourtSessionProvider>
+                <PushNotificationProvider>
+                  <CourtSessionProvider>
+                    <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+                    <RootNavigator />
+                  </CourtSessionProvider>
+                </PushNotificationProvider>
               </LocationProvider>
             </InvalidationProvider>
             <Toaster

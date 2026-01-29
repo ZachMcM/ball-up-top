@@ -27,6 +27,7 @@ export type CourtListEntry = {
   currentActiveSessions: number;
   popular: boolean;
   isBookmarked: boolean;
+  isNotificationEnabled?: boolean;
 };
 
 export type Court = CourtListEntry & {

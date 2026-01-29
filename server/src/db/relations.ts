@@ -6,6 +6,7 @@ import {
   courtBookmark,
   courtSession,
   encounteredPlayer,
+  notificationCourt,
   rating,
   session,
   user,
@@ -20,6 +21,7 @@ export const userRelations = relations(user, ({ many }) => ({
   outgoingRatings: many(rating, { relationName: "outgoingRatings" }),
   courtBookmarks: many(courtBookmark),
   encounteredPlayersAsRatee: many(encounteredPlayer),
+  notificationCourts: many(notificationCourt),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -116,3 +118,17 @@ export const activityRelations = relations(activity, ({ one }) => ({
     references: [court.id],
   }),
 }));
+
+export const notificationCourtRelations = relations(
+  notificationCourt,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [notificationCourt.userId],
+      references: [user.id],
+    }),
+    court: one(court, {
+      fields: [notificationCourt.courtId],
+      references: [court.id],
+    }),
+  })
+);

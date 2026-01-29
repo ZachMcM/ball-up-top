@@ -1,8 +1,12 @@
 import { SessionFooter, useCourtSession } from '@/components/providers/CourtSessionProvider';
 import { Icon } from '@/components/ui/icon';
+import { getActivity } from '@/lib/endpoints';
+import { THEME } from '@/lib/theme';
 import { BottomTabBar, BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { useQuery } from '@tanstack/react-query';
 import { Tabs, usePathname, useRouter } from 'expo-router';
 import { Activity, Search, User } from 'lucide-react-native';
+import { useColorScheme } from 'nativewind';
 import { useEffect, useRef } from 'react';
 import { View } from 'react-native';
 
@@ -23,6 +27,13 @@ export default function TabsLayout() {
   const pathname = usePathname();
   const { unratedCourtSession } = useCourtSession();
   const lastPromptTime = useRef<number>(0);
+
+  const { data: activityList } = useQuery({
+    queryKey: ['activity'],
+    queryFn: getActivity,
+  });
+
+  const unreadCount = activityList?.filter((a) => !a.read).length ?? 0;
 
   useEffect(() => {
     if (!unratedCourtSession) {
@@ -58,6 +69,8 @@ export default function TabsLayout() {
     }
   }, [unratedCourtSession, pathname]);
 
+  const { colorScheme } = useColorScheme();
+
   return (
     <Tabs tabBar={(props) => <CustomTabBar {...props} />}>
       <Tabs.Screen
@@ -74,6 +87,12 @@ export default function TabsLayout() {
           headerShown: false,
           title: 'Activity',
           tabBarIcon: ({ color }) => <Icon as={Activity} size={18} color={color} />,
+          tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
+          tabBarBadgeStyle: {
+            backgroundColor: THEME[colorScheme!].primary,
+            color: THEME[colorScheme!].primaryForeground,
+            fontWeight: 600
+          },
         }}
       />
       <Tabs.Screen

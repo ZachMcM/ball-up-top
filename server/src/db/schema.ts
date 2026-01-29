@@ -9,7 +9,7 @@ import {
   integer,
   serial,
   uniqueIndex,
-  json,
+  unique,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable(
@@ -45,6 +45,8 @@ export const user = pgTable(
       .default("name")
       .notNull()
       .$type<"name" | "height" | "image" | "complete">(),
+
+    expoPushToken: text("expo_push_token"),
   },
   (table) => [index("user_overall_idx").on(table.overall)]
 );
@@ -332,3 +334,18 @@ export const activity = pgTable("activity", {
   read: boolean("read").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+export const notificationCourt = pgTable(
+  "notification_court",
+  {
+    id: serial().primaryKey().notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id),
+    courtId: integer("court_id")
+      .notNull()
+      .references(() => court.id),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [unique().on(table.userId, table.courtId)]
+);

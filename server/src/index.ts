@@ -9,6 +9,7 @@ import { limiter } from "../utils/limiter";
 import { logger } from "../utils/logger";
 import { routes } from "./routes";
 import { socketServer } from "./sockets";
+import { notificationsWorker } from "./workers/notifications.worker";
 
 const app = express();
 const PORT = parseInt(process.env.PORT!);
@@ -35,4 +36,12 @@ app.use("/", routes);
 
 httpServer.listen(PORT, () => {
   logger.info(`Server listening on port ${PORT} in ${process.env.NODE_ENV}`);
+  logger.info("Notifications worker started");
+});
+
+// Graceful shutdown
+process.on("SIGTERM", async () => {
+  logger.info("SIGTERM received, closing workers...");
+  await notificationsWorker.close();
+  process.exit(0);
 });

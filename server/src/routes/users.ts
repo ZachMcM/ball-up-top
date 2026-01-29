@@ -16,6 +16,7 @@ import { authMiddleware, upload } from "../../utils/middleware";
 import { r2 } from "../../utils/r2";
 import { db } from "../db";
 import { activity, court, courtSession, rating, user } from "../db/schema";
+import { invalidateQueries } from "../../utils/invalidateQueries";
 
 export const usersRoute = Router();
 
@@ -255,5 +256,42 @@ usersRoute.get("/users", authMiddleware, async (req, res) => {
     res.json(players);
   } catch (error) {
     handleError(error, res, "GET /players");
+  }
+});
+
+const ExpoPushTokenSchema = z.object({
+  expoPushToken: z.string(),
+});
+
+usersRoute.patch("/users/expoPushToken", authMiddleware, async (req, res) => {
+  try {
+    const validBody = ExpoPushTokenSchema.safeParse(req.body);
+    if (!validBody.success) {
+      return res.status(400).json({ error: validBody.error.message });
+    }
+
+    await db
+      .update(user)
+      .set({ expoPushToken: validBody.data.expoPushToken })
+      .where(eq(user.id, res.locals.userId!));
+
+    return res.json({ success: true });
+  } catch (error) {
+    handleError(error, res, "PATCH /users/expoPushToken");
+  }
+});
+
+usersRoute.patch("/users/activity/read", authMiddleware, async (req, res) => {
+  try {
+    await db
+      .update(activity)
+      .set({ read: true })
+      .where(eq(activity.userId, res.locals.userId!));
+
+    invalidateQueries(["activity"]);
+
+    return res.json({ success: true });
+  } catch (error) {
+    handleError(error, res, "PATCH /users/activity/read");
   }
 });

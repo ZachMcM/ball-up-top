@@ -11,15 +11,16 @@ import {
 } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
-import { getActivity } from '@/lib/endpoints';
+import { getActivity, patchActivityRead } from '@/lib/endpoints';
 import { timeAgo } from '@/lib/utils';
 import { Activity } from '@/types/activity';
-import { useQuery } from '@tanstack/react-query';
+import { useFocusEffect } from '@react-navigation/native';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { isToday, isYesterday, subDays, isAfter } from 'date-fns';
 import { Link, useRouter } from 'expo-router';
 import { Award, BanIcon, MapPin, TrendingUp } from 'lucide-react-native';
-import { useMemo } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
+import { useCallback, useMemo } from 'react';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-native';
 
 type ActivitySection = {
   title: 'Today' | 'Yesterday' | 'Last 7 Days' | 'Last 30 Days';
@@ -27,12 +28,39 @@ type ActivitySection = {
 };
 
 export default function ActivityPage() {
+  const queryClient = useQueryClient();
   const { data: activityList, isPending: activityPending } = useQuery({
     queryKey: ['activity'],
     queryFn: getActivity,
   });
 
   const router = useRouter();
+
+  const { mutate: markAsRead } = useMutation({
+    mutationFn: patchActivityRead,
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['activity'] });
+      const previousData = queryClient.getQueryData<Activity[]>(['activity']);
+      queryClient.setQueryData<Activity[]>(['activity'], (old) =>
+        old?.map((a) => ({ ...a, read: true }))
+      );
+      return { previousData };
+    },
+    onError: (_, __, context) => {
+      if (context?.previousData) {
+        queryClient.setQueryData(['activity'], context.previousData);
+      }
+    },
+  });
+
+  useFocusEffect(
+    useCallback(() => {
+      const hasUnread = activityList?.some((a) => !a.read);
+      if (hasUnread) {
+        markAsRead();
+      }
+    }, [activityList, markAsRead])
+  );
 
   const activitySections = useMemo(() => {
     if (!activityList) return [];
@@ -99,7 +127,7 @@ export default function ActivityPage() {
           </View>
         ) : (
           <NativewindSectionList
-            contentContainerClassName="pb-32"
+            contentContainerClassName="pb-8"
             sections={activitySections}
             showsVerticalScrollIndicator={false}
             stickySectionHeadersEnabled={false}
