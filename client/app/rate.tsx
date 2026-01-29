@@ -220,7 +220,6 @@ export default function RatePage() {
 
   useEffect(() => {
     if (currentPlayer && !hasSubmittedRef.current) {
-      console.log("Updating draft")
       updateDraft(debouncedRatings);
     }
   }, [debouncedRatings, currentPlayer?.id]);
