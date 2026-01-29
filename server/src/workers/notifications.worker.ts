@@ -6,6 +6,7 @@ import { db } from "../db";
 import { activity, court, courtSession, notificationCourt, rating, user } from "../db/schema";
 import { sendPushNotification, sendPushNotifications } from "../../utils/pushNotifications";
 import { logger } from "../../utils/logger";
+import { invalidateQueriesForUser, invalidateQueriesForUsers } from "../../utils/invalidateQueries";
 import { COURT_NOTI_THRESHOLD } from "../config/courts";
 
 async function processNotificationJob(job: Job<NotificationJobData>) {
@@ -18,6 +19,7 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
         type: "session_completed",
         courtSessionId: data.courtSessionId,
       });
+      invalidateQueriesForUser(data.userId, ["activity"]);
       break;
     }
 
@@ -44,6 +46,7 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
           type: "rating_received",
           ratingId,
         });
+        invalidateQueriesForUser(userId, ["activity"]);
 
         // Send push notification for rating received
         const avgRating = Math.round(
@@ -63,6 +66,7 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
             type: "archetype_changed",
             ratingId,
           });
+          invalidateQueriesForUser(userId, ["activity"]);
 
           await sendPushNotification({
             userId,
@@ -85,6 +89,7 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
             type: "rating_milestone",
             ratingId,
           });
+          invalidateQueriesForUser(userId, ["activity"]);
 
           await sendPushNotification({
             userId,
@@ -146,6 +151,7 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
               courtId: data.courtId,
             });
           }
+          invalidateQueriesForUsers(userIds, ["activity"]);
 
           // Send push notifications
           await sendPushNotifications({

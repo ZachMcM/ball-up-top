@@ -347,6 +347,7 @@ courtsRoute.post(
       });
 
       invalidateQueries(
+        ["courts"],
         ["court", courtId],
         ["court", courtId, "active-players"]
       );

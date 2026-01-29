@@ -239,7 +239,7 @@ export default function RatePage() {
     onSuccess: () => {
       if (isLastStep) {
         queryClient.invalidateQueries({ queryKey: ['courtSession', 'unrated'] });
-        toast.success('Ratings submitted successfully!', { position: 'bottom-center' });
+        toast.success('Ratings submicptted successfully!', { position: 'bottom-center' });
         router.dismiss();
       } else {
         refetch();

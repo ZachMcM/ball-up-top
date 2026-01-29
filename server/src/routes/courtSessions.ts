@@ -717,6 +717,7 @@ courtSessionsRoute.patch(
       }
 
       invalidateQueries(
+        ["courts"],
         ["court", targetCourtSession.courtId],
         ["court", targetCourtSession.courtId, "active-players"]
       );
