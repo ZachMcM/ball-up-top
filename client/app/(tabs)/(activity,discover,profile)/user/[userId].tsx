@@ -186,11 +186,7 @@ export default function ProfilePage() {
                       ))}
                     </View>
                   ) : (
-                    <View className="rounded-2xl border border-border bg-card p-4">
-                      <Text className="text-center text-sm text-muted-foreground">
-                        No sessions yet.
-                      </Text>
-                    </View>
+                    <Text className="text-center text-xs font-medium">No sessions yet.</Text>
                   )}
                 </View>
                 {user.id === currentUserData?.user.id && (

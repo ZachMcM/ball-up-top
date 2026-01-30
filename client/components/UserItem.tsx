@@ -1,3 +1,4 @@
+import { useTabContext } from '@/hooks/useTabContext';
 import { cn, getInitials } from '@/lib/utils';
 import { User } from '@/types/user';
 import { Link } from 'expo-router';
@@ -6,10 +7,12 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Text } from './ui/text';
 
 export default function UserItem({ user, className, ...props }: { user: User } & ViewProps) {
+  const tabContext = useTabContext();
+
   return (
     <Link
       href={{
-        pathname: '/user/[userId]',
+        pathname: `/(tabs)/(${tabContext})/user/[userId]` as const,
         params: { userId: user.id },
       }}
       className="w-full">

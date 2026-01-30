@@ -83,6 +83,8 @@ export default function CourtPlayersPage() {
   );
 }
 
+// Note: This component is unused - consider removing it.
+// UserItem is preferred as it handles tab context automatically.
 function UserCard({ user }: { user: User }) {
   return (
     <Link

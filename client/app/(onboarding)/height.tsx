@@ -79,7 +79,7 @@ export default function HeightPage() {
               <Select
                 value={{ value, label: value }}
                 onValueChange={(option) => onChange(option?.value)}>
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full rounded-2xl">
                   <SelectValue placeholder="Select your height" />
                 </SelectTrigger>
                 <SelectContent>

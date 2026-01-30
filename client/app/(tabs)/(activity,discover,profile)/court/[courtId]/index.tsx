@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import UserItem from '@/components/UserItem';
+import { useTabContext } from '@/hooks/useTabContext';
 import {
   deleteCourtBookmark,
   deleteCourtNotification,
@@ -457,10 +458,12 @@ export default function CourtPage() {
 }
 
 function LeaderboardCard({ user, index }: { user: User; index: number }) {
+  const tabContext = useTabContext();
+
   return (
     <Link
       href={{
-        pathname: '/user/[userId]',
+        pathname: `/(tabs)/(${tabContext})/user/[userId]` as const,
         params: { userId: user.id },
       }}>
       <View className="flex flex-col items-center gap-2">
