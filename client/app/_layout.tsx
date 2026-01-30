@@ -106,14 +106,14 @@ export function RootNavigator() {
       <Stack.Protected guard={!isLoading && currentUserData === null}>
         <Stack.Screen
           name="auth"
-          options={{ title: 'Pull Up', headerLeft: () => <BackButton/> }}
+          options={{ title: 'Ball Up Top', headerLeft: () => <BackButton/> }}
         />
       </Stack.Protected>
       <Stack.Protected guard={showOnboarding && onboardingStep === 'name'}>
         <Stack.Screen
           name="(onboarding)/name"
           options={{
-            title: 'Pull Up',
+            title: 'Ball Up Top',
           }}
         />
       </Stack.Protected>
@@ -121,7 +121,7 @@ export function RootNavigator() {
         <Stack.Screen
           name="(onboarding)/height"
           options={{
-            title: 'Pull Up',
+            title: 'Ball Up Top',
             headerBackVisible: false,
           }}
         />
@@ -130,7 +130,7 @@ export function RootNavigator() {
         <Stack.Screen
           name="(onboarding)/image"
           options={{
-            title: 'Pull Up',
+            title: 'Ball Up Top',
             headerBackVisible: false,
           }}
         />

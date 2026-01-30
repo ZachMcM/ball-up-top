@@ -28,9 +28,9 @@ export const auth = betterAuth({
       async sendVerificationOTP({ email, otp, type }) {
         if (type === "sign-in") {
           resend.emails.send({
-            from: `Pull Up <${process.env.RESEND_FROM_OTP_DNS}>`,
+            from: `Ball Up Top <${process.env.RESEND_FROM_OTP_DNS}>`,
             to: email,
-            subject: "Your Pull Up one-time verification code",
+            subject: "Your Ball Up Top one-time verification code",
             html: `One-Time Verification Code: ${otp}. Do not share with anyone else.`,
           });
         }
@@ -38,7 +38,7 @@ export const auth = betterAuth({
     }),
   ],
   trustedOrigins: [
-    "pull-up-client://", // Production Expo app
+    "ball-up-top-client://", // Production Expo app
     // Development mode - Expo's exp:// scheme with local IP ranges
     ...(process.env.NODE_ENV === "development"
       ? [

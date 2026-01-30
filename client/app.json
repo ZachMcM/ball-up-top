@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Pull Up",
-    "slug": "pull-up-client",
+    "name": "Ball Up Top",
+    "slug": "ball-up-top-client",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "pull-up-client",
+    "scheme": "ball-up-top-client",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -18,7 +18,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.zachmcm.pullupclient",
+      "bundleIdentifier": "com.zachmcm.balluptopclient",
       "infoPlist": {
         "UIDesignRequiresCompatibility": true,
         "ITSAppUsesNonExemptEncryption": false
@@ -30,7 +30,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.zachmcm.pullupclient"
+      "package": "com.zachmcm.balluptopclient"
     },
     "web": {
       "bundler": "metro",

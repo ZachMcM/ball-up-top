@@ -11,8 +11,8 @@ export const authClient = createAuthClient({
   },
   plugins: [
     expoClient({
-      scheme: 'pull-up-client',
-      storagePrefix: 'pull-up-client',
+      scheme: 'ball-up-top-client',
+      storagePrefix: 'ball-up-top-client',
       storage: SecureStore,
     }),
     emailOTPClient(),
