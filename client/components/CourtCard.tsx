@@ -47,9 +47,9 @@ export default function CourtCard({ court }: { court: CourtListEntry }) {
           />
         </AspectRatio>
         <View className="flex flex-col gap-2">
-          <View className="flex flex-col">
-            <View className="flex flex-row items-center justify-between">
-              <Text className="text-lg font-semibold">{court.name}</Text>
+          <View className="flex flex-col gap-1">
+            <View className="flex flex-row items-center justify-between gap-4">
+              <Text className="text-lg font-semibold flex-1">{court.name}</Text>
               <Text className="font-medium text-muted-foreground">
                 {court.distance.toFixed(1)} mi
               </Text>

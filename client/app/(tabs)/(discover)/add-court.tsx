@@ -227,7 +227,7 @@ export default function AddCourtPage() {
                 <View className="flex w-full flex-1 flex-col gap-2">
                   <Pressable onPress={pickImage}>
                     <AspectRatio
-                      ratio={4 / 1}
+                      ratio={16 / 9}
                       className={cn(
                         'rounded-md',
                         value !== undefined

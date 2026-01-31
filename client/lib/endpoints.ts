@@ -83,7 +83,7 @@ export async function getCourts({
   limit = 25,
   searchQuery,
   indoor,
-  verified,
+  verified = true,
   popular,
   bookmarked,
   sortBy,
