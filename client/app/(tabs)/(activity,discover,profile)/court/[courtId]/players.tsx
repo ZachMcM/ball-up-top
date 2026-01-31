@@ -1,12 +1,11 @@
 import { NativewindFlatList } from '@/components/NativewindFlatList';
 import { useLocation } from '@/components/providers/LocationProvider';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar } from '@/components/ui/avatar';
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import UserItem from '@/components/UserItem';
 import { getCourt, getCourtActivePlayers } from '@/lib/endpoints';
-import { getInitials } from '@/lib/utils';
 import { User } from '@/types/user';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useLocalSearchParams } from 'expo-router';
@@ -95,12 +94,7 @@ function UserCard({ user }: { user: User }) {
       className="w-full">
       <View className="flex w-full flex-row items-center justify-between">
         <View className="flex flex-row items-center gap-2">
-          <Avatar className="size-10" alt={`${user.name}'s image`}>
-            <AvatarImage source={{ uri: user.image }} />
-            <AvatarFallback>
-              <Text>{getInitials(user.name)}</Text>
-            </AvatarFallback>
-          </Avatar>
+          <Avatar className="size-10" alt={`${user.name}'s image`} source={{ uri: user.image }} />
           <View className="flex flex-col">
             <Text className="text-sm font-semibold">{user.name}</Text>
             <Text className="text-xs font-medium text-muted-foreground">{user.archetype}</Text>

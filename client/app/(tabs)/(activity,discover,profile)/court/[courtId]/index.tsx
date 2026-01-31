@@ -3,7 +3,7 @@ import { NativewindScrollView } from '@/components/NativewindScrollView';
 import { useCourtSession } from '@/components/providers/CourtSessionProvider';
 import { useLocation } from '@/components/providers/LocationProvider';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
@@ -18,7 +18,7 @@ import {
   postCourtNotification,
 } from '@/lib/endpoints';
 import { THEME } from '@/lib/theme';
-import { getInitials, openDirections } from '@/lib/utils';
+import { openDirections } from '@/lib/utils';
 import { Court } from '@/types/court';
 import { User } from '@/types/user';
 import {
@@ -397,7 +397,7 @@ export default function CourtPage() {
                 className="absolute inset-0 object-cover"
               />
             </AspectRatio>
-            <View className="flex flex-col">
+            <View className="flex flex-1 flex-col">
               <Text className="font-bold">{court?.name}</Text>
               <View className="flex flex-row items-center gap-1">
                 <Icon className="text-muted-foreground" size={16} as={MapPinIcon} />
@@ -420,12 +420,11 @@ export default function CourtPage() {
                   <View
                     key={user.id}
                     className="flex flex-row items-center gap-1.5 rounded-full bg-muted p-0.5 pr-2.5">
-                    <Avatar className="size-6" alt={`${user.name}'s image`}>
-                      <AvatarImage source={{ uri: user.image }} />
-                      <AvatarFallback>
-                        <Text>{getInitials(user.name)}</Text>
-                      </AvatarFallback>
-                    </Avatar>
+                    <Avatar
+                      className="size-6"
+                      alt={`${user.name}'s image`}
+                      source={{ uri: user.image }}
+                    />
                     <Text className="text-sm font-semibold">{user.name.split(' ')[0]}</Text>
                   </View>
                 ))}
@@ -468,12 +467,7 @@ function LeaderboardCard({ user, index }: { user: User; index: number }) {
       }}>
       <View className="flex flex-col items-center gap-2">
         <View className="relative">
-          <Avatar className="size-14" alt={`${user.name}'s image`}>
-            <AvatarImage source={{ uri: user.image }} />
-            <AvatarFallback>
-              <Text>{getInitials(user.name)}</Text>
-            </AvatarFallback>
-          </Avatar>
+          <Avatar className="size-14" alt={`${user.name}'s image`} source={{ uri: user.image }} />
           <View className="absolute -bottom-1 -right-1 rounded-full bg-background p-1">
             <View className="size-5 items-center justify-center rounded-full bg-secondary">
               <Text className="text-sm font-semibold text-secondary-foreground">{index + 1}.</Text>

@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
@@ -7,7 +7,7 @@ import { patchUserImage } from '@/lib/endpoints';
 import { useMutation } from '@tanstack/react-query';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { ArrowLeftIcon, ImageIcon } from 'lucide-react-native';
+import { ArrowLeftIcon } from 'lucide-react-native';
 import { useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 import { toast } from 'sonner-native';
@@ -54,12 +54,11 @@ export default function ImagePage() {
         <Text className="text-xl font-bold">Add an image of yourself.</Text>
         <View className="flex items-center gap-4">
           <Pressable onPress={pickImage}>
-            <Avatar alt="User Image" className="size-32">
-              <AvatarImage source={{ uri: selectedAsset?.uri ?? undefined }} />
-              <AvatarFallback className="flex items-center justify-center border-2 border-dashed border-border dark:bg-muted/30 bg-muted">
-                <Icon as={ImageIcon} size={56} />
-              </AvatarFallback>
-            </Avatar>
+            <Avatar
+              alt="User Image"
+              className="size-32"
+              source={{ uri: selectedAsset?.uri ?? undefined }}
+            />
           </Pressable>
           <Button variant="outline" onPress={pickImage}>
             <Text>{selectedAsset?.uri ? 'Change Image' : 'Select Image'}</Text>
@@ -70,7 +69,7 @@ export default function ImagePage() {
         </Text>
         <View className="flex w-full flex-row items-center gap-2">
           {router.canGoBack() && (
-            <Button size="lg" className='flex-1' onPress={() => router.back()} variant="outline">
+            <Button size="lg" className="flex-1" onPress={() => router.back()} variant="outline">
               <Icon as={ArrowLeftIcon} size={18} />
               <Text>Back</Text>
             </Button>

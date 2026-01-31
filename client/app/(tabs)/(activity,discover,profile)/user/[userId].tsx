@@ -1,6 +1,6 @@
 import { NativewindScrollView } from '@/components/NativewindScrollView';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Icon } from '@/components/ui/icon';
@@ -9,7 +9,7 @@ import { VerticalRatingBar } from '@/components/ui/vertical-rating-bar';
 import { authClient } from '@/lib/auth-client';
 import { getUser } from '@/lib/endpoints';
 import { THEME } from '@/lib/theme';
-import { getInitials, timeAgo } from '@/lib/utils';
+import { timeAgo } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
@@ -84,12 +84,11 @@ export default function ProfilePage() {
               <>
                 <View className="flex w-full flex-row items-center justify-between">
                   <View className="flex flex-row items-center gap-3">
-                    <Avatar className="size-16" alt={`${user.name}'s image`}>
-                      <AvatarImage source={{ uri: user.image ?? undefined }} />
-                      <AvatarFallback>
-                        <Text>{getInitials(user.name)}</Text>
-                      </AvatarFallback>
-                    </Avatar>
+                    <Avatar
+                      className="size-16"
+                      alt={`${user.name}'s image`}
+                      source={{ uri: user.image ?? undefined }}
+                    />
                     <View className="flex flex-col">
                       <Text className="text-xl font-bold">{user.name}</Text>
                       <Text className="font-semibold text-muted-foreground">

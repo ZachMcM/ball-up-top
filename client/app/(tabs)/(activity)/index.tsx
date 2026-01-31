@@ -1,5 +1,5 @@
 import { NativewindSectionList } from '@/components/NativewindSectionList';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
   Empty,
@@ -16,7 +16,7 @@ import { timeAgo } from '@/lib/utils';
 import { Activity } from '@/types/activity';
 import { useFocusEffect } from '@react-navigation/native';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { isToday, isYesterday, subDays, isAfter } from 'date-fns';
+import { isAfter, isToday, isYesterday, subDays } from 'date-fns';
 import { Link, useRouter } from 'expo-router';
 import { Award, BanIcon, MapPin, TrendingUp } from 'lucide-react-native';
 import { useCallback, useMemo } from 'react';
@@ -173,12 +173,7 @@ function RatingReceivedRow({ activity }: { activity: Activity }) {
         params: { userId: rater.id },
       }}>
       <View className="flex flex-row items-center gap-3 px-4 py-3">
-        <Avatar alt={rater.name} className="size-12">
-          <AvatarImage source={{ uri: rater.image }} />
-          <AvatarFallback>
-            <Text>{rater.name.substring(0, 2).toUpperCase()}</Text>
-          </AvatarFallback>
-        </Avatar>
+        <Avatar alt={rater.name} className="size-12" source={{ uri: rater.image }} />
         <View className="flex-1">
           <Text className="leading-5">
             <Text className="font-bold">{rater.name}</Text>
@@ -225,12 +220,7 @@ function SessionCompletedRow({ activity }: { activity: Activity }) {
         params: { courtId: court.id },
       }}>
       <View className="flex flex-row items-center gap-3 px-4 py-3">
-        <Avatar alt={court.name} className="size-12 rounded-lg">
-          <AvatarImage source={{ uri: court.image }} />
-          <AvatarFallback>
-            <Icon as={MapPin} size={22} />
-          </AvatarFallback>
-        </Avatar>
+        <Avatar alt={court.name} className="size-12 rounded-lg" source={{ uri: court.image }} />
         <View className="flex-1">
           <Text className="leading-5">
             <Text>You played at</Text>
@@ -307,12 +297,7 @@ function CourtActivityRow({ activity }: { activity: Activity }) {
           </Text>
           <Text className="text-sm text-muted-foreground">{timeAgo(activity.createdAt)}</Text>
         </View>
-        <Avatar alt={court.name} className="size-12 rounded-lg">
-          <AvatarImage source={{ uri: court.image }} />
-          <AvatarFallback>
-            <Icon as={MapPin} size={22} />
-          </AvatarFallback>
-        </Avatar>
+        <Avatar alt={court.name} className="size-12 rounded-lg" source={{ uri: court.image }} />
       </View>
     </Link>
   );

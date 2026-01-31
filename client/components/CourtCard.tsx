@@ -8,12 +8,13 @@ import {
   UsersIcon,
   VerifiedIcon,
 } from 'lucide-react-native';
-import { Image, View } from 'react-native';
+import { View } from 'react-native';
 import { AspectRatio } from './ui/aspect-ratio';
 import { Badge } from './ui/badge';
 import { Card } from './ui/card';
 import { Icon } from './ui/icon';
 import { Text } from './ui/text';
+import { Image } from 'expo-image';
 
 function getCityState(address: string): string {
   const parts = address.split(',').map((p) => p.trim());

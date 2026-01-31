@@ -11,15 +11,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { Progress } from '@/components/ui/progress';
 import { Text } from '@/components/ui/text';
 import { getEncounteredPlayers, patchEncounteredPlayer, postSessionRatings } from '@/lib/endpoints';
-import { cn, getInitials } from '@/lib/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import {
@@ -318,12 +316,11 @@ export default function RatePage() {
                 <Progress className="h-1" value={(step + 1 / totalSteps) * 100} />
               </View>
               <View className="flex flex-row items-center gap-4">
-                <Avatar className="size-16" alt={`${currentPlayer.rateeName}'s image`}>
-                  <AvatarImage source={{ uri: currentPlayer.rateeImage ?? undefined }} />
-                  <AvatarFallback>
-                    <Text>{getInitials(currentPlayer.rateeName)}</Text>
-                  </AvatarFallback>
-                </Avatar>
+                <Avatar
+                  source={{ uri: currentPlayer.rateeImage ?? undefined }}
+                  className="size-16"
+                  alt={`${currentPlayer.rateeName}'s image`}
+                />
                 <View className="flex flex-1 flex-col">
                   <Text className="text-lg font-bold">{currentPlayer.rateeName}</Text>
                   <Text className="text-sm text-muted-foreground">

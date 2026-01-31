@@ -1,9 +1,9 @@
 import { useTabContext } from '@/hooks/useTabContext';
-import { cn, getInitials } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { User } from '@/types/user';
 import { Link } from 'expo-router';
 import { View, ViewProps } from 'react-native';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Avatar } from './ui/avatar';
 import { Text } from './ui/text';
 
 export default function UserItem({ user, className, ...props }: { user: User } & ViewProps) {
@@ -20,12 +20,7 @@ export default function UserItem({ user, className, ...props }: { user: User } &
         className={cn('flex w-full flex-row items-center justify-between', className)}
         {...props}>
         <View className="flex flex-row items-center gap-3">
-          <Avatar className="size-12" alt={`${user.name}'s image`}>
-            <AvatarImage source={{ uri: user.image }} />
-            <AvatarFallback>
-              <Text>{getInitials(user.name)}</Text>
-            </AvatarFallback>
-          </Avatar>
+          <Avatar className="size-12" alt={`${user.name}'s image`} source={{ uri: user.image }} />
           <View className="flex flex-col">
             <Text className="font-semibold">{user.name}</Text>
             <Text className="text-sm font-medium text-muted-foreground">
