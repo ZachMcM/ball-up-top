@@ -493,6 +493,7 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
       .groupBy(courtSession.courtId)
       .as("session_stats");
 
+    // TODO do I want to have this conditional here? Lets say I'm at home and want to view the Purdue leaderboard
     const conditions = [sql`${distanceFormula} <= ${MAX_DISTANCE}`];
 
     if (indoor !== undefined) {

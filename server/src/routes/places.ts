@@ -38,7 +38,6 @@ placesRoute.get("/places", authMiddleware, async (req, res) => {
             radius: 50000,
           },
         },
-        // TODO
         regionCode: "us",
         maxResultCount: MAX_RESULTS,
         languageCode: "en-US",
