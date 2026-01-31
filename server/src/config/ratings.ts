@@ -1,5 +1,5 @@
 // no rating can move more than this value
-export const MAX_SHIFT = 10
+export const MAX_SHIFT = 7
 
 export const MIN_OVR = 45
 export const MAX_OVR = 99
@@ -34,4 +34,4 @@ export const EXPERIENCE_GROWTH_RT = 4
 
 export const EST_RATINGS_PER_SESS = 8
 
-export const WEIGHT_E = 0.025
+export const WEIGHT_E = 0.001
