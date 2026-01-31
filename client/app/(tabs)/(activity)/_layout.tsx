@@ -31,6 +31,13 @@ export default function ActivityLayout() {
           headerLeft: () => <BackButton />,
         }}
       />
+      <Stack.Screen
+        name='court/[courtId]/leaderboard'
+        options={{
+          headerTitle: "Leaderboard",
+          headerLeft: () => <BackButton/>
+        }}
+      />
     </Stack>
   );
 }

@@ -549,7 +549,6 @@ courtSessionsRoute.post(
 
       invalidateQueries(
         ["court", targetCourtSession.courtId],
-        ["court", targetCourtSession.courtId, "active-players"]
       );
 
       res.json({ success: true });
@@ -719,7 +718,6 @@ courtSessionsRoute.patch(
       invalidateQueries(
         ["courts"],
         ["court", targetCourtSession.courtId],
-        ["court", targetCourtSession.courtId, "active-players"]
       );
 
       res.json({ success: true });

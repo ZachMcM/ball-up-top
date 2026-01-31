@@ -232,17 +232,17 @@ export default function CourtPage() {
                   </View>
                   <View className="flex flex-row items-center gap-1">
                     {court.popular && (
-                      <Badge variant="outline">
+                      <Badge variant="secondary">
                         <Icon size={12} as={StarIcon} />
                         <Text>Popular</Text>
                       </Badge>
                     )}
-                    <Badge variant="outline" className="self-start">
+                    <Badge variant="secondary" className="self-start">
                       <Icon size={12} as={court.indoor ? HomeIcon : SunIcon} />
                       <Text>{court.indoor ? 'Indoor' : 'Outdoor'}</Text>
                     </Badge>
                     {court.verified && (
-                      <Badge variant="outline">
+                      <Badge variant="secondary">
                         <Icon size={12} as={VerifiedIcon} />
                         <Text>Verified</Text>
                       </Badge>
@@ -327,7 +327,7 @@ export default function CourtPage() {
                             }}
                             size="sm"
                             variant="outline"
-                            className="self-start">
+                            className="self-end">
                             <Text>View All</Text>
                             <Icon as={ArrowRight} className="text-secondary-foreground" />
                           </Button>
@@ -353,7 +353,7 @@ export default function CourtPage() {
                       horizontal
                       showsHorizontalScrollIndicator={false}>
                       {court.leaderboard.map((user, i) => (
-                        <LeaderboardCard key={i} user={user} index={i} />
+                        <LeaderboardCard key={i} user={user} />
                       ))}
                     </NativewindScrollView>
                   ) : (
@@ -361,6 +361,19 @@ export default function CourtPage() {
                       No court leaderboard data.
                     </Text>
                   )}
+                  <Button
+                    onPress={() => {
+                      router.push({
+                        pathname: '/court/[courtId]/leaderboard',
+                        params: { courtId },
+                      });
+                    }}
+                    size="sm"
+                    variant="outline"
+                    className="self-end">
+                    <Text>View All</Text>
+                    <Icon as={ArrowRight} className="text-secondary-foreground" />
+                  </Button>
                 </View>
               </>
             )
@@ -456,7 +469,7 @@ export default function CourtPage() {
   );
 }
 
-function LeaderboardCard({ user, index }: { user: User; index: number }) {
+function LeaderboardCard({ user }: { user: User & { rank: number } }) {
   const tabContext = useTabContext();
 
   return (
@@ -470,7 +483,7 @@ function LeaderboardCard({ user, index }: { user: User; index: number }) {
           <Avatar className="size-14" alt={`${user.name}'s image`} source={{ uri: user.image }} />
           <View className="absolute -bottom-1 -right-1 rounded-full bg-background p-1">
             <View className="size-5 items-center justify-center rounded-full bg-secondary">
-              <Text className="text-sm font-semibold text-secondary-foreground">{index + 1}.</Text>
+              <Text className="text-sm font-semibold text-secondary-foreground">{user.rank}.</Text>
             </View>
           </View>
         </View>

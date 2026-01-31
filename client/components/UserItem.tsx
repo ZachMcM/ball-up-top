@@ -6,7 +6,7 @@ import { View, ViewProps } from 'react-native';
 import { Avatar } from './ui/avatar';
 import { Text } from './ui/text';
 
-export default function UserItem({ user, className, ...props }: { user: User } & ViewProps) {
+export default function UserItem({ user, className, children, ...props }: { user: User } & ViewProps) {
   const tabContext = useTabContext();
 
   return (
@@ -20,6 +20,7 @@ export default function UserItem({ user, className, ...props }: { user: User } &
         className={cn('flex w-full flex-row items-center justify-between', className)}
         {...props}>
         <View className="flex flex-row items-center gap-3">
+          {children}
           <Avatar className="size-12" alt={`${user.name}'s image`} source={{ uri: user.image }} />
           <View className="flex flex-col">
             <Text className="font-semibold">{user.name}</Text>

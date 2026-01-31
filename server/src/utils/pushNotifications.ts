@@ -1,5 +1,5 @@
+import { inArray } from "drizzle-orm";
 import { Expo, ExpoPushMessage, ExpoPushTicket } from "expo-server-sdk";
-import { eq, inArray } from "drizzle-orm";
 import { db } from "../db";
 import { user } from "../db/schema";
 import { logger } from "./logger";
@@ -10,7 +10,7 @@ export async function sendPushNotifications({
   userIds,
   title,
   body,
-  data,
+  data = { url: "/activity" },
 }: {
   userIds: string[];
   title: string;
@@ -32,7 +32,9 @@ export async function sendPushNotifications({
   for (const u of users) {
     if (!u.expoPushToken) continue;
     if (!Expo.isExpoPushToken(u.expoPushToken)) {
-      logger.warn(`Invalid Expo push token for user ${u.id}: ${u.expoPushToken}`);
+      logger.warn(
+        `Invalid Expo push token for user ${u.id}: ${u.expoPushToken}`,
+      );
       continue;
     }
 
@@ -74,7 +76,7 @@ export async function sendPushNotification({
   userId,
   title,
   body,
-  data,
+  data = { url: "/activity" },
 }: {
   userId: string;
   title: string;

@@ -5,15 +5,45 @@ import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import { useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
+import { useRouter } from 'expo-router';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldPlaySound: true,
     shouldSetBadge: false,
     shouldShowList: true,
-    shouldShowBanner: true
+    shouldShowBanner: true,
   }),
 });
+
+function useNotificationObserver() {
+  const router = useRouter();
+
+  useEffect(() => {
+    function redirect(notification: Notifications.Notification) {
+      const url = notification.request.content.data?.url;
+      if (typeof url === 'string') {
+        if (router.canDismiss()) {
+          router.dismiss();
+        }
+        router.navigate(url as any);
+      }
+    }
+
+    const response = Notifications.getLastNotificationResponse();
+    if (response?.notification) {
+      redirect(response.notification);
+    }
+
+    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+      redirect(response.notification);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+}
 
 async function registerForPushNotificationsAsync(): Promise<string | null> {
   if (!Device.isDevice) {
@@ -77,6 +107,8 @@ export function PushNotificationProvider({ children }: { children: React.ReactNo
       });
     }
   }, []);
+
+  useNotificationObserver();
 
   return <>{children}</>;
 }

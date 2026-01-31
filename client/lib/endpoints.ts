@@ -215,6 +215,15 @@ export async function getCourt(
   return court;
 }
 
+export async function getCourtLeaderboard(id: number): Promise<(User & { rank: number })[]> {
+  const leaderboard = await serverRequest({
+    endpoint: `/courts/${id}/leaderboard`,
+    method: 'GET',
+  });
+
+  return leaderboard;
+}
+
 export async function getCourtActivePlayers(id: number): Promise<User[]> {
   const users = await serverRequest({
     endpoint: `/courts/${id}/active-players`,

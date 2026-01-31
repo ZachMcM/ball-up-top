@@ -24,6 +24,13 @@ export default function CourtsLayout() {
         }}
       />
       <Stack.Screen
+        name="court/[courtId]/leaderboard"
+        options={{
+          headerTitle: 'Leaderboard',
+          headerLeft: () => <BackButton />,
+        }}
+      />
+      <Stack.Screen
         name="add-court"
         options={{
           title: 'Add Court',

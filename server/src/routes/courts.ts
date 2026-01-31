@@ -14,7 +14,13 @@ import {
   POPULAR_THRESHOLD,
 } from "../config/courts";
 import { db } from "../db";
-import { court, courtBookmark, courtSession, notificationCourt, user } from "../db/schema";
+import {
+  court,
+  courtBookmark,
+  courtSession,
+  notificationCourt,
+  user,
+} from "../db/schema";
 import { notificationsQueue } from "../queues/notifications.queue";
 
 export const courtsRoute = Router();
@@ -53,8 +59,8 @@ courtsRoute.delete("/courts/:id/bookmark", authMiddleware, async (req, res) => {
       .where(
         and(
           eq(courtBookmark.courtId, courtId),
-          eq(courtBookmark.userId, res.locals.userId!)
-        )
+          eq(courtBookmark.userId, res.locals.userId!),
+        ),
       );
 
     return res.json({ success: true });
@@ -94,16 +100,74 @@ courtsRoute.get(
           and(
             eq(courtSession.courtId, courtId),
             isNull(courtSession.endTime),
-            sql`DATE(${courtSession.startTime}) = CURRENT_DATE`
-          )
+            sql`DATE(${courtSession.startTime}) = CURRENT_DATE`,
+          ),
         );
 
       res.json(activeUsers);
     } catch (error) {
       handleError(error, res, "GET /courts/:id/active-players");
     }
-  }
+  },
 );
+
+function getCourtLeaderboard({
+  courtId,
+  limit,
+}: {
+  courtId: number;
+  limit?: number;
+}) {
+  return db.execute<{
+    rank: number;
+    id: string;
+    name: string;
+    image: string | null;
+    height: number;
+    archetype: string;
+    overall: number;
+    finishingRating: number;
+    defenseRating: number;
+    playmakingRating: number;
+    shootingRating: number;
+  }>(sql`                                                                                                                                 
+        SELECT                                                                                                                              
+          ROW_NUMBER() OVER (ORDER BY overall DESC)::integer as rank,                                                                       
+          *                                                                                                                                 
+        FROM (                                                                                                                              
+          SELECT DISTINCT ON (u.id)                                                                                                         
+            u.id, u.name, u.image, u.height, u.archetype, u.overall,                                                                        
+            u.finishing_rating as "finishingRating",                                                                                        
+            u.defense_rating as "defenseRating",                                                                                            
+            u.playmaking_rating as "playmakingRating",                                                                                      
+            u.shooting_rating as "shootingRating"                                                                                           
+          FROM court_session cs                                                                                                             
+          INNER JOIN "user" u ON cs.user_id = u.id                                                                                          
+          WHERE cs.court_id = ${courtId}                                                                                                    
+            AND cs.start_time >= NOW() - INTERVAL '30 days'                                                                                 
+          ORDER BY u.id                                                                                                                     
+        ) AS unique_users                                                                                                                   
+        ORDER BY overall DESC                                                                                                               
+        LIMIT ${limit ?? 10}                                                                                                                
+      `);
+}
+
+courtsRoute.get("/courts/:id/leaderboard", authMiddleware, async (req, res) => {
+  try {
+    const courtId = parseInt(req.params.id);
+
+    if (!Number.isInteger(courtId)) {
+      logger.error("Court ID is not an integer.");
+      return res.status(400).json({ error: "Court ID is not an integer." });
+    }
+
+    const courtLeaderboard = await getCourtLeaderboard({ courtId, limit: 50 });
+
+    res.json(courtLeaderboard.rows);
+  } catch (error) {
+    handleError(error, res, "GET /courts/:id/leaderboard");
+  }
+});
 
 const CourtGetSchema = z.object({
   lat: z.coerce.number().min(-90).max(90),
@@ -175,8 +239,8 @@ courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
         and(
           eq(courtSession.courtId, courtId),
           isNull(courtSession.endTime),
-          sql`DATE(${courtSession.startTime}) = CURRENT_DATE`
-        )
+          sql`DATE(${courtSession.startTime}) = CURRENT_DATE`,
+        ),
       );
 
     // Calculate average players per day: count unique players per day, then average
@@ -190,34 +254,7 @@ courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
       ) as daily_counts
     `);
 
-    const leaderboardQuery = db.execute<{
-      id: string;
-      name: string;
-      image: string | null;
-      height: number;
-      archetype: string;
-      overall: number;
-      finishingRating: number;
-      defenseRating: number;
-      playmakingRating: number;
-      shootingRating: number;
-    }>(sql`
-      SELECT * FROM (
-        SELECT DISTINCT ON (u.id)
-          u.id, u.name, u.image, u.height, u.archetype, u.overall,
-          u.finishing_rating as "finishingRating",
-          u.defense_rating as "defenseRating",
-          u.playmaking_rating as "playmakingRating",
-          u.shooting_rating as "shootingRating"
-        FROM court_session cs
-        INNER JOIN "user" u ON cs.user_id = u.id
-        WHERE cs.court_id = ${courtId}
-          AND cs.start_time >= NOW() - INTERVAL '30 days'
-        ORDER BY u.id
-      ) AS unique_users
-      ORDER BY overall DESC
-      LIMIT 10
-    `);
+    const leaderboardQuery = getCourtLeaderboard({ courtId });
 
     const activeUsersQuery = db
       .select({
@@ -238,8 +275,8 @@ courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
         and(
           eq(courtSession.courtId, courtId),
           isNull(courtSession.endTime),
-          sql`DATE(${courtSession.startTime}) = CURRENT_DATE`
-        )
+          sql`DATE(${courtSession.startTime}) = CURRENT_DATE`,
+        ),
       )
       .limit(5);
 
@@ -316,7 +353,7 @@ courtsRoute.post(
       const preexistingSession = await db.query.courtSession.findFirst({
         where: and(
           eq(courtSession.userId, res.locals.userId!),
-          or(isNull(courtSession.endTime), eq(courtSession.hasRated, false))
+          or(isNull(courtSession.endTime), eq(courtSession.hasRated, false)),
         ),
       });
 
@@ -331,7 +368,7 @@ courtsRoute.post(
         targetCourt.lat,
         targetCourt.lng,
         lat,
-        lng
+        lng,
       );
 
       if (distance > MAX_DISTANCE_FOR_CHECK_IN) {
@@ -346,11 +383,7 @@ courtsRoute.post(
         courtId,
       });
 
-      invalidateQueries(
-        ["courts"],
-        ["court", courtId],
-        ["court", courtId, "active-players"]
-      );
+      invalidateQueries(["courts"], ["court", courtId]);
 
       res.json({ success: true });
 
@@ -363,7 +396,7 @@ courtsRoute.post(
     } catch (error) {
       handleError(error, res, "POST /courts/:courtId/sessions");
     }
-  }
+  },
 );
 
 const CourtsParamsSchema = z.object({
@@ -427,7 +460,7 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
       .select({
         courtId: sql<number>`court_id`.as("court_id"),
         avgPlayersPerDay: sql<number>`AVG(daily_players)`.as(
-          "avg_players_per_day"
+          "avg_players_per_day",
         ),
       })
       .from(
@@ -438,7 +471,7 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
             COUNT(DISTINCT user_id)::float as daily_players
           FROM court_session
           GROUP BY court_id, DATE(start_time)
-        ) as daily_counts`
+        ) as daily_counts`,
       )
       .groupBy(sql`court_id`)
       .as("avg_players_per_day_stats");
@@ -474,7 +507,7 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
           ${court.name} ILIKE ${`%${searchQuery}%`} OR
           ${court.address} ILIKE ${`%${searchQuery}%`} OR
           ${sql`array_to_string(${court.aliases}, ' ')`} ILIKE ${`%${searchQuery}%`}
-        )`
+        )`,
       );
     }
 
@@ -492,7 +525,7 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
 
     if (popular !== undefined) {
       conditions.push(
-        sql`COALESCE(${avgPlayersPerDayStats.avgPlayersPerDay}, 0) > ${POPULAR_THRESHOLD}`
+        sql`COALESCE(${avgPlayersPerDayStats.avgPlayersPerDay}, 0) > ${POPULAR_THRESHOLD}`,
       );
     }
 
@@ -515,7 +548,7 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
       .from(court)
       .leftJoin(
         avgPlayersPerDayStats,
-        eq(court.id, avgPlayersPerDayStats.courtId)
+        eq(court.id, avgPlayersPerDayStats.courtId),
       )
       .leftJoin(sessionStats, eq(court.id, sessionStats.courtId))
       .leftJoin(bookmarkStatus, eq(court.id, bookmarkStatus.courtId))
@@ -523,7 +556,7 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
       .orderBy(
         sortBy === "active_players"
           ? desc(sql`COALESCE(${sessionStats.currentActiveSessions}, 0)`)
-          : asc(distanceFormula)
+          : asc(distanceFormula),
       )
       .limit(limit);
 
@@ -606,7 +639,7 @@ courtsRoute.post(
           Key: fileName,
           Body: file.buffer,
           ContentType: file.mimetype,
-        })
+        }),
       );
 
       const imageUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
@@ -627,49 +660,57 @@ courtsRoute.post(
     } catch (error) {
       handleError(error, res, "POST /courts");
     }
-  }
+  },
 );
 
-courtsRoute.post("/courts/:id/notifications", authMiddleware, async (req, res) => {
-  try {
-    const courtId = parseInt(req.params.id);
+courtsRoute.post(
+  "/courts/:id/notifications",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const courtId = parseInt(req.params.id);
 
-    if (!Number.isInteger(courtId)) {
-      logger.error("Court ID is not an integer.");
-      return res.status(400).json({ error: "Court ID is not an integer." });
+      if (!Number.isInteger(courtId)) {
+        logger.error("Court ID is not an integer.");
+        return res.status(400).json({ error: "Court ID is not an integer." });
+      }
+
+      await db.insert(notificationCourt).values({
+        courtId,
+        userId: res.locals.userId!,
+      });
+
+      return res.json({ success: true });
+    } catch (error) {
+      handleError(error, res, "POST /courts/:id/notifications");
     }
+  },
+);
 
-    await db.insert(notificationCourt).values({
-      courtId,
-      userId: res.locals.userId!,
-    });
+courtsRoute.delete(
+  "/courts/:id/notifications",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const courtId = parseInt(req.params.id);
 
-    return res.json({ success: true });
-  } catch (error) {
-    handleError(error, res, "POST /courts/:id/notifications");
-  }
-});
+      if (!Number.isInteger(courtId)) {
+        logger.error("Court ID is not an integer.");
+        return res.status(400).json({ error: "Court ID is not an integer." });
+      }
 
-courtsRoute.delete("/courts/:id/notifications", authMiddleware, async (req, res) => {
-  try {
-    const courtId = parseInt(req.params.id);
+      await db
+        .delete(notificationCourt)
+        .where(
+          and(
+            eq(notificationCourt.courtId, courtId),
+            eq(notificationCourt.userId, res.locals.userId!),
+          ),
+        );
 
-    if (!Number.isInteger(courtId)) {
-      logger.error("Court ID is not an integer.");
-      return res.status(400).json({ error: "Court ID is not an integer." });
+      return res.json({ success: true });
+    } catch (error) {
+      handleError(error, res, "DELETE /courts/:id/notifications");
     }
-
-    await db
-      .delete(notificationCourt)
-      .where(
-        and(
-          eq(notificationCourt.courtId, courtId),
-          eq(notificationCourt.userId, res.locals.userId!)
-        )
-      );
-
-    return res.json({ success: true });
-  } catch (error) {
-    handleError(error, res, "DELETE /courts/:id/notifications");
-  }
-});
+  },
+);

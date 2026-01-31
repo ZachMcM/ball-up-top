@@ -36,7 +36,7 @@ export type Court = CourtListEntry & {
     avgSessions: number;
   }[];
   currentActiveUsers: User[];
-  leaderboard: User[];
+  leaderboard: (User & { rank: number })[];
 };
 
 export type CourtSession = {
