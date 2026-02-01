@@ -5,7 +5,7 @@ const steps = [
     number: "01",
     title: "Download the App",
     description:
-      "Get Ball Up Top free on the App Store or Google Play. Create your profile in seconds.",
+      "Get Ball Up Top free on the App Store. Create your profile in seconds.",
   },
   {
     number: "02",

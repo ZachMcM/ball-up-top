@@ -14,7 +14,7 @@ export function Hero() {
           <div className="text-center lg:text-left">
             <div className="inline-flex items-center gap-2 bg-card border border-border rounded-full px-4 py-1.5 mb-6">
               <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              <span className="text-sm text-muted-foreground">Now available on iOS & Android</span>
+              <span className="text-sm text-muted-foreground">Now available on iOS</span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
@@ -44,7 +44,7 @@ export function Hero() {
           <div className="relative flex justify-center lg:justify-end">
             <div className="relative">
               {/* Phone frame */}
-              <div className="relative w-[280px] sm:w-[320px] h-[580px] sm:h-[660px] bg-card rounded-[3rem] p-2 border border-border shadow-2xl">
+              <div className="relative w-[280px] sm:w-[320px] h-[580px] sm:h-[660px] bg-card rounded-[2rem] p-2 border border-border shadow-2xl overflow-hidden">
                 {/* Screen */}
                 <div className="w-full h-full rounded-[2.5rem] overflow-hidden bg-black">
                   <Image

@@ -13,13 +13,12 @@ export function Header() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
       <Container>
         <nav className="flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-3">
             <Image
               src="/logo.png"
               alt="Ball Up Top"
-              width={32}
-              height={32}
-              className="w-8 h-8"
+              width={24}
+              height={24}
             />
             <span className="font-semibold text-lg">Ball Up Top</span>
           </Link>

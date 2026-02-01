@@ -17,7 +17,6 @@ export function DownloadCTA() {
                 alt="Ball Up Top"
                 width={64}
                 height={64}
-                className="w-16 h-16"
               />
             </div>
 
@@ -39,18 +38,6 @@ export function DownloadCTA() {
                 <div className="text-left">
                   <div className="text-xs leading-none opacity-80">Download on the</div>
                   <div className="text-lg font-semibold leading-tight">App Store</div>
-                </div>
-              </a>
-              <a
-                href="#"
-                className="inline-flex items-center justify-center gap-3 bg-white text-black px-6 py-3.5 rounded-xl hover:bg-white/90 transition-colors"
-              >
-                <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z" />
-                </svg>
-                <div className="text-left">
-                  <div className="text-xs leading-none opacity-80">Get it on</div>
-                  <div className="text-lg font-semibold leading-tight">Google Play</div>
                 </div>
               </a>
             </div>

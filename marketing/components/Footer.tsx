@@ -52,13 +52,12 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-4">
+            <Link href="/" className="flex items-center gap-3 mb-4">
               <Image
                 src="/logo.png"
                 alt="Ball Up Top"
-                width={32}
-                height={32}
-                className="w-8 h-8"
+                width={24}
+                height={24}
               />
               <span className="font-semibold text-lg">Ball Up Top</span>
             </Link>
@@ -142,18 +141,6 @@ export function Footer() {
                 <div className="text-left">
                   <div className="text-[10px] leading-none">Download on the</div>
                   <div className="text-sm font-semibold leading-tight">App Store</div>
-                </div>
-              </a>
-              <a
-                href="#"
-                className="inline-flex items-center gap-2 bg-white text-black px-4 py-2 rounded-lg hover:bg-white/90 transition-colors w-fit"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z" />
-                </svg>
-                <div className="text-left">
-                  <div className="text-[10px] leading-none">Get it on</div>
-                  <div className="text-sm font-semibold leading-tight">Google Play</div>
                 </div>
               </a>
             </div>
