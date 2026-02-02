@@ -10,7 +10,7 @@ export async function sendPushNotifications({
   userIds,
   title,
   body,
-  data = { url: "/activity" },
+  data,
 }: {
   userIds: string[];
   title: string;
@@ -76,7 +76,7 @@ export async function sendPushNotification({
   userId,
   title,
   body,
-  data = { url: "/activity" },
+  data,
 }: {
   userId: string;
   title: string;
