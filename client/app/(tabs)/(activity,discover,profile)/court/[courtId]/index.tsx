@@ -10,6 +10,7 @@ import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import UserItem from '@/components/UserItem';
 import { useTabContext } from '@/hooks/useTabContext';
+import { authClient } from '@/lib/auth-client';
 import {
   deleteCourtBookmark,
   deleteCourtNotification,
@@ -57,6 +58,8 @@ export default function CourtPage() {
   const courtId = parseInt(searchParams.courtId as string);
   const queryClient = useQueryClient();
 
+  const { data: currentUserData } = authClient.useSession();
+
   const router = useRouter();
 
   const { data: court, isPending } = useQuery({
@@ -74,6 +77,9 @@ export default function CourtPage() {
       queryClient.invalidateQueries({
         queryKey: ['courts'],
       });
+      queryClient.invalidateQueries({
+        queryKey: ['user', currentUserData?.user.id],
+      });
       queryClient.setQueryData(['court', courtId], (old: Court) => ({
         ...old,
         isBookmarked: true,
@@ -90,6 +96,9 @@ export default function CourtPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['courts'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['user', currentUserData?.user.id],
       });
       queryClient.setQueryData(['court', courtId], (old: Court) => ({
         ...old,

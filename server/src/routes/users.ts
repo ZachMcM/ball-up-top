@@ -1,22 +1,20 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import {
-  and,
-  desc,
-  eq,
-  gte,
-  ilike,
-  InferSelectModel,
-  lte,
-  sql,
-} from "drizzle-orm";
+import { and, desc, eq, gte, ilike, lte, sql } from "drizzle-orm";
 import { Router } from "express";
 import * as z from "zod";
+import { db } from "../db";
+import {
+  activity,
+  court,
+  courtBookmark,
+  courtSession,
+  rating,
+  user,
+} from "../db/schema";
 import { handleError } from "../utils/handleError";
+import { invalidateQueries } from "../utils/invalidateQueries";
 import { authMiddleware, upload } from "../utils/middleware";
 import { r2 } from "../utils/r2";
-import { db } from "../db";
-import { activity, court, courtSession, rating, user } from "../db/schema";
-import { invalidateQueries } from "../utils/invalidateQueries";
 
 export const usersRoute = Router();
 
@@ -25,7 +23,7 @@ usersRoute.get("/users/activity", authMiddleware, async (_, res) => {
     const activityEntries = await db.query.activity.findMany({
       where: and(
         eq(activity.userId, res.locals.userId!),
-        sql`${activity.createdAt} >= NOW() - INTERVAL '30 days'`
+        sql`${activity.createdAt} >= NOW() - INTERVAL '30 days'`,
       ),
       orderBy: desc(activity.createdAt),
       with: {
@@ -113,10 +111,25 @@ usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
       .orderBy(desc(courtSession.startTime))
       .limit(5);
 
+    const bookmarkedCourts = await db
+      .select({
+        id: court.id,
+        name: court.name,
+        address: court.address,
+        lat: court.lat,
+        lng: court.lng,
+        indoor: court.indoor,
+        verified: court.verified,
+        image: court.image,
+      })
+      .from(courtBookmark)
+      .innerJoin(court, eq(courtBookmark.courtId, court.id));
+
     res.json({
       ...targetUser,
       ratingHistory,
       recentSessions,
+      bookmarkedCourts,
     });
   } catch (error) {
     handleError(error, res, "GET /users/:id");
@@ -159,7 +172,7 @@ usersRoute.patch(
           Key: fileName,
           Body: file.buffer,
           ContentType: file.mimetype,
-        })
+        }),
       );
 
       const imageUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
@@ -173,7 +186,7 @@ usersRoute.patch(
     } catch (error) {
       handleError(error, res, "PATCH /users/image");
     }
-  }
+  },
 );
 
 const PlayersParamsSchema = z.object({
@@ -215,7 +228,10 @@ usersRoute.get("/users", authMiddleware, async (req, res) => {
       conditions.push(lte(user.height, maxHeight));
     }
 
-    const sessionsCount30Days = sql<number>`COUNT(CASE WHEN ${courtSession.startTime} >= NOW() - INTERVAL '30 days' THEN 1 END)`.as('sessions_count_30_days');
+    const sessionsCount30Days =
+      sql<number>`COUNT(CASE WHEN ${courtSession.startTime} >= NOW() - INTERVAL '30 days' THEN 1 END)`.as(
+        "sessions_count_30_days",
+      );
 
     const query = db
       .select({
@@ -240,7 +256,7 @@ usersRoute.get("/users", authMiddleware, async (req, res) => {
         user.image,
         user.height,
         user.archetype,
-        user.overall
+        user.overall,
       );
 
     if (sortBy === "most_active") {

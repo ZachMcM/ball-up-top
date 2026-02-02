@@ -151,6 +151,42 @@ export default function ProfilePage() {
                   )}
                 </View>
                 <View className="flex flex-col gap-4 rounded-2xl border border-border p-4">
+                  <Text className="text-lg font-semibold">BOOKMARKED COURTS</Text>
+                  {user.bookmarkedCourts.length > 0 ? (
+                    <View className="flex flex-col gap-3">
+                      {user.bookmarkedCourts.map((court) => (
+                        <Link
+                          href={{
+                            pathname: '/court/[courtId]',
+                            params: { courtId: court.id },
+                          }}
+                          key={court.id}
+                          className="w-full">
+                          <Card className="flex flex-row items-center gap-3 px-4 py-3">
+                            <AspectRatio
+                              ratio={1 / 1}
+                              className="relative h-[48px] overflow-hidden rounded-md">
+                              <Image
+                                source={{
+                                  uri: court.image,
+                                }}
+                                style={{ width: '100%', height: '100%' }}
+                                className="absolute inset-0 object-cover"
+                              />
+                            </AspectRatio>
+                            <View className="flex flex-1 flex-col">
+                              <Text className="font-semibold">{court.name}</Text>
+                              <Text className="text-sm text-muted-foreground">{court.address}</Text>
+                            </View>
+                          </Card>
+                        </Link>
+                      ))}
+                    </View>
+                  ) : (
+                    <Text className="text-center text-xs font-medium">No sessions yet.</Text>
+                  )}
+                </View>
+                <View className="flex flex-col gap-4 rounded-2xl border border-border p-4">
                   <Text className="text-lg font-semibold">RECENT SESSIONS</Text>
                   {user.recentSessions.length > 0 ? (
                     <View className="flex flex-col gap-3">

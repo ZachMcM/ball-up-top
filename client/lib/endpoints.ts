@@ -1,12 +1,11 @@
 import { AddCourtSchema } from '@/app/(tabs)/(discover)/add-court';
+import { Activity } from '@/types/activity';
 import { Court, CourtListEntry, CourtSession, Place } from '@/types/court';
 import { EncounteredPlayer } from '@/types/encounteredPlayer';
 import { ExtendedUser, User } from '@/types/user';
 import { ImagePickerAsset } from 'expo-image-picker';
 import * as z from 'zod';
 import { authClient } from './auth-client';
-import { Activity } from '@/types/activity';
-import { Rating } from '@/types/rating';
 
 export type serverRequestParams = {
   endpoint: string;
