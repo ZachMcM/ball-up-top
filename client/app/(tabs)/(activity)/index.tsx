@@ -18,7 +18,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { isAfter, isToday, isYesterday, subDays } from 'date-fns';
 import { Link, useRouter } from 'expo-router';
-import { Award, BanIcon, MapPin, TrendingUp } from 'lucide-react-native';
+import { Award, BanIcon, MapPin, Star, TrendingUp } from 'lucide-react-native';
 import { useCallback, useMemo } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-native';
 
@@ -167,33 +167,34 @@ function RatingReceivedRow({ activity }: { activity: Activity }) {
   const rater = rating.rater;
 
   return (
-    <Link
-      href={{
-        pathname: '/user/[userId]',
-        params: { userId: rater.id },
-      }}>
-      <View className="flex flex-row items-center gap-3 px-4 py-3">
-        <Avatar alt={rater.name} className="size-12" source={{ uri: rater.image }} />
-        <View className="flex-1">
-          <Text className="leading-5">
-            <Text className="font-bold">{rater.name}</Text>
-            <Text>
-              {' '}
-              rated you a{' '}
-              {(
-                (rating.defenseRating +
-                  rating.playmakingRating +
-                  rating.shootingRating +
-                  rating.finishingRating) /
-                4
-              ).toFixed(0)}{' '}
-              overall
-            </Text>
-          </Text>
-          <Text className="text-sm text-muted-foreground">{timeAgo(rating.createdAt)}</Text>
-        </View>
+    // <Link
+    //   href={{
+    //     pathname: '/user/[userId]',
+    //     params: { userId: rater.id },
+    //   }}>
+    <View className="flex flex-row items-center gap-3 px-4 py-3">
+      <View className="size-12 items-center justify-center rounded-full border border-border bg-muted/30">
+        <Icon as={Star} size={22} />
       </View>
-    </Link>
+      <View className="flex-1">
+        <Text className="leading-5">
+          {/* <Text className="font-bold">{rater.name}</Text> */}
+          <Text>
+            Someone rated you a{' '}
+            {(
+              (rating.defenseRating +
+                rating.playmakingRating +
+                rating.shootingRating +
+                rating.finishingRating) /
+              4
+            ).toFixed(0)}{' '}
+            overall
+          </Text>
+        </Text>
+        <Text className="text-sm text-muted-foreground">{timeAgo(rating.createdAt)}</Text>
+      </View>
+    </View>
+    // </Link>
   );
 }
 

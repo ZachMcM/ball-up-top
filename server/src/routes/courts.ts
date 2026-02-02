@@ -1,13 +1,7 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { and, asc, desc, eq, isNull, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, lte, or, sql } from "drizzle-orm";
 import { Router } from "express";
 import * as z from "zod";
-import { getDistanceInMiles } from "../utils/getDistanceMiles";
-import { handleError } from "../utils/handleError";
-import { invalidateQueries } from "../utils/invalidateQueries";
-import { logger } from "../utils/logger";
-import { authMiddleware, upload } from "../utils/middleware";
-import { r2 } from "../utils/r2";
 import {
   MAX_DISTANCE,
   MAX_DISTANCE_FOR_CHECK_IN,
@@ -22,6 +16,12 @@ import {
   user,
 } from "../db/schema";
 import { notificationsQueue } from "../queues/notifications.queue";
+import { getDistanceInMiles } from "../utils/getDistanceMiles";
+import { handleError } from "../utils/handleError";
+import { invalidateQueries } from "../utils/invalidateQueries";
+import { logger } from "../utils/logger";
+import { authMiddleware, upload } from "../utils/middleware";
+import { r2 } from "../utils/r2";
 
 export const courtsRoute = Router();
 
@@ -494,7 +494,11 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
       .as("session_stats");
 
     // TODO do I want to have this conditional here? Lets say I'm at home and want to view the Purdue leaderboard
-    const conditions = [sql`${distanceFormula} <= ${MAX_DISTANCE}`];
+    const conditions = [];
+
+    if (bookmarked !== true) {
+      conditions.push(lte(distanceFormula, MAX_DISTANCE));
+    }
 
     if (indoor !== undefined) {
       conditions.push(eq(court.indoor, indoor));
