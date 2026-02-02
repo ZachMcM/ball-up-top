@@ -44,3 +44,15 @@ export function timeAgo(date: Date | string): string {
       : date;
   return formatDistanceToNow(parsedDate, { addSuffix: true });
 }
+
+export function getCityState(address: string): string {
+  const parts = address.split(',').map((p) => p.trim());
+  if (parts.length >= 2) {
+    const city = parts[parts.length - 2];
+    const stateZip = parts[parts.length - 1];
+    // Extract just the state abbreviation (first 2 letters after trimming)
+    const state = stateZip.split(' ')[0];
+    return `${city}, ${state}`;
+  }
+  return address;
+}

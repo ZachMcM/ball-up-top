@@ -15,18 +15,7 @@ import { Card } from './ui/card';
 import { Icon } from './ui/icon';
 import { Text } from './ui/text';
 import { Image } from 'expo-image';
-
-function getCityState(address: string): string {
-  const parts = address.split(',').map((p) => p.trim());
-  if (parts.length >= 2) {
-    const city = parts[parts.length - 2];
-    const stateZip = parts[parts.length - 1];
-    // Extract just the state abbreviation (first 2 letters after trimming)
-    const state = stateZip.split(' ')[0];
-    return `${city}, ${state}`;
-  }
-  return address;
-}
+import { getCityState } from '@/lib/utils';
 
 export default function CourtCard({ court }: { court: CourtListEntry }) {
   return (

@@ -9,7 +9,7 @@ import { VerticalRatingBar } from '@/components/ui/vertical-rating-bar';
 import { authClient } from '@/lib/auth-client';
 import { getUser } from '@/lib/endpoints';
 import { THEME } from '@/lib/theme';
-import { timeAgo } from '@/lib/utils';
+import { getCityState, timeAgo } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
@@ -102,7 +102,7 @@ export default function ProfilePage() {
                   </View>
                 </View>
                 <View className="flex flex-1 flex-col gap-4 rounded-2xl border border-border p-4">
-                  <Text className="text-lg font-semibold">RATINGS</Text>
+                  <Text className="text-lg font-semibold">Ratings</Text>
                   <View className="flex flex-row">
                     {RATING_CATEGORIES.map(({ key, label }) => (
                       <VerticalRatingBar key={key} value={user[key]} label={label} />
@@ -110,7 +110,7 @@ export default function ProfilePage() {
                   </View>
                 </View>
                 <View className="flex flex-1 flex-col gap-4 rounded-2xl border border-border p-4">
-                  <Text className="text-lg font-semibold">RATING HISTORY</Text>
+                  <Text className="text-lg font-semibold">Rating History</Text>
                   {user.ratingHistory.length > 0 ? (
                     <LineChart
                       isAnimated
@@ -151,7 +151,7 @@ export default function ProfilePage() {
                   )}
                 </View>
                 <View className="flex flex-col gap-4 rounded-2xl border border-border p-4">
-                  <Text className="text-lg font-semibold">BOOKMARKED COURTS</Text>
+                  <Text className="text-lg font-semibold">Bookmarked Courts</Text>
                   {user.bookmarkedCourts.length > 0 ? (
                     <View className="flex flex-col gap-3">
                       {user.bookmarkedCourts.map((court) => (
@@ -176,7 +176,9 @@ export default function ProfilePage() {
                             </AspectRatio>
                             <View className="flex flex-1 flex-col">
                               <Text className="font-semibold">{court.name}</Text>
-                              <Text className="text-sm text-muted-foreground">{court.address}</Text>
+                              <Text className="text-sm text-muted-foreground">
+                                {getCityState(court.address)}
+                              </Text>
                             </View>
                           </Card>
                         </Link>
@@ -187,7 +189,7 @@ export default function ProfilePage() {
                   )}
                 </View>
                 <View className="flex flex-col gap-4 rounded-2xl border border-border p-4">
-                  <Text className="text-lg font-semibold">RECENT SESSIONS</Text>
+                  <Text className="text-lg font-semibold">Recent Sessions</Text>
                   {user.recentSessions.length > 0 ? (
                     <View className="flex flex-col gap-3">
                       {user.recentSessions.map(({ court, id, startTime, endTime }) => (

@@ -291,7 +291,7 @@ export default function CourtPage() {
                 </View>
                 <View className="flex flex-1 flex-col gap-6 rounded-2xl border border-border p-4">
                   <View className="flex flex-col">
-                    <Text className="font-semibold">ACTIVITY</Text>
+                    <Text className="font-semibold">Activity</Text>
                     <Text className="text-sm font-medium text-muted-foreground">
                       Average players at a given hour
                     </Text>
@@ -306,7 +306,7 @@ export default function CourtPage() {
                 </View>
                 <View className="flex flex-1 flex-col gap-6 rounded-2xl border border-border p-4">
                   <View className="flex flex-col">
-                    <Text className="font-semibold">CURRENTLY PLAYING</Text>
+                    <Text className="font-semibold">Currently Playing</Text>
                     <Text className="text-sm font-medium text-muted-foreground">
                       {court.currentActiveSessions > 1
                         ? `${court.currentActiveSessions} players • ~${court.avgPlayerOverall.toFixed(0)} overall`
@@ -351,7 +351,7 @@ export default function CourtPage() {
                 </View>
                 <View className="flex flex-1 flex-col gap-6 rounded-2xl border border-border p-4">
                   <View className="flex flex-col">
-                    <Text className="font-semibold">COURT LEADERBOARD</Text>
+                    <Text className="font-semibold">Court Leaderboard</Text>
                     <Text className="text-sm font-medium text-muted-foreground">
                       Best players from past 30 days
                     </Text>
