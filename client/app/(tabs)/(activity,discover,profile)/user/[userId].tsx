@@ -1,10 +1,12 @@
 import { NativewindScrollView } from '@/components/NativewindScrollView';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Avatar } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { VerticalRatingBar } from '@/components/ui/vertical-rating-bar';
 import { authClient } from '@/lib/auth-client';
 import { getUser } from '@/lib/endpoints';
@@ -13,7 +15,7 @@ import { getCityState, timeAgo } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
-import { LogOutIcon } from 'lucide-react-native';
+import { InfoIcon, LogOutIcon } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
@@ -89,11 +91,16 @@ export default function ProfilePage() {
                       alt={`${user.name}'s image`}
                       source={{ uri: user.image ?? undefined }}
                     />
-                    <View className="flex flex-col">
+                    <View className="flex flex-col gap-1">
                       <Text className="text-xl font-bold">{user.name}</Text>
                       <Text className="font-semibold text-muted-foreground">
                         {user.height} • {user.archetype}
                       </Text>
+                      {user.isFoundingUser && (
+                        <Badge variant="secondary" className="self-start">
+                          <Text>Founding Member</Text>
+                        </Badge>
+                      )}
                     </View>
                   </View>
                   <View className="flex flex-col items-center">
@@ -102,7 +109,21 @@ export default function ProfilePage() {
                   </View>
                 </View>
                 <View className="flex flex-1 flex-col gap-4 rounded-2xl border border-border p-4">
-                  <Text className="text-lg font-semibold">Ratings</Text>
+                  <View className="flex flex-row items-center gap-2">
+                    <Text className="text-lg font-semibold">Ratings</Text>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Icon as={InfoIcon} className="size-4 text-muted-foreground" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-[100px] m-4">
+                        <Text>
+                          Ratings are calculated from verified check-ins at real courts. Each session
+                          contributes to your score based on performance data from other players
+                          who've seen you play, keeping ratings honest and community-driven.
+                        </Text>
+                      </TooltipContent>
+                    </Tooltip>
+                  </View>
                   <View className="flex flex-row">
                     {RATING_CATEGORIES.map(({ key, label }) => (
                       <VerticalRatingBar key={key} value={user[key]} label={label} />
@@ -136,7 +157,7 @@ export default function ProfilePage() {
                         fontSize: 12,
                       }}
                       maxValue={99}
-                      data={user.ratingHistory.map((entry) => ({
+                      data={user.ratingHistory.map((entry, i) => ({
                         value: entry.overall,
                         label: timeAgo(entry.createdAt),
                         dataPointLabelComponent: () => (

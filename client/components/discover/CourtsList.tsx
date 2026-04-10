@@ -11,12 +11,13 @@ import {
 } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { getCourts } from '@/lib/endpoints';
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { PlusCircle } from 'lucide-react-native';
+import { Info, PlusCircle } from 'lucide-react-native';
 import { useMemo } from 'react';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { useDebounce } from 'use-debounce';
 
 interface CourtsListProps {
@@ -97,6 +98,14 @@ export function CourtsList({
       showsVerticalScrollIndicator={false}
       renderItem={({ item }) => <CourtCard court={item} />}
       keyExtractor={(item) => item.id.toString()}
+      ListFooterComponent={
+        <Alert icon={Info} className="mt-2">
+          <AlertTitle>More Courts Coming Soon</AlertTitle>
+          <AlertDescription>
+            We're constantly adding new courts. Check back soon for more options near you.
+          </AlertDescription>
+        </Alert>
+      }
     />
   );
 }
