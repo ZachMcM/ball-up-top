@@ -1,361 +1,206 @@
 # Competitor Analysis — Ball Up Top
 
-*Last updated: 2026-04-10*
+*Last updated: 2026-04-11*
+*Post-pivot. Reflects campus-community positioning. Competitive frame has shifted from "court finder" to "campus basketball social platform."*
 
 ---
 
 ## TL;DR
 
-No direct competitor combines real-time GPS check-in, peer skill ratings, and player archetypes in a single product. The competitive landscape is fragmented — court finders that don't show real-time activity, social tools (group chats, Facebook Groups) that don't have discovery or skill tracking, and fitness apps that don't understand basketball. Ball Up Top's moat is the intersection of real-time court intelligence + earned, portable skill reputation. No current product occupies that space.
+The pivot to a campus-community model changes the competitive frame significantly. Ball Up Top no longer primarily competes with court finders — it competes with the informal coordination tools that campus basketball communities already use (GroupMe, Discord, Instagram), and it occupies territory that none of them cover: structured, real-time, skill-rated community infrastructure for pickup basketball.
+
+No existing product gives a college basketball community a leaderboard, a skill rating system, real-time court activity data, and player archetypes. The shelf is empty.
 
 ---
 
-## Competitive Landscape Map
+## Competitive Landscape Map (Post-Pivot)
 
 ```
-                    HIGH REAL-TIME ACTIVITY DATA
+                    HIGH COMMUNITY STRUCTURE
                               │
          Ball Up Top ─────────┤
          (target position)    │
                               │
-SOCIAL/COMMUNITY ─────────────┼──────────────── UTILITY/TOOLS
+CAMPUS-SPECIFIC ──────────────┼──────────────── GENERAL / BROAD
                               │
-  Facebook Groups             │    Google Maps / Court Finders
-  WhatsApp/GroupMe            │    PickupBasketball.com
-                              │    Hooper App
+  GroupMe/Discord             │    Google Maps
+  r/[school] threads          │    Hooper App
+  Campus Instagram accounts   │    PickupBasketball.com
                               │
-                    LOW REAL-TIME ACTIVITY DATA
+                    LOW COMMUNITY STRUCTURE
 
-                    NO SKILL RATING          SKILL RATING
+                    NO SKILL/IDENTITY LAYER      SKILL/IDENTITY LAYER
                               │
-  Hooper / Court Finders ─────┤
+  All above competitors ──────┤
                               │
-                              ├─── Ball Up Top (target position)
-  Strava ─────────────────────┤
+                              ├─── Ball Up Top
                               │
-                    HIGH SKILL TRACKING
+                    Chess.com / Strava (analogues)
 ```
 
 ---
 
-## Competitor Profiles
+## Direct Competitors
+
+### 1. GroupMe / Discord / iMessage Group Chats
+
+**What these do:**
+Coordinate pickup runs with existing crews. "Who's going to the rec tonight?" "Anyone out right now?" The primary coordination infrastructure for established campus basketball groups.
+
+**Why players use them:**
+- Zero friction — everyone already has them
+- Instant reach to existing crew
+- Works perfectly for a tight group that always plays together
+
+**What they can't do:**
+- No discovery for players outside the existing group
+- No real-time court activity for anyone not in the chat
+- No skill ratings, archetypes, or leaderboards
+- No way for new players, freshmen, or transfers to find the scene
+- Information is ephemeral — no historical court data
+- Invite-only — the community is walled off
+
+**Why this is Ball Up Top's most important competitor:**
+More college basketball players coordinate via GroupMe than any other tool. Ball Up Top doesn't replace the group chat — it provides what the group chat can't: open discovery, skill rating, and persistent community infrastructure. The right framing is not "instead of GroupMe" but "the layer GroupMe can't be."
+
+**Ball Up Top's advantage:**
+- Open to anyone near the court, not just chat members
+- Persistent, structured community data (leaderboards, rating history)
+- Skill-rated identity that travels beyond the chat
+- Real-time court visibility without requiring someone to actively post
 
 ---
 
-### 1. Hooper App
+### 2. Hooper App
 
-**Positioning:** "Find pickup basketball games near you." Court finder + game scheduler for pickup ballers.
-
-**Target audience:** Pickup basketball players, 18–35, urban markets
+**Positioning:** Court finder and pickup game scheduler.
 
 **What it does:**
-- Lists basketball courts with basic info (address, surface type, indoor/outdoor)
-- Lets users schedule pickup games and invite others
-- Shows upcoming games at specific courts
+- Lists basketball courts with basic info
+- Advance game scheduling with invite functionality
 - Basic player profiles
 
 **What it doesn't do:**
 - No real-time check-in or live player count
-- No peer skill rating system
-- No skill profiles, archetypes, or progression tracking
-- No leaderboards or court-level rankings
-- Scheduling is advance-only — can't see who's there *right now*
+- No peer skill ratings
+- No player archetypes or progression tracking
+- No campus-specific community features
+- Scheduling is advance-only — can't see who's there right now
 
-**Pricing:** Free
+**Common complaint (App Store):**
+"Downloaded it, no one near me uses it, deleted." — The cold-start problem with no community model to solve it.
 
-**Common complaints (App Store / community):**
-- "Downloaded it, no one near me uses it"
-- "The court data is outdated / wrong"
-- "Game scheduling never works — people don't show up"
-- "No way to know if there's actually a run happening"
+**Why players would choose Ball Up Top:**
+- Real-time check-in answers the "is anyone there right now?" question Hooper can't
+- Campus-community model solves the cold-start problem Hooper never solved
+- Skill ratings and archetypes give players a reason to return beyond scheduling
 
-**Strengths:**
-- Has an existing user base in some markets
-- Scheduling feature addresses the coordination problem
-- Clean, purpose-built mobile UI
-
-**Weaknesses:**
-- Async scheduling doesn't match the spontaneous nature of pickup ball
-- No skill layer means no retention hook after court discovery
-- Cold-start problem in most markets — feels empty
-
-**Why people would choose Ball Up Top instead:**
-- Real-time check-in answers the "is anyone there right now?" question that Hooper can't
-- Skill ratings and archetypes give players a reason to come back beyond scheduling games
-- Leaderboards create status and competition at the court level
-
-**Who should still use Hooper:**
-- Players who primarily play in organized, pre-scheduled games rather than spontaneous pickup
+**Honest assessment:** Hooper addresses the right problem but with the wrong architecture. Advance scheduling doesn't match how pickup basketball actually works (spontaneous, show up and play). Ball Up Top's real-time model is fundamentally more aligned with the use case.
 
 ---
 
-### 2. PickupBasketball.com
+### 3. Yik Yak (Structural Model, Not Competitor)
 
-**Positioning:** Online directory for finding pickup basketball games and courts.
+Yik Yak is not a competitor — it's the structural blueprint Ball Up Top adapted. Understanding what Yik Yak did right and what it got wrong is competitive intelligence for avoiding the same mistakes.
 
-**Target audience:** Older demographic (25–45), web-first users
+**What Yik Yak got right:**
+- Campus-bound architecture (one community per campus)
+- Anonymous, proximity-based social layer
+- School-by-school, ambassador-driven expansion
+- Large schools first
+- Product was the campus community itself, not a feature for campuses
 
-**What it does:**
-- Web-based court directory organized by city/state
-- Community-submitted court info
-- Some event listing functionality
-- Forum-style discussions in some cities
+**What Yik Yak got wrong (and what killed it):**
+- Adding usernames destroyed the anonymous community dynamic — identity changed the product's core behavior
+- Failed to build sustainable business model before the toxic content problem became unmanageable
+- Never found the second act beyond novelty
 
-**What it doesn't do:**
-- No mobile app (web-only)
-- No real-time anything — purely static listings
-- No check-in, no live player count
-- No skill ratings or player profiles
-- UI is visually dated (2010s web aesthetic)
+**What Ball Up Top takes from Yik Yak:**
+- Campus-node architecture
+- School-by-school expansion model
+- Community IS the product frame
 
-**Pricing:** Free
-
-**Common complaints:**
-- "Data is years out of date in most cities"
-- "No mobile app is a dealbreaker"
-- "Forums are dead / spam-heavy"
-- "Not useful for knowing if there's actually a game"
-
-**Strengths:**
-- Some established SEO presence for court-related searches in certain cities
-- Comprehensive directory in major markets
-- Long-standing brand recognition in the niche
-
-**Weaknesses:**
-- No mobile-first experience
-- No real-time data layer
-- No social or skill features
-- Not designed for the spontaneous, phone-in-pocket nature of modern pickup ball
-
-**Why people would choose Ball Up Top instead:**
-- Mobile-native vs. web-only
-- Real-time activity vs. static listings
-- Skill system creates retention that a directory never can
-
-**Who should still use PickupBasketball.com:**
-- Researching courts in advance in an unfamiliar city (travel planning use case)
+**Where Ball Up Top diverges:**
+- Location-based discovery (not hard school selection) — handles multi-campus cities and non-students
+- Identity is core, not anonymous (archetypes and ratings are the retention mechanism)
+- Physical presence requirement (GPS check-in) is natural anti-gaming infrastructure Yik Yak didn't have
 
 ---
 
-### 3. Google Maps / Apple Maps
+## Secondary Competitors
 
-**Positioning:** General-purpose location discovery (not basketball-specific)
+### 4. Instagram / TikTok / Campus Sports Accounts
 
-**Target audience:** Everyone
+**What they do:**
+Showcase basketball highlights from campus courts. Broadcast-only. No utility, no community structure, no skill layer.
 
-**What it does:**
-- Find basketball courts by searching "basketball courts near me"
-- Court hours, photos, user reviews, directions
-- Some user-submitted "tips" or reviews about court quality
+**Why they matter as a competitive consideration:**
+Campus basketball Instagram accounts (e.g., @[school]_hoops, @[school]_ballers) have an existing audience of exactly the players Ball Up Top targets. They are potential distribution partners, not competitors. A campus basketball Instagram account with 2,000 followers is a warm channel for Ball Up Top ambassador content.
 
-**What it doesn't do:**
-- No real-time player count or check-in
-- No basketball-specific data (run quality, skill level, court rules)
-- No player profiles, ratings, or community
-- No notification system for court activity
-
-**Pricing:** Free
-
-**Strengths:**
-- Ubiquitous — every basketball player has already used this
-- Court data is generally accurate (Google maintains it)
-- Directions and hours are genuinely useful
-
-**Weaknesses:**
-- Zero real-time court activity data
-- Not basketball-culturally aware (reviews are generic)
-- No community layer
-
-**Why people would choose Ball Up Top instead:**
-- Ball Up Top solves the question Google Maps can't: "Is there a run *right now*?"
-- The basketball-specific context (skill levels, archetypes, leaderboards) is irreplaceable
-
-**Coexistence note:** Ball Up Top and Google Maps are largely complementary, not competitive. Google is how players find courts exist; Ball Up Top is how they know those courts are live.
+**Ball Up Top's advantage:** Instagram can show highlights; Ball Up Top shows rankings, ratings, and who's at the court right now. These are different information types that complement each other.
 
 ---
 
-### 4. WhatsApp / GroupMe / iMessage Group Chats
+### 5. Google Maps / Apple Maps
 
-**Positioning:** General-purpose messaging (used for pickup coordination)
+**Role:** Court location discovery for new-to-area players.
 
-**Target audience:** Everyone
+**Gap:** Shows courts exist, not if anyone is playing. No community, no ratings, no activity data.
 
-**What it does (for pickup ball):**
-- Coordinate with existing crew about when/where to play
-- Share photos/videos of runs
-- Organize recurring games with known groups
-
-**What it doesn't do:**
-- No discovery — can't find new courts or new players
-- No real-time visibility for outsiders
-- No skill ratings, profiles, or progression
-- Invite-only — excludes players without existing social connections
-- No court intelligence or activity history
-
-**Pricing:** Free
-
-**Strengths:**
-- Zero learning curve — players already use it
-- Works for established crews perfectly
-- No cold-start problem for existing groups
-
-**Weaknesses:**
-- Creates walled gardens that exclude new players
-- No signal for outsiders ("is anyone out there?")
-- No skill tracking or reputation system
-- Information decays instantly — no historical court data
-- Requires someone to message first; passive discovery is impossible
-
-**Why people would choose Ball Up Top instead:**
-- Group chats serve existing relationships; Ball Up Top surfaces new ones
-- New players, transplants, and freshmen have no group chat to join — Ball Up Top is their on-ramp
-- Skill tracking and archetypes are impossible in a chat context
-
-**Who should keep using group chats:**
-- Players whose entire pickup experience is with a tight, fixed crew who have no interest in finding new competition
+**Coexistence note:** Google Maps and Ball Up Top are complementary. Google Maps is how players find courts exist; Ball Up Top is how they know those courts are live and competitive. These are often used in sequence: Google Maps for initial discovery, Ball Up Top for deciding whether to go.
 
 ---
 
-### 5. Facebook Groups (Local Court Communities)
+### 6. Intramural Sports Platforms (IMLeagues, SportsEngine)
 
-**Positioning:** Community forum for local basketball players (self-organized)
+**What they do:** Manage organized intramural leagues — scheduling, standings, roster management for structured competition.
 
-**Target audience:** 25–45 primarily; declining among 18–24
+**Gap:** Designed for organized leagues, not pickup play. Pickup basketball by definition has no pre-set rosters, no advance scheduling, and no league structure.
 
-**What it does:**
-- Community posting: "Anyone out at Grant Park today?"
-- Event creation for organized games
-- Photo/video sharing from runs
-- Some court-specific groups in major cities
-
-**What it doesn't do:**
-- No real-time activity — posts decay fast
-- No check-in, GPS verification, or live player count
-- No skill ratings or player profiles
-- Algorithm buries posts — not a reliable real-time signal
-- Skews older; 18–24 players largely aren't on Facebook
-
-**Pricing:** Free
-
-**Strengths:**
-- Some existing communities in major cities
-- Low barrier to create a group
-- Familiar UX
-
-**Weaknesses:**
-- Facebook's algorithm actively works against real-time utility (posts are buried)
-- Demographic mismatch with core Ball Up Top audience (18–25)
-- No structure — every group is different in quality and activity
-- No skill or reputation layer
-
-**Why people would choose Ball Up Top instead:**
-- Structured, real-time data vs. unstructured, asynchronous posts
-- Works for the 18–24 demographic that has abandoned Facebook
-- App-native mobile experience vs. forced mobile web
+**Opportunity:** Intramural basketball participants are a high-intent audience. Players who sign up for IM basketball are among the most committed campus basketball players. Ball Up Top can be positioned as the complement to IM basketball — "after your IM game, rate your opponents on Ball Up Top."
 
 ---
 
-### 6. Strava / Nike Run Club / Fitness Tracking Apps
+## Structural Comparison
 
-**Positioning:** Activity tracking and fitness social network (running/cycling analogue)
-
-**Target audience:** Endurance athletes, fitness-focused consumers
-
-**What it does:**
-- GPS activity tracking (routes, pace, distance)
-- Segments with leaderboards
-- Social feed of workouts
-- Kudos / encouragement social layer
-- Training plans and goals
-
-**What it doesn't do:**
-- No basketball-specific features at all
-- No court discovery
-- No peer skill rating (only self-tracked metrics)
-- No archetypes or basketball skill dimensions
-- Not designed for team/social sports
-
-**Pricing:** Freemium (~$8/month for premium)
-
-**Strengths:**
-- Proven that sports tracking + social layer creates deep retention
-- Segment leaderboards show that court-level leaderboards work psychologically
-- Established playbook for sports identity products
-
-**Why this is the right analogue, not a competitor:**
-- Strava's playbook validates Ball Up Top's core concept: sports tracking + leaderboards + social identity = strong retention
-- The question "what's my running pace vs. others on this route" is structurally identical to "what's my skill rating vs. others at this court"
-- Ball Up Top is effectively Strava for pickup basketball — a comparison that works well in pitches
-
-**Lessons to apply from Strava:**
-- Segment leaderboards (court leaderboards) drive return visits even for solo users
-- Activity feed creates passive engagement even on rest days
-- Year-in-review / milestone notifications are powerful retention moments
-
----
-
-### 7. Chess.com (Distant Analogue — Skill Rating Benchmark)
-
-**Not a competitor, but the most relevant analogue for the skill rating system.**
-
-**What Chess.com gets right that Ball Up Top should study:**
-- ELO rating is central to identity — players organize their entire chess experience around their rating number
-- Rating is trusted because the algorithm is perceived as fair and math-based
-- Players actively discuss their rating in conversation: "I'm a 1200" is a complete social signal
-- Archetypes (opening repertoires, playing styles) are deeply tied to identity
-- Rating history graph is one of the most-visited features
-
-**Implications for Ball Up Top:**
-- The skill rating system will only work if players trust it. Communicating "your rating reflects who you played and how long you played together" is equivalent to Chess.com explaining ELO — it builds trust.
-- "What's your rating?" should aim to become the pickup basketball equivalent of "what's your ELO?" — a natural conversation among players
-
----
-
-## Comparison Table
-
-| Feature | Ball Up Top | Hooper | PickupBball.com | Group Chats | Facebook Groups | Strava |
-|---------|-------------|--------|-----------------|-------------|-----------------|--------|
-| Court discovery | ✓ | ✓ | ✓ | ✗ | Partial | ✗ |
-| Real-time player count | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ |
-| GPS check-in | ✓ | ✗ | ✗ | ✗ | ✗ | ✓ (routes) |
-| Peer skill ratings | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ |
-| Player archetypes | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ |
-| Skill progression tracking | ✓ | ✗ | ✗ | ✗ | ✗ | ✓ (pace/distance) |
-| Court leaderboards | ✓ | ✗ | ✗ | ✗ | ✗ | ✓ (segments) |
-| Push notifications | ✓ | Partial | ✗ | ✓ | ✓ | ✓ |
-| Mobile-native | ✓ | ✓ | ✗ | ✓ | Partial | ✓ |
-| Anti-gaming/verification | ✓ | ✗ | ✗ | N/A | N/A | ✓ (GPS) |
-| Open discovery (meet new players) | ✓ | Partial | Partial | ✗ | Partial | ✓ |
-| Activity feed / social layer | ✓ | ✗ | ✗ | ✓ | ✓ | ✓ |
-
----
-
-## Positioning Summary
-
-**Ball Up Top is best for:**
-- Pickup basketball players who want to know if a court is live right now
-- Players who want a portable, earned skill reputation beyond their local circle
-- Players new to an area (transplants, college freshmen) who need to find a run
-- Competitive players who want to track skill progression and court standing
-- Players who care about their archetype and player identity
-
-**When to recommend an alternative:**
-- You only play with a fixed, closed crew who have no interest in ratings → Group chat is fine
-- You exclusively play in organized leagues → Rec center apps / league management tools
-- You're primarily looking for courts in a new city while traveling → Google Maps + PickupBasketball.com for static research
+| Feature | Ball Up Top | GroupMe | Hooper | Google Maps | IM Platforms |
+|---------|-------------|---------|--------|-------------|--------------|
+| Real-time court activity | ✅ | Partial (manual post) | ❌ | ❌ | ❌ |
+| GPS-verified check-in | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Peer skill ratings | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Player archetypes | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Court leaderboards | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Open discovery (no invite needed) | ✅ | ❌ | Partial | ✅ | ❌ |
+| Campus-specific community | ✅ | Partial | ❌ | ❌ | ✅ |
+| Portable skill profile | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Anti-gaming architecture | ✅ | N/A | N/A | N/A | N/A |
+| Mobile-native | ✅ | ✅ | ✅ | ✅ | Partial |
 
 ---
 
 ## Competitive Moat Assessment
 
-Ball Up Top's defensibility comes from **data accumulation** and **network effects** — both of which are hard to replicate once established:
+Ball Up Top's defensibility compounds over time through three mechanisms:
 
-1. **Rating history data:** Each player's rating history, archetype evolution, and session record accumulates over time. A player with 2 years of data has a much higher switching cost than a new user. This is Ball Up Top's deepest moat if retention is achieved.
+**1. Rating history data (switching cost)**
+Each player's rating history, archetype evolution, and session record accumulates. A player with 60 sessions of data has a much higher switching cost than a new user. This moat deepens every week a player continues using the app. No competitor launching at the same campus could offer this history — they'd have to start from scratch.
 
-2. **Court-level data:** Hourly activity heatmaps, leaderboard histories, and court personality (average skill level, active players) accumulate and become increasingly valuable and accurate over time. A competitor starting from zero would need years of check-in data to replicate this.
+**2. Court-level data (accuracy moat)**
+Hourly activity heatmaps, leaderboard histories, and court personality data (average skill, peak hours) accumulate and become increasingly accurate over time. A competitor entering a campus Ball Up Top has already seeded would face 6–12 months of activity data disadvantage.
 
-3. **Community network effect:** Each new player makes the leaderboards more meaningful, the activity data more reliable, and the "is anyone there?" question more answerable. This compounds over time.
+**3. Community trust (reputation moat)**
+Once players trust their rating as accurate and hard to game, they won't abandon it for a competitor's unproven algorithm. This is the Chess.com dynamic — "you don't leave Chess.com because you'd lose your 1400 rating." Ball Up Top needs to earn this trust in the first 60 days at each campus; once earned, it's extremely durable.
 
-4. **Trust in the rating system:** Once players trust their rating (because it's been consistent over many sessions), they won't abandon it for a competitor with no data. The ELO analogue holds: you don't leave Chess.com because you'd lose your 1400 rating.
+**Vulnerability:** The moat only materializes after critical mass. Before reaching tipping point at a campus, Ball Up Top has no moat — a competitor launching simultaneously could split the market and prevent either from reaching critical mass. Speed at each campus launch is therefore competitive strategy, not just growth strategy.
 
-**Vulnerability:** The moat only materializes *after* critical mass is achieved at specific courts. Before that point, the app has no moat — a well-funded competitor launching at the same campus simultaneously could split the market and prevent either from reaching critical mass. Speed at the Purdue launch is therefore not just a growth consideration; it's a competitive one.
+---
+
+## Key Takeaways for Marketing
+
+1. **Don't compete with GroupMe — complement it.** GroupMe solves an existing crew's coordination problem. Ball Up Top solves the discovery and reputation problem GroupMe can't. Market them as different layers of the same experience.
+
+2. **The empty shelf is the story.** No competitor offers the full combination. This is the headline: "The first real community platform for college pickup basketball."
+
+3. **Campus Instagram accounts are distribution allies.** Find them, offer them content (leaderboard updates, player spotlights), and let them distribute Ball Up Top to their existing audiences.
+
+4. **Speed is a competitive advantage.** The first app to reach critical mass at a specific campus owns that campus's community data. Competitors who arrive later face the rating history disadvantage. Move fast.

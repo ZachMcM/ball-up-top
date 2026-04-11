@@ -1,299 +1,241 @@
 # Content Strategy — Ball Up Top
 
-*Last updated: 2026-04-10*
-*Focus: Social-first (Instagram, TikTok, Reddit) — pre-revenue, campus launch stage*
+*Last updated: 2026-04-11*
+*Post-pivot. Campus-community model. Social-first strategy — not SEO-first.*
 
 ---
 
 ## Strategic North Star
 
-Ball Up Top is not a SaaS with a blog funnel. The content strategy is **social and community-first** — built to spread within basketball culture, not rank in search engines. Every piece of content serves one of three jobs:
+Ball Up Top is not a SaaS with a blog. The content strategy is **social and community-first** — built to spread within campus basketball culture, not rank in search engines.
 
-1. **Awareness** — make people who don't know the app exist feel like they're missing something
-2. **Activation** — give curious players a reason to download and check in *today*
-3. **Virality** — create content players want to share because it says something true about *them*
+The content flywheel: real players → real sessions → real archetypes and leaderboards → shareable moments → more players.
 
-The content flywheel: real players → real sessions → real archetypes + ratings → shareable moments → more players.
+Every piece of content serves one of three jobs:
+1. **Awareness** — make players who don't have Ball Up Top feel like they're missing something real
+2. **Activation** — give curious players a specific reason to check in *this week at their court*
+3. **Virality** — create shareable content that says something true about *the player*, not about the app
 
 ---
 
 ## Content Pillars
 
-### Pillar 1: Identity & Archetype ("Know Your Game")
+### Pillar 1: Campus Hierarchy — "Who Runs Your Court?"
+*40% of content — primary acquisition pillar*
 
-**Rationale:** Player archetypes are the product's most emotionally resonant feature. A well-named archetype ("3 & D Wing," "Playmaking Shot Creator," "Paint Beast") says something true and specific about a player's identity. Content in this pillar helps players discover, understand, and share their archetype — and creates FOMO in players who don't have one yet.
+This is the product's most differentiating claim expressed as content. Every piece in this pillar answers a version of the question every competitive campus basketball player is already asking: "Who are the best players at this school?"
 
 **Content types:**
-- Archetype reveal posts/videos (player-generated or ambassador-created)
-- "What archetype are you?" educational content (explain what each archetype means)
-- Archetype comparison posts ("3 & D Wing vs. Stretch 5 — what's the difference?")
-- "Your archetype changed" milestone moments
+- Weekly campus leaderboard updates ("Week [N] at [School] — here's who's climbing")
+- Season championship announcements ("Season 1 Champion at [School]: [Name], [Archetype]")
+- Player spotlights for top leaderboard holders
+- Cross-campus rivalry content ("Purdue's #1 vs. Ohio State's #1 — who wins?")
+- "The [School] Leaderboard is Live" announcement posts for each new campus launch
 
-**Primary platform:** Instagram (shareable cards), TikTok (reveal videos)
+**Primary platforms:** Instagram (static graphics, stories), r/[school] subreddits
 
-**Virality mechanism:** Identity-sharing. "I'm a Paint Beast" is the same impulse as "I'm an INTJ" — people share because it's a true, specific, cool thing to say about themselves.
+**Why this pillar leads:**
+It speaks directly to the Competitive Regular — the highest-retention, highest-advocacy persona. And it's a claim no competitor can make. "Here's who's ranked at your school" is content with built-in audience (anyone who plays basketball on campus) and built-in motivation (competitive players want to see where they stack up).
 
 ---
 
-### Pillar 2: Court Culture ("Know Your Court")
+### Pillar 2: Archetype Identity — "What's Your Archetype?"
+*30% of content — primary virality pillar*
 
-**Rationale:** Real-time court activity is the product's most *useful* feature. Content in this pillar shows what it looks like when a court is live — who's there, what the vibe is, who's at the top of the leaderboard. It makes the abstract concept of "real-time court data" visceral and concrete.
+The archetype reveal is the product's most shareable moment. Every player who gets an archetype has a potential social post. Every share is a potential acquisition event.
 
 **Content types:**
-- Court spotlight posts (photos/reels of active courts with player count overlays)
-- Leaderboard updates ("Top 5 players at [Court] right now")
-- "Court is live" announcement posts from ambassador accounts
-- Court culture documentary-style short videos (who plays here, what's the vibe)
+- First archetype reveal videos (authentic player reactions, 15–30 seconds, TikTok-native)
+- Archetype explainer content ("what does a 3 & D Wing actually mean?")
+- "What archetype are you?" interactive polls and quizzes
+- Archetype comparison posts ("Slasher vs. Playmaking Shot Creator — which do you want to be?")
+- "Your archetype changed" milestone content
+- Archetype card graphics (shareable static assets, designed for Instagram Stories)
 
-**Primary platform:** Instagram (aesthetic court photography), TikTok (short-form court footage)
+**Primary platforms:** TikTok (reveal videos are native here), Instagram Stories (shareable archetype cards)
 
-**Virality mechanism:** Local pride. Players tag their home court and their crew. Outsiders want to visit.
+**Why this pillar is second:**
+The archetype reveal is the mimetic desire engine. "What's your archetype?" needs to become vocabulary in campus basketball circles. This pillar seeds the question — once players start asking it of each other, the acquisition loop is self-sustaining.
 
 ---
 
-### Pillar 3: Skill & Progress ("Know Your Rating")
+### Pillar 3: Pickup Culture — "Know the Game"
+*20% of content — brand credibility and organic reach pillar*
 
-**Rationale:** Tracking skill progression is deeply motivating once players have data. Content in this pillar shows the rating system in action — how it works, why it matters, what milestones look like. It also addresses the trust objection ("is the rating actually legit?") through transparency.
+Content that has nothing to do with the product. Pure pickup basketball culture — relatable, funny, true. This pillar builds brand credibility within basketball culture and reaches players who haven't downloaded the app yet.
 
 **Content types:**
-- Rating explanation content ("how the algorithm works in plain English")
-- Milestone celebration posts (player hits 75, 80, 85 overall)
-- "Your rating after X sessions" progression stories
-- Skill breakdown posts ("what does a high playmaking rating actually mean?")
-- Before/after archetype change stories
+- "Types of players at every pickup run" character sketches (recognition humor — extremely shareable)
+- Unwritten rules of pickup basketball
+- Hot takes on pickup basketball culture
+- "Every run has a ____" relatable content
+- Historical pickup basketball content (Rucker Park, playground legends, legendary campus courts)
+- Court culture photography and short-form video
 
-**Primary platform:** Reddit (trust-building, deeper explanations), Instagram (milestone moments)
+**Primary platforms:** TikTok (entertainment algorithm rewards this format), Instagram Reels
 
-**Virality mechanism:** Progress-sharing. Players show their rating improving the same way people share their Wordle streak or Duolingo streak.
+**Why this pillar matters:**
+Content that only promotes the product reaches only players who are already downloading Ball Up Top. Culture content reaches everyone who plays basketball. This builds the brand's credibility as a voice within basketball culture — not just an app that wants downloads. Players who follow Ball Up Top for the culture content convert when a friend mentions the app or when they see a leaderboard post about their campus.
 
 ---
 
-### Pillar 4: Pickup Culture ("Know the Game")
+### Pillar 4: The Build Story — "Campus by Campus"
+*10% of content — founder/brand story and community transparency*
 
-**Rationale:** Ball Up Top isn't just an app — it's a brand that understands and respects pickup basketball culture. Content in this pillar isn't about the product at all; it's about the culture the app exists within. This builds credibility, brand affinity, and organic follows from people who may not download the app yet.
-
-**Content types:**
-- Pickup basketball history and legends (Rucker Park, The Cage, playground legends)
-- Unwritten rules of pickup ball (calling fouls, next, run etiquette)
-- "Types of players you meet at every run" character content
-- Hot takes / basketball culture commentary
-- Classic court footage (archival or community-sourced)
-
-**Primary platform:** TikTok (entertainment), Instagram Reels, Reddit
-
-**Virality mechanism:** Resonance and recognition. "This is exactly what happens every time I play" energy. Shared because it's accurate and funny.
-
----
-
-### Pillar 5: Community ("Know Your Crew")
-
-**Rationale:** Ball Up Top creates a social layer for pickup basketball that previously didn't exist. Content in this pillar highlights the community — founding players, top court leaderboard holders, player spotlights. This creates social proof and shows real people who are already part of the scene.
+The story of building Ball Up Top campus by campus. Transparent, honest, founder-voice content that documents the journey in real time.
 
 **Content types:**
-- Player spotlights (ambassador features: their archetype, their court, their game)
-- Founding Player recognition posts
-- "Best player at [Court] this month" announcements
-- Campus/city community highlights
-- Player ratings submitted milestones ("1,000 ratings submitted at Purdue")
+- "Ball Up Top just launched at [School] — here's what the first week looked like"
+- "[N] campuses now — here's everything we learned"
+- "Ball Up Top is building its own tournament bracket — [N] schools and counting"
+- Founder posts on why pickup basketball needs this infrastructure
+- Honest milestone posts ("we just hit [X] ratings submitted")
 
-**Primary platform:** Instagram (visual profiles), TikTok (interview/vlog style)
+**Primary platforms:** Reddit (r/startups, campus subreddits), Instagram/TikTok for milestone moments
 
-**Virality mechanism:** Social recognition. Players tagged in spotlight posts share. Their followers follow.
+**Why this pillar rounds out the mix:**
+Authenticity and transparency build trust — the most important asset for a rating system that needs players to believe it's fair. The founder story ("student built this for campus hoopers") is also inherently newsworthy for campus media. It gives the product a human origin that makes it harder to dismiss as a corporate app.
 
 ---
 
 ## Platform Strategy
 
-### Instagram (@balluptop or @balluptop_purdue for campus launch)
+### TikTok — Primary Discovery Channel
 
-**Role:** Primary visual brand hub. Social proof, identity content, court culture aesthetics.
+**Role:** Reach new players who've never heard of Ball Up Top via basketball algorithm.
 
-**Content mix:**
-- 40% Archetype/identity content (reveal cards, archetype explanations)
-- 25% Court culture (court photography, leaderboard updates, live court announcements)
-- 20% Community/player spotlights
-- 15% Pickup culture (memes, commentary, character types)
-
-**Posting frequency:** 4–5x/week during launch month; 3x/week steady state
-
-**Format priority:**
-1. Reels (highest reach for new audiences)
-2. Static posts (archetype cards, leaderboard screenshots — highly shareable)
-3. Stories (daily "who's at the court" updates during active seeding)
-
-**Key tactics:**
-- Every archetype card post should be designed as a shareable asset — players repost to their story
-- Tag ambassadors in their player spotlight posts; they share = their followers see
-- Stories: real-time "X players checked in at CoRec right now" during active days
-- Bio link goes to a landing page optimized for app download (not the App Store directly — brief explanation first)
-
-**Aesthetic direction:**
-- Dark backgrounds, bright accent colors, bold typography
-- Court photography: concrete, chain nets, worn backboards, golden hour lighting
-- Player photography: action, not posed. Real game situations.
-- No generic stock athlete photography.
-
----
-
-### TikTok (@balluptop)
-
-**Role:** Discovery and virality engine. Raw, authentic content that spreads via basketball culture algorithm.
+**Why TikTok leads for discovery:**
+- 18–22 demographic is predominantly TikTok-first for content discovery
+- Basketball TikTok is a real algorithm niche — pickup culture content travels
+- Ball Up Top's archetype reveal format is native to TikTok (personality reveal content performs well)
+- Discovery reach is orders of magnitude higher than Instagram for non-follower audiences
 
 **Content mix:**
-- 35% Archetype reveals and reactions (player finds out their archetype for the first time)
-- 30% Pickup culture (types of players, unwritten rules, "every run has a _____")
-- 20% Court footage + check-in/session footage
-- 15% Rating transparency / how it works
+- 40%: Archetype reveals and reactions (Pillar 2)
+- 30%: Pickup culture — character types, unwritten rules, relatable moments (Pillar 3)
+- 20%: Campus leaderboard and community moments (Pillar 1)
+- 10%: Founder/build story (Pillar 4)
 
-**Posting frequency:** Daily during launch month (volume matters more on TikTok); 4–5x/week steady state
+**Posting frequency:** Daily during campus launch months; 4–5x/week steady state.
 
-**Format priority:**
-1. Short-form reaction/reveal videos (15–30 seconds)
-2. "Types of players you meet at the run" character content (30–60 seconds)
-3. Court vlog clips with app overlay
+**The hero format: First Archetype Reveal**
 
-**High-potential TikTok formats:**
+This is the single most important content format Ball Up Top can produce on TikTok. No narration needed. No script. The reaction IS the content.
 
-*"First Archetype Reveal" series:*
-Format: Player opens app for the first time post-session → sees their archetype for the first time → genuine reaction. 15–30 seconds. No narration needed. The reaction is the content.
-Why it works: Authentic reactions to identity-assignment are highly relatable and shareable. Same energy as "reading your zodiac sign for the first time."
+Structure:
+1. Player opens Ball Up Top post-session (0–3 sec)
+2. Player sees their archetype for the first time (3–8 sec)
+3. Genuine reaction (8–25 sec) — surprise, recognition, challenge ("that's not right, I can shoot")
+4. Optional: "Tag someone who's a [archetype]" CTA
 
-*"Types of players at every pickup run" series:*
-Format: 30–45 second character sketch of archetypes you encounter at every court — the guy who calls every foul, the one who only shoots threes, the big who refuses to go to the post. Ball Up Top is mentioned as the resolution ("Ball Up Top would give him a 45 defense rating").
-Why it works: Recognition humor. Every pickup player has met every one of these people. Extremely shareable.
+Post from both Ball Up Top's account AND the player's personal TikTok for maximum reach.
 
-*"Rate your run" series:*
-Format: Player at court, checks in on Ball Up Top, plays for X minutes, checks out, shows the rating screen and walks through who they're rating and why. 45–60 seconds.
-Why it works: Transparent and educational. Shows the product in context without feeling like an ad.
-
-*"Court challenge" format:*
-Format: Challenge at a specific court — first player to check in and get an 80+ overall by end of semester wins a prize (Ball Up Top branded gear). Film the standings updates.
-Why it works: Competitive content with a built-in narrative arc (who's going to win?).
-
-**TikTok voice:** Unpolished, real, basketball-literate. No corporate tone. Jokes should land in the first 2 seconds.
+**TikTok hooks that work for Ball Up Top:**
+- "I just found out my basketball archetype and..." (identity curiosity)
+- "We ranked every pickup player at [School] and..." (campus relevance)
+- "Every pickup run has the same 6 players — here they are" (recognition hook)
+- "My basketball rating just updated and I have thoughts" (progress hook)
 
 ---
 
-### Reddit (r/streetball, r/BasketballTips, r/nba, r/purdue)
+### Instagram — Primary Community Platform
 
-**Role:** Trust-building, authentic community presence, targeted seeding for high-intent players.
+**Role:** Community maintenance, social proof, and shareable identity assets.
 
-**Content approach:** Reddit requires a fundamentally different posture than Instagram/TikTok. The audience is skeptical of promotion and will immediately reject anything that feels like marketing. The strategy here is **authentic participation first, product mention second.**
+**Why Instagram is community, not discovery:**
+Instagram's algorithm now favors content from accounts users already follow. It's less powerful than TikTok for reaching new audiences with standard posts. Its strength is maintaining and deepening relationships with players who are already engaged — sharing leaderboard updates that get reshared, posting archetype cards that players repost to their Stories.
 
-**Phase 1 (Weeks 1–4 of Reddit presence): Pure participation**
-- Join r/streetball, r/BasketballTips, r/nba
-- Respond genuinely to threads about pickup basketball — where to find games, improving your game, court culture debates
-- Never mention Ball Up Top in this phase
-- Goal: establish a persona as a genuine hooper and basketball community member
+**Content mix:**
+- 40%: Leaderboard updates and campus hierarchy content (Pillar 1)
+- 30%: Archetype cards and identity shareable assets (Pillar 2)
+- 20%: Player spotlights and community features
+- 10%: Court photography and culture content (Pillar 3)
 
-**Phase 2 (Weeks 5–8): Natural product introduction**
-- In relevant threads ("how do you find pickup games?", "how do you know if your game is improving?"), mention Ball Up Top naturally: "I've been working on an app that actually tries to solve this..."
-- Post a genuine launch post in r/streetball: story-first format, honest about what the app does and what it doesn't do yet, ask for feedback
-- Respond to every comment personally within 24 hours
+**Posting frequency:** 4–5x/week during launch months; 3x/week steady state.
 
-**Phase 3 (Ongoing): Community presence**
-- Post milestone updates ("We just hit 500 ratings submitted in our first month at Purdue — here's what we learned")
-- Share player archetype data / interesting patterns ("We have 40+ archetypes and the most common at Purdue is 'Slasher' — makes sense for campus ball")
-- Participate in culture threads with insight from being embedded in the pickup basketball community
+**Key recurring format: The Weekly Leaderboard Post**
 
-**r/purdue targeting:**
-- Post specifically about the Purdue launch in r/purdue: "Built an app for pickup ball at Purdue — come get your rating at the CoRec"
-- This is a highly targeted, low-noise channel where the message is directly relevant to every basketball-playing Purdue student
+Every Friday: "Week [N] Rankings at [School]" — clean graphic showing top 5 players with archetypes and overall ratings. Tag players with permission. Caption: "Who's climbing next week?"
 
-**Content formats that work on Reddit:**
-- Genuine "I built this" posts with honest story arcs
-- Data/insight posts ("here's what we learned from X sessions")
-- Questions that invite community participation ("what's the hardest part about finding a pickup game?")
-- Responding thoughtfully to existing threads
+This post serves three simultaneous functions:
+1. Ongoing engagement from leaderboard players (they share when tagged — their followers see Ball Up Top)
+2. Competitive motivation for players not yet in the top 5
+3. Social proof for non-users who see it reshared — "this is a real, active community at my school"
+
+**Account structure:**
+- Global: @balluptop — all content, national stories
+- Campus-specific: @balluptop_purdue, @balluptop_ohiostate — campus-specific leaderboards, player spotlights, local content
+
+Campus accounts are the Instagram equivalent of the campus node. Follows grow faster from campus-specific content than global. Campus accounts create the social proof that "Ball Up Top is here and active at my school."
 
 ---
 
-## Content Calendar — Purdue Launch Month
+### Reddit — Primary Trust-Building Channel
 
-### Pre-Launch (Week -2 to -1): Seeding
-| Day | Platform | Content |
-|-----|----------|---------|
-| -14 | Instagram | Account creation. No posts yet. |
-| -10 | Instagram | "Something is coming to Purdue courts" teaser — dark background, no product shown, just court imagery |
-| -7 | Instagram | Ambassador spotlight 1: "Meet [Name] — one of the first players to get their rating at Purdue" |
-| -5 | TikTok | First TikTok: "We built an app for pickup basketball at Purdue. Here's why." — Founder story format |
-| -3 | Instagram | Ambassador archetype reveal 1: share card from first ambassador session |
-| -1 | Instagram Story | "Launch tomorrow. First 50 players get Founding Player status." |
+**Role:** Authentic presence in campus communities and basketball culture; highest-credibility acquisition channel per campus.
 
-### Launch Week (Week 1)
-| Day | Platform | Content |
-|-----|----------|---------|
-| Day 1 | Instagram + TikTok | Launch announcement: "Ball Up Top is live at Purdue. Check in. Rate your run. Get your archetype." |
-| Day 1 | r/purdue | "Built an app for pickup ball at Purdue — come get your rating" post |
-| Day 2 | Instagram | Court spotlight: CoRec main gym with active player count overlay |
-| Day 3 | TikTok | "Types of players at every Purdue pickup run" character video |
-| Day 4 | Instagram | Leaderboard update: "Top 5 players at [Court] after Week 1" |
-| Day 5 | TikTok | First archetype reveal reaction video |
-| Day 6 | Instagram Stories | "10 players checked in at CoRec right now" — real-time activity push |
-| Day 7 | Instagram | "First week recap: X sessions, X ratings, X archetypes generated" |
+**Why Reddit matters:**
+r/[school] subreddits are the closest digital equivalent to the campus community itself. A genuine, human post from the founder about a student-built basketball app performs differently than any other marketing channel — because the audience self-selects (these are students who care about campus life) and the format rewards authenticity over promotion.
 
-### Growth Weeks (Weeks 2–4)
-**Recurring weekly content:**
-- Monday: Motivation/identity content (archetype or rating milestone)
-- Wednesday: Court culture content (court spotlight, leaderboard update)
-- Friday: Community content (player spotlight, session footage)
-- Weekend: Pickup culture content (character types, unwritten rules)
+**Content approach:** Personal and authentic first. Promotional never.
 
-**Weekly anchor content:** Leaderboard update post every Friday ("Who's leading the Purdue rankings this week?")
+**Per-campus launch post format:**
+- Personal story: "I was tired of showing up to [Court] and not knowing if there was a run."
+- What I built: honest description, honest about limitations
+- What's live: "The [School] leaderboard is live — [Name] is currently #1"
+- What I want: "Honest feedback from [School] hoopers"
+
+**Community presence beyond launch:**
+- Data/insight posts 2–3 weeks post-launch: "Ball Up Top has been at [School] for 2 weeks — here's what we learned from the first [X] sessions"
+- Data posts resonate specifically in campus subreddits because they provide insight about the campus community to the campus community
+- Respond personally to every comment within 24 hours of any Ball Up Top post
+
+---
+
+## Content Calendar Template — Campus Launch Month
+
+| Week | Monday | Wednesday | Friday | Weekend |
+|------|--------|-----------|--------|---------|
+| **Pre-launch W-2** | @[school] Instagram created — no posts yet | "Something is coming to [School] courts" teaser | Ambassador archetype card #1 reshared | Build court photography bank |
+| **Pre-launch W-1** | Ambassador archetype card #2 | "Launch in 7 days — Founding Hooper status available" | Ambassador cohort all share archetypes simultaneously | Final seeding push |
+| **Launch W1** | Launch announcement (all channels) | r/[school] launch post | Week 1 leaderboard update (first public leaderboard) | Court Takeover Day |
+| **W2** | Pickup culture TikTok ("every run has these 6 players") | Player spotlight — Ambassador #1 | Week 2 leaderboard update | Archetype reveal video #1 |
+| **W3** | "What archetype are you?" interactive post | Milestone post ("50 players have their archetype at [School]") | Week 3 leaderboard update | Behind the build: "first 3 weeks at [School]" |
+| **W4** | Character type TikTok | Player spotlight — top leaderboard player | Month 1 recap + Season 1 standings | Season 1 halfway point content |
 
 ---
 
 ## Content Production Workflow
 
 **Who creates content:**
-- Founder: Reddit posts, "I built this" content, product transparency posts
-- Ambassadors: Archetype reveal videos, session footage, court check-in stories
-- Community: UGC from players sharing their archetype cards (repost + credit)
+- Founder: Reddit posts, milestone posts, build story content
+- Ambassadors: Archetype reveal TikToks, session footage, court check-in Stories
+- Community (UGC): Players sharing archetype cards, leaderboard screenshots — repost with credit
 
-**Tools needed:**
-- Canva or Figma: Archetype share card templates, leaderboard graphics
+**Tools:**
+- Canva or Figma: Archetype card templates, leaderboard graphics
 - CapCut or native TikTok editor: Short-form video editing
-- iPhone camera: All court photography and video — no need for professional equipment
+- iPhone camera: All court photography and video — no professional equipment needed
 
-**Content approval:** None needed. Authenticity > polish at this stage. Post fast, iterate.
+**Production philosophy:** Authenticity > polish. A shaky 15-second genuine archetype reaction beats a produced 60-second promotional video. Post fast. Iterate based on what performs.
 
-**Repurposing flow:**
+**Repurposing chain:**
 ```
-TikTok video
-    → Repost as Instagram Reel
-    → Clip best 10-second moment for Instagram Story
-    
-Player archetype card (in-app)
-    → Player shares to their story
-    → Ball Up Top reposts to Instagram feed
-    → Use still as a Reddit image post
+TikTok reveal video → Repost as Instagram Reel → Best 10 seconds as Instagram Story
+Leaderboard graphic → Instagram post → Story with poll ("are you on here?") → r/[school] image
+Archetype card → Player shares to their story → Ball Up Top reshares → Feed post
 ```
 
 ---
 
-## Content Performance Metrics
+## Content Metrics
 
-| Metric | Platform | Target (Month 1) | What It Tells You |
-|--------|----------|------------------|-------------------|
-| Archetype card shares | Instagram | 50+ | Identity virality working |
-| TikTok video views | TikTok | 5,000+ on best video | Cultural resonance |
-| App store clicks from social | All | 200+ | Conversion from content |
-| r/purdue post upvotes | Reddit | 50+ | Local community interest |
+| Metric | Platform | Target (Month 1) | Signal |
+|--------|----------|-----------------|--------|
+| Archetype card shares | Instagram | 25+/week | Identity virality working |
+| TikTok views on best video | TikTok | 5,000+ | Cultural resonance |
+| App store clicks from social | All | 200+ | Content converting |
+| r/[school] post upvotes | Reddit | 50+ | Campus community interest |
 | Comments asking "what's the app?" | All | Ongoing | Organic interest signal |
-| Story reshares of archetype cards | Instagram | 20+ per week | Virality loop active |
-
----
-
-## Content Risks and Mitigations
-
-**Risk 1: Content feels promotional / cringe**
-*Mitigation:* Lead with culture, not product. When in doubt, make the player the hero, not the app. "Look at this player's archetype" not "look at our product."
-
-**Risk 2: Ambassador-generated content is low quality**
-*Mitigation:* Provide a simple shot list and 3 example videos. Focus on archetype reveals (which require no skill to film authentically). Don't require high production value — it should look real.
-
-**Risk 3: Not enough players to generate content in Week 1**
-*Mitigation:* Pre-seed with ambassador content during the 2-week pre-launch period. Launch with a leaderboard that already has entries. The content calendar above assumes 10–15 ambassador sessions before public launch.
-
-**Risk 4: Reddit backlash to launch post**
-*Mitigation:* Founder must participate in the Reddit community for 4+ weeks before any product mention. The launch post should be humble, honest about limitations, and explicitly ask for feedback — not just announce. Lead with the problem story, not the product.
+| Leaderboard post reshares | Instagram | 15+/week | Community engagement |
+| UGC archetype posts (not ours) | TikTok/IG | 5+/week | Virality loop active |

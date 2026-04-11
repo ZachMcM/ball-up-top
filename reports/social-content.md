@@ -1,44 +1,64 @@
 # Social Content — Ball Up Top
 
-*Last updated: 2026-04-10*
-*Ready-to-use content pieces. Customize [brackets] with real names, courts, and data.*
+*Last updated: 2026-04-11*
+*Post-pivot. Ready-to-use content pieces. Customize [brackets] with real names, courts, and data.*
 
 ---
 
-## 1. Instagram Launch Post
+## Launch Post — Instagram
 
-**Visual:** Action photo at a real Purdue court — chain net, worn concrete, mid-game. NOT a product screenshot. Optional: overlay the Ball Up Top wordmark in the top corner, minimal.
+**Visual:** Action photo at the target court — real players, real court, no product screenshots. Optional: Ball Up Top wordmark in the top corner, minimal.
 
 **Caption:**
 
 ---
 
-You show up to the court and nobody's there.
+You've been playing at [Court Name] all semester.
 
-You text 5 people. Nobody responds. You drive back home.
+You know who the good players are. You know who can't guard you. You know who runs this court.
 
-We've all been there.
+Now there's a way to prove it.
 
-Ball Up Top just launched at Purdue. Check in at the court, play your run, and rate every player you went up against. Your skill rating and player archetype update after every session.
+Ball Up Top is live at [School]. Check in at [Court], play your run, and rate every player you went up against. Your skill rating and player archetype update in real time — based on real games, rated by real opponents.
 
-Real ratings. Real competition. Earned.
+The [School] leaderboard is live.
 
-Download link in bio. Founding Player status goes to the first 50 to check in — that's a permanent badge on your profile. After 50 it's gone.
+Come see where you rank. Link in bio.
 
-Come get your rating.
+First 50 players to check in get Founding Hooper status — permanent badge on your profile, never available after this.
 
 ---
 
 **Hashtags (first comment):**
-#BallUpTop #PurdueBasketball #PickupBasketball #Purdue #Hooper #PurdueBoilermakers #StreetBall #HoopDreams #BasketballLife #CourtLife #PickupBall
+#BallUpTop #[School]Basketball #PickupBasketball #Hooper #[School] #CourtLife #StreetBall #Basketball #RealRatings
 
 ---
 
-## 2. Instagram Caption Templates — Ambassador Archetype Cards
+## Weekly Leaderboard Post — Instagram
 
-*(Use these when reposting a player's archetype card to the Ball Up Top Instagram. Fill in the [brackets].)*
+**Visual:** Clean dark graphic. "[School] Rankings — Week [N]" as header. Top 5 players listed with archetype and overall rating. Ball Up Top logo bottom right.
 
-### Template A — Reputation Angle
+**Caption:**
+
+---
+
+Week [N] at [Court Name].
+
+[#1 Player] — [Archetype] — [Overall] overall
+[#2 Player] — [Archetype] — [Overall] overall
+[#3 Player] — [Archetype] — [Overall] overall
+[#4 Player] — [Archetype] — [Overall] overall
+[#5 Player] — [Archetype] — [Overall] overall
+
+Rankings update with every session. Who's climbing next week?
+
+Ball Up Top — [School] is live. Check in. Get rated.
+
+---
+
+## Ambassador Archetype Card Repost — Instagram
+
+**Template A — Reputation angle:**
 
 ---
 
@@ -46,247 +66,245 @@ Come get your rating.
 
 The algorithm noticed.
 
-[ARCHETYPE NAME] — [Overall Rating] overall.
-[Skill 1]: [Score] | [Skill 2]: [Score] | [Skill 3]: [Score] | [Skill 4]: [Score]
+[ARCHETYPE NAME] — [Overall] overall
+Shooting: [Score] | Finishing: [Score] | Playmaking: [Score] | Defense: [Score]
 
-Get yours. Link in bio.
-
----
-
-### Template B — Identity Angle
-
----
-
-Not self-reported. Not made up.
-
-Earned in real games, rated by real opponents.
-
-[ARCHETYPE NAME].
-
-[Player first name] checked in [X] times at [Court Name]. This is what the court said back.
+Not self-reported. Earned in real games, rated by real opponents.
 
 What's your archetype? Link in bio.
 
 ---
 
-## 3. TikTok Script — Archetype Reveal Video
-
-**Format:** Player on court or at home, phone in hand. Raw, casual. Shot portrait/vertical. 20–30 seconds.
-
-**Shot list:**
-- Open: Player's face / hands holding phone. Natural lighting.
-- Middle: Screen recording or phone tilted toward camera showing the archetype card.
-- End: Player reaction — surprise, nod, laughter. Real.
+**Template B — Community angle:**
 
 ---
 
-**Script / Spoken audio:**
+[School] has its first [Archetype Name].
 
-> [Open — player talks to camera, casual]
-> "Aight so I just finished my run at [court name] and checked out on Ball Up Top for the first time..."
->
-> [Pause — looks at phone]
->
-> "...bro. [Archetype Name]."
->
-> [Shows screen to camera — archetype card visible]
->
-> "[Reading stats] [Overall] overall, [Shooting] shooting, [Finishing] finishing, [Playmaking] playmaking, [Defense] defense."
->
-> [Looks back at camera]
->
-> "That's... actually me though. That's actually me."
->
-> [Optional tag someone / call out]
-> "[Friend's name], you need to get your rating. What are you scared of?"
+[Player first name] — [Overall] overall — checked in [X] times at [Court Name]. This is what the court said back.
 
-**On-screen text overlay (CapCut):**
-- Opening: "found out my basketball archetype 👀"
-- On archetype reveal: "[ARCHETYPE NAME]" in large bold text
-- End CTA: "balluptop.com — get your rating"
+The [School] leaderboard is live. Where do you rank? Link in bio.
+
+---
+
+## Season Championship Post — Instagram
+
+**Visual:** Full-bleed court photo with overlay. Large text: "[School] SEASON 1 CHAMPION." Player name, archetype, overall rating. Ball Up Top logo.
 
 **Caption:**
-> not gonna lie this is accurate 😭 what's your archetype? #BallUpTop #PickupBasketball #BasketballArchetype #Hooper #StreetBall #fyp #basketball
 
 ---
 
-## 4. TikTok Script — "Types of Players at Every Pickup Run"
+[School] Basketball — Season 1 is over.
 
-**Format:** Talking head or voiceover with on-screen text labels. 45–60 seconds. Comedic, fast-paced. No product pitch until the very end — earn it.
+After [X] sessions, [X] ratings, and [X] players on the leaderboard, one player came out on top.
 
-**Shot list:**
-- Straight-to-camera or court background
-- Each "type" gets a text card + 3–5 second bit
+[Champion Name]. [Archetype]. [Overall] overall.
+
+[Championship quote from player if available: "________________________________"]
+
+Season 2 starts [date]. The leaderboard resets. New race begins.
+
+Ball Up Top — [School] — Season 2 coming [date].
 
 ---
 
-**Script:**
+## Founding Hooper Story Countdown — Instagram Stories
 
-> [Fast cut, energetic]
->
-> "Every pickup run has the same 6 players. Every single time."
->
-> [Cut 1 — text on screen: "The guy who calls every foul"]
-> "You breathe on him and it's a foul. Didn't even touch him. 'That's a reach, that's a reach.'"
->
-> [Cut 2 — text: "The guy who only shoots threes"]
-> "Hasn't driven to the basket once in his life. ISO three. Miss. ISO three. Miss. 'Kick it out, kick it out.'"
->
-> [Cut 3 — text: "The big who refuses to post up"]
-> "6'5", 230 pounds. Wants to dribble-drive from the elbow. Put your back to the basket, bro."
->
-> [Cut 4 — text: "The guy who's been 'almost NBA' since 2015"]
-> "You hear about his highlight against [local school] every single run. Every. Run."
->
-> [Cut 5 — text: "The silent assassin"]
-> "Doesn't say a word. Doesn't argue calls. Just scores 18 points and walks off."
->
-> [Cut 6 — text: "The guy who needs to get on Ball Up Top"]
-> "Thinks he's a 90 overall. His opponents would give him a 71. Download the app. Find out the truth."
->
-> [Hold to camera — slight smirk]
-> "Ball Up Top. Real ratings from real opponents. Link in bio."
+**Story 1 (Launch morning):**
+```
+[Court photo]
+[Large text overlay:]
+BALL UP TOP
+IS LIVE AT [SCHOOL]
+[Smaller text:] Check in. Get rated. See where you rank.
+[CTA sticker:] Link in bio →
+```
 
-**On-screen text overlays:**
-- Each type name as a bold label
-- Final frame: "Ball Up Top — get your rating"
+**Story 2 (Mid-day):**
+```
+[Dark background]
+FOUNDING HOOPER STATUS
+[Counter graphic: "38 of 50 remaining"]
+First 50 players to check in get a permanent badge.
+After that — it's gone.
+[CTA: Tap to download →]
+```
+
+**Story 3 (Evening):**
+```
+[Dark background]
+[N] players already checked in today.
+[Court Name] leaderboard is filling up.
+[Poll sticker:] "You pulling up?" YES / TOMORROW
+```
+
+---
+
+## TikTok Script — First Archetype Reveal
+
+**Format:** Player at court or home, phone in hand. Portrait/vertical. 20–30 seconds. No script — just prompts.
+
+**Shot prompts (give to player, don't direct word-for-word):**
+1. "Open the app, check out from your session, show the archetype screen coming up"
+2. "Read your archetype out loud when you see it — we want your genuine reaction"
+3. "Tell us if it's accurate or not, and tag someone who needs to get theirs"
+
+**On-screen text overlays (CapCut):**
+- Opening: "i just got my basketball archetype 👀" or "ball up top gave me my rating..."
+- On archetype name: "[ARCHETYPE NAME]" in large bold text
+- End: "what's yours? @balluptop"
+
+**Caption template:**
+> not gonna lie... [accurate/inaccurate] 😭 what's your archetype? #BallUpTop #PickupBasketball #Hooper #basketball #fyp
+
+---
+
+## TikTok Script — "Types of Players at Every Pickup Run"
+
+**Format:** Talking head or voiceover, fast cuts, on-screen text labels. 45–60 seconds. Earn the product mention at the end.
+
+---
+
+"Every pickup run has the same 6 players. Every single time."
+
+**[CUT 1 — text: "The guy who calls every foul"]**
+"You breathe on him and it's a foul. Didn't touch him. 'That's a reach, that's a reach.'"
+
+**[CUT 2 — text: "The guy who only shoots threes"]**
+"Hasn't driven to the basket once. ISO three. Miss. ISO three. Miss. 'Kick it out, kick it out.'"
+
+**[CUT 3 — text: "The big who refuses to post up"]**
+"6'4", 230 pounds. Wants to dribble-drive from the elbow. Post your back, bro."
+
+**[CUT 4 — text: "The guy who's been 'almost went D1' since 2018"]**
+"You hear about it every single run. Every. Run."
+
+**[CUT 5 — text: "The silent assassin"]**
+"Doesn't say a word. Just scores 20 and walks off."
+
+**[CUT 6 — text: "The guy who needs his rating"]**
+"Thinks he's a 90 overall. His opponents would give him a 71. Ball Up Top — download it. Find out the truth."
+
+**[Hold to camera, slight smirk]**
+"Ball Up Top. Real ratings from real opponents. Link in bio."
 
 **Caption:**
-> every run has ALL of these 😭 which one are you? #PickupBasketball #Hooper #Basketball #Relatable #StreetBall #BallUpTop #fyp
+> every run has ALL of these 💀 which one are you? #PickupBasketball #Hooper #Basketball #BallUpTop #fyp
 
 ---
 
-## 5. Reddit Launch Post — r/purdue
+## TikTok Script — Cross-Campus Rivalry
 
-**Title:** Built an app for pickup basketball at Purdue — come get your rating at the CoRec
+**Format:** Split-screen graphic or voiceover. 30 seconds. Post when two campuses are active.
 
 ---
+
+"[School A]'s #1 pickup basketball player vs. [School B]'s #1."
+
+"[Player A] — [Archetype] — [Overall] overall at [Court A]."
+"[Player B] — [Archetype] — [Overall] overall at [Court B]."
+
+"Same position. Same archetype. Different schools."
+
+"Who wins?"
+
+"Ball Up Top — real ratings at [School A] and [School B]. Who's got the better campus?"
+
+**Caption:**
+> settle the debate. who wins? [School A] or [School B] — comment below 👇 #BallUpTop #[School A] #[School B] #PickupBasketball
+
+---
+
+## r/[school] Launch Post
+
+**Title:** Built an app for pickup basketball at [School] — the [Court Name] leaderboard is now live
 
 **Body:**
 
-Hey Purdue —
+Hey [School] —
 
-I've been working on something for the last several months and it's finally live on campus.
+I've been working on this for a while and it's finally live on campus.
 
-**The problem I was trying to solve:** You show up to the CoRec or an outdoor court and you have no idea if there's a run happening. You either drive there and hope, or you text a bunch of people and wait. There's no real-time signal.
-
-The other problem: pickup basketball has no way to track your skills or build a reputation beyond the people who've personally seen you play.
+**The problem:** You show up to [Court Name] and you have no idea if there's a run happening. You either drive there and hope, or you text 5 people and wait. And there's no way to build a rep as a player outside of people who've personally seen you play.
 
 **What Ball Up Top does:**
 
-- Shows you which courts near you have players checked in right now (GPS-based, within 100 meters to check in — can't fake it from your couch)
-- After your session, you rate everyone you played against across 4 skill dimensions: shooting, finishing, playmaking, defense
-- The algorithm combines all your ratings into an overall score (45–99) and generates your player archetype — things like "3 & D Wing," "Playmaking Shot Creator," "Paint Beast," etc.
-- Court leaderboards show the top-rated players at each court over the last 30 days
+- Shows you who's checked in at [Court Name] right now (GPS-based — you have to be within 100 meters to check in, can't fake it from your car)
+- After your session, you rate the players you played against on 4 dimensions: shooting, finishing, playmaking, defense
+- The algorithm combines your ratings into an overall score (45–99) and gives you a player archetype — 3 & D Wing, Paint Beast, Playmaking Shot Creator, etc. — based on how you actually play
+- Court leaderboard shows the top-rated players at [Court Name] over the last 30 days
 
-The rating system is weighted — your rater's skill level, how long you actually played together, and how competitive the run was all factor in. So it's not just your boys inflating your score.
+The rating isn't just your friends rating you high — rater credibility, session overlap, and run competitiveness all factor in. It's more resistant to gaming than a simple average.
 
-**Right now:** We're just starting at Purdue. A handful of players have already checked in and gotten their archetypes. The leaderboards are young but real.
-
-Founding Player status (permanent badge on your profile, never available after this) goes to the first 50 players to complete their first session.
+**Right now at [School]:** [X] players are already on the leaderboard. [Name] is currently #1. The Founding Hooper badge (permanent, only available right now) goes to the first 50 to check in.
 
 App is free. iOS and Android.
 
-Happy to answer any questions — this is my project and I want honest feedback from actual Purdue hoopers about what works and what doesn't.
+I want honest feedback from actual [School] hoopers — what's broken, what's confusing, what's missing.
 
 Download: [link]
 
 ---
 
-**Anticipated comments and responses:**
+**Prepared response to common comments:**
 
-*"What if no one else uses it at my court?"*
-→ Fair concern — that's the cold start problem every app like this faces. That's why we're starting at 2–3 courts on campus instead of trying to cover everything at once. A few active users at the same courts is all it takes to start getting useful data.
+*"What if no one else at my court uses it?"*
+> Fair — that's the cold-start problem every app like this faces. We solved it by pre-seeding the court with committed players before launch. There's already a live leaderboard at [Court]. Day 1 isn't empty.
 
-*"What stops people from rating each other high to boost scores?"*
-→ The algorithm weights ratings by how long you actually played together and how skilled the rater is. Extreme outlier ratings get penalized. It's not perfect, but it's not naive either.
+*"What stops people from rating each other high?"*
+> Rater credibility weighting, overlap requirements, and outlier detection all dampen inflation. Not perfect, but meaningfully more resistant than a simple average.
 
 *"Is this tracking my location all the time?"*
-→ No. Location is only used when you tap to check in. No background tracking.
+> No. Location is only used when you tap to check in. No background tracking.
 
 ---
 
-## 6. Reddit Launch Post — r/streetball
+## Ambassador DM Template
 
-**Title:** I built an app to solve the empty court problem — real-time check-in + peer skill ratings for pickup ball. Here's what I learned.
-
----
-
-**Body:**
-
-I've been playing pickup basketball for a long time and the two problems that never went away were:
-
-1. You never know if there's a run until you actually drive there
-2. There's no way to build a reputation or track your skills outside of people who've personally seen you play
-
-I spent the last several months building Ball Up Top to try to fix both.
-
-**How it works:**
-
-You check in at a court (GPS-verified, within 100 meters — can't check in from your car). Play your run. When you check out, you see every player you overlapped with for 2+ minutes. You rate them across shooting, finishing, playmaking, and defense on a 45–99 scale.
-
-The ratings combine into an overall and generate a player archetype — there are 40+ types based on your skill profile and position (guard/wing/big from your height). Things like "3 & D Wing," "Slasher," "Stretch 5," "Elite Playmaker," etc.
-
-**On the rating algorithm:**
-
-This was the hardest part to get right. The obvious failure mode is people rating their friends high. So the system weights each rating by:
-- How long the rater and ratee actually played together (overlap weight)
-- The rater's own skill level (higher-rated players' ratings count more)
-- How competitive the run was (average skill of everyone in the session)
-- Outlier detection (if someone rates you 40 points away from your current skill, the weight is cut in half)
-
-It's not perfect but it's a lot more resistant to gaming than a simple average.
-
-**What we're doing:**
-
-We just launched at Purdue University as our first campus. The plan is to prove the model there and then expand to other campuses and eventually urban courts.
-
-**Honest limitations right now:**
-- It only works if enough people at your court use it (cold start problem — we're seeding courts manually)
-- Court data depends on Google Places + user submissions
-- iOS and Android, but the app is new so there will be bugs
-
-App is free. Happy to get feedback from real hoopers who can tell me what's wrong with it.
-
-[link]
+*(Use after watching a player at the target court. Instagram DM or in-person.)*
 
 ---
 
-*Edit: To everyone asking about the rating system math — happy to go deeper on the algorithm in comments if there's interest.*
+"Hey [Name] — I saw you play at [Court] [recently / last week]. You've got a legit game.
+
+I'm building Ball Up Top for pickup basketball at [School]. Real-time court activity + a skill rating system that generates a player archetype based on how people rate you after real games.
+
+I'm looking for a small group of the best players at [School] to be founding players before we go wide. Your rating and archetype would be some of the first on the [School] leaderboard.
+
+You in? Takes one session to get your first rating — I can show you the whole thing."
 
 ---
 
-## Bonus: DM Template for Ambassador Recruitment
+## "Court Is Live" Story Template
 
-*(Use when reaching out to players in person or via Instagram DM after seeing their game at a court)*
+*(Post during active ambassador seeding days to create FOMO and announce court activity.)*
 
----
-
-**Subject / opener:**
-
-> "Hey [Name] — I saw you play at [Court] [last week / recently]. You've got a legit game.
->
-> I'm building an app called Ball Up Top for pickup basketball. Real-time court activity + a skill rating system that generates a player archetype based on how you actually play.
->
-> I'm looking for a small group of the best players at Purdue to be founding users before we go wide. Your rating and archetype would be some of the first at [Court].
->
-> Takes 10 minutes — check in at your next run and I'll show you the whole thing. Interested?"
-
----
-
-## Bonus: Story Template — "Court Is Live" Notification
-
-*(Post to Instagram Stories during active ambassador seeding days to create FOMO)*
-
-**Visual:** Screenshot of court in app showing active player count (e.g., "8 players checked in")
+**Visual:** App screenshot showing active player count at the court.
 
 **Text overlay:**
-> "[Court Name]
-> RIGHT NOW
-> 8 players checked in
->
-> are you there?
->
-> Ball Up Top 🏀"
+```
+[Court Name]
+RIGHT NOW
+[N] players checked in
+are you there?
+Ball Up Top 🏀
+```
 
-**Sticker:** Location tag for the court. Poll sticker: "You pulling up? YES / ON MY WAY"
+**Sticker:** Location tag for the court. Poll: "You pulling up? YES / ON MY WAY"
+
+---
+
+## Milestone Post Templates
+
+**First 50 check-ins:**
+> "50 founding players at [School]. That's it — Founding Hooper status is closed. The leaderboard is yours now. Keep climbing."
+
+**First 100 ratings:**
+> "100 ratings submitted at [School]. The [Court Name] community has spoken. The leaderboard is starting to mean something."
+
+**First archetype change:**
+> "[Player Name] was a Slasher. Three sessions later, [Player Name] is a Playmaking Shot Creator. The algorithm noticed. Keep playing."
+
+**First season championship:**
+> "[School] Season 1 is over. [Player Name] ran this campus. Season 2 starts [date] — the leaderboard resets. New race."
