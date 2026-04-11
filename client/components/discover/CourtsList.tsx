@@ -81,12 +81,13 @@ export function CourtsList({
             No courts found nearby. Try a different search or adding a new court.
           </EmptyDescription>
         </EmptyHeader>
-        <EmptyContent>
+        {/* Disabled */}
+        {/* <EmptyContent>
           <Button onPress={() => router.navigate('/add-court')}>
             <Text>Add Court</Text>
             <Icon size={16} className="text-primary-foreground" as={PlusCircle} />
           </Button>
-        </EmptyContent>
+        </EmptyContent> */}
       </Empty>
     );
   }
@@ -98,14 +99,6 @@ export function CourtsList({
       showsVerticalScrollIndicator={false}
       renderItem={({ item }) => <CourtCard court={item} />}
       keyExtractor={(item) => item.id.toString()}
-      ListFooterComponent={
-        <Alert icon={Info} className="mt-2">
-          <AlertTitle>More Courts Coming Soon</AlertTitle>
-          <AlertDescription>
-            We're constantly adding new courts. Check back soon for more options near you.
-          </AlertDescription>
-        </Alert>
-      }
     />
   );
 }
