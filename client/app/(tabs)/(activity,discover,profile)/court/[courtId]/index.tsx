@@ -199,13 +199,14 @@ export default function CourtPage() {
                   as={BellIcon}
                 />
               </Pressable>
-              <Pressable onPress={toggleBookmark}>
+              {/* @deprecated */}
+              {/* <Pressable onPress={toggleBookmark}>
                 <Icon
                   size={22}
                   fill={court?.isBookmarked ? THEME[colorScheme!].primary : undefined}
                   as={BookmarkIcon}
                 />
-              </Pressable>
+              </Pressable> */}
             </View>
           ),
         }}
@@ -240,22 +241,24 @@ export default function CourtPage() {
                     </Text>
                   </View>
                   <View className="flex flex-row items-center gap-1">
-                    {court.popular && (
+                    {/* @deprecated */}
+                    {/* {court.popular && (
                       <Badge variant="secondary">
                         <Icon size={12} as={StarIcon} />
                         <Text>Popular</Text>
                       </Badge>
-                    )}
+                    )} */}
                     <Badge variant="secondary" className="self-start">
                       <Icon size={12} as={court.indoor ? HomeIcon : SunIcon} />
                       <Text>{court.indoor ? 'Indoor' : 'Outdoor'}</Text>
                     </Badge>
-                    {court.verified && (
+                    {/* @deprecated */}
+                    {/* {court.verified && (
                       <Badge variant="secondary">
                         <Icon size={12} as={VerifiedIcon} />
                         <Text>Verified</Text>
                       </Badge>
-                    )}
+                    )} */}
                   </View>
                 </View>
                 <View className="flex w-full flex-1 flex-row items-center gap-2">

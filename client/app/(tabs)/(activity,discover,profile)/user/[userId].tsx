@@ -96,11 +96,6 @@ export default function ProfilePage() {
                       <Text className="font-semibold text-muted-foreground">
                         {user.height} • {user.archetype}
                       </Text>
-                      {user.isFoundingUser && (
-                        <Badge variant="secondary" className="self-start">
-                          <Text>Founding Member</Text>
-                        </Badge>
-                      )}
                     </View>
                   </View>
                   <View className="flex flex-col items-center">

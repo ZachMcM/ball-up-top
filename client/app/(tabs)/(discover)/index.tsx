@@ -19,8 +19,9 @@ export default function DiscoverPage() {
   // Courts filter state
   const [courtsFilters, setCourtsFilters] = useState<{
     isIndoor?: boolean;
-    isBookmarked?: true;
-    isPopular?: true;
+    // @deprecated
+    // isBookmarked?: true;
+    // isPopular?: true;
     sortBy?: 'distance' | 'active_players';
   }>({});
 
@@ -36,8 +37,9 @@ export default function DiscoverPage() {
     if (activeTab === 'courts') {
       let count = 0;
       if (courtsFilters.isIndoor !== undefined) count++;
-      if (courtsFilters.isBookmarked) count++;
-      if (courtsFilters.isPopular) count++;
+      // @deprecated
+      // if (courtsFilters.isBookmarked) count++;
+      // if (courtsFilters.isPopular) count++;
       if (courtsFilters.sortBy) count++;
       return count;
     } else {

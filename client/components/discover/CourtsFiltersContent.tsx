@@ -7,15 +7,22 @@ import { Pressable, View } from 'react-native';
 interface CourtsFiltersContentProps {
   filters: {
     isIndoor?: boolean;
-    isBookmarked?: true;
-    isPopular?: true;
+    // @deprecated
+    // isBookmarked?: true;
+    // isPopular?: true;
     sortBy?: 'distance' | 'active_players';
   };
   onChange: (filters: CourtsFiltersContentProps['filters']) => void;
 }
 
 export function CourtsFiltersContent({ filters, onChange }: CourtsFiltersContentProps) {
-  const { isIndoor, isBookmarked, isPopular, sortBy } = filters;
+  const {
+    isIndoor,
+    // @deprecated
+    // isBookmarked,
+    // isPopular,
+    sortBy,
+  } = filters;
 
   return (
     <>
@@ -48,7 +55,8 @@ export function CourtsFiltersContent({ filters, onChange }: CourtsFiltersContent
           </Button>
         </View>
       </View>
-      <View className="flex flex-col gap-2 border-b border-border px-4 py-5">
+      {/* @deprecated */}
+      {/* <View className="flex flex-col gap-2 border-b border-border px-4 py-5">
         <Text className="text-lg font-bold">Filters</Text>
         <Pressable
           onPress={() =>
@@ -82,7 +90,7 @@ export function CourtsFiltersContent({ filters, onChange }: CourtsFiltersContent
             {isBookmarked && <Icon as={CheckIcon} size={16} className="text-primary-foreground" />}
           </View>
         </Pressable>
-      </View>
+      </View> */}
       <View className="flex flex-col gap-2 px-4 py-5">
         <Text className="text-lg font-bold">Sort</Text>
         <Pressable

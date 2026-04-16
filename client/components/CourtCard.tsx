@@ -61,22 +61,24 @@ export default function CourtCard({ court }: { court: CourtListEntry }) {
           </View>
         </View>
         <View className="flex flex-row items-center gap-1">
-          {court.popular && (
+          {/* @deprecated */}
+          {/* {court.popular && (
             <Badge variant="secondary">
               <Icon size={12} as={StarIcon} />
               <Text>Popular</Text>
             </Badge>
-          )}
+          )} */}
           <Badge variant="secondary">
             <Icon size={12} as={court.indoor ? HomeIcon : SunIcon} />
             <Text>{court.indoor ? 'Indoor' : 'Outdoor'}</Text>
           </Badge>
-          {court.verified && (
+          {/* @deprecated */}
+          {/* {court.verified && (
             <Badge variant="secondary">
               <Icon size={12} as={VerifiedIcon} />
               <Text>Verified</Text>
             </Badge>
-          )}
+          )} */}
         </View>
       </Card>
     </Link>

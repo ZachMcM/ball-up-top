@@ -81,7 +81,7 @@ export function CourtsList({
             No courts found nearby. Try a different search or adding a new court.
           </EmptyDescription>
         </EmptyHeader>
-        {/* Disabled */}
+        {/* @deprecated */}
         {/* <EmptyContent>
           <Button onPress={() => router.navigate('/add-court')}>
             <Text>Add Court</Text>
