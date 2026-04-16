@@ -5,7 +5,7 @@ import { THEME } from '@/lib/theme';
 import { BottomTabBar, BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useQuery } from '@tanstack/react-query';
 import { Tabs, usePathname, useRouter } from 'expo-router';
-import { Activity, Search, User } from 'lucide-react-native';
+import { Activity, Home, Search, User } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { useEffect, useRef } from 'react';
 import { View } from 'react-native';
@@ -74,11 +74,11 @@ export default function TabsLayout() {
   return (
     <Tabs tabBar={(props) => <CustomTabBar {...props} />}>
       <Tabs.Screen
-        name="(discover)"
+        name="(home)"
         options={{
           headerShown: false,
-          title: 'Discover',
-          tabBarIcon: ({ color }) => <Icon as={Search} size={18} color={color} />,
+          title: 'Home',
+          tabBarIcon: ({ color }) => <Icon as={Home} size={18} color={color} />,
         }}
       />
       <Tabs.Screen

@@ -1,6 +1,6 @@
 import { useSegments } from 'expo-router';
 
-export type TabContext = 'activity' | 'discover' | 'profile';
+export type TabContext = 'activity' | 'home' | 'profile';
 
 /**
  * Returns the current tab context based on the route segments.
@@ -8,11 +8,10 @@ export type TabContext = 'activity' | 'discover' | 'profile';
  */
 export function useTabContext(): TabContext {
   const segments = useSegments();
-  // Segments look like: ["(tabs)", "(discover)", "user", "[userId]"]
   for (const segment of segments) {
     if (segment === '(activity)') return 'activity';
-    if (segment === '(discover)') return 'discover';
+    if (segment === '(home)') return 'home';
     if (segment === '(profile)') return 'profile';
   }
-  return 'discover'; // Default fallback
+  return 'home'; // Default fallback
 }

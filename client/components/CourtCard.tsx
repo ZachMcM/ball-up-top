@@ -1,12 +1,12 @@
+import { getCityState } from '@/lib/utils';
 import { CourtListEntry } from '@/types/court';
+import { Image } from 'expo-image';
 import { Link } from 'expo-router';
 import {
   HomeIcon,
   MapPinIcon,
-  StarIcon,
   SunIcon,
-  UsersIcon,
-  VerifiedIcon,
+  UsersIcon
 } from 'lucide-react-native';
 import { View } from 'react-native';
 import { AspectRatio } from './ui/aspect-ratio';
@@ -14,14 +14,12 @@ import { Badge } from './ui/badge';
 import { Card } from './ui/card';
 import { Icon } from './ui/icon';
 import { Text } from './ui/text';
-import { Image } from 'expo-image';
-import { getCityState } from '@/lib/utils';
 
 export default function CourtCard({ court }: { court: CourtListEntry }) {
   return (
     <Link
       href={{
-        pathname: '/(tabs)/(discover)/court/[courtId]',
+        pathname: '/(tabs)/(home)/court/[courtId]',
         params: {
           courtId: court.id,
         },

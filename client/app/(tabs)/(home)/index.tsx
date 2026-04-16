@@ -1,17 +1,17 @@
-import { CourtsList } from '@/components/discover/CourtsList';
-import { DiscoverFilters } from '@/components/discover/DiscoverFilters';
-import { PlayersList } from '@/components/discover/PlayersList';
+import { CourtsList } from '@/components/home/CourtsList';
+import { HomeFilters } from '@/components/home/HomeFilters';
+import { PlayersList } from '@/components/home/PlayersList';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { SlidersHorizontal } from 'lucide-react-native';
+import { Home, SlidersHorizontal } from 'lucide-react-native';
 import { useMemo, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 
-export default function DiscoverPage() {
+export default function HomePage() {
   const [activeTab, setActiveTab] = useState<'courts' | 'players'>('courts');
   const [searchQuery, setSearchQuery] = useState<string | undefined>(undefined);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -98,7 +98,7 @@ export default function DiscoverPage() {
           )}
         </View>
       </KeyboardAvoidingView>
-      <DiscoverFilters
+      <HomeFilters
         activeTab={activeTab as 'courts' | 'players'}
         bottomSheetRef={bottomSheetModalRef}
         courtsFilters={courtsFilters}

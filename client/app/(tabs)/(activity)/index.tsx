@@ -119,7 +119,7 @@ export default function ActivityPage() {
                 </EmptyDescription>
               </EmptyHeader>
               <EmptyContent>
-                <Button onPress={() => router.navigate('/(tabs)/(discover)')} size="sm">
+                <Button onPress={() => router.navigate('/(tabs)/(home)')} size="sm">
                   <Text>View Courts</Text>
                 </Button>
               </EmptyContent>

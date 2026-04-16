@@ -1,4 +1,4 @@
-import { AddCourtSchema } from '@/app/(tabs)/(discover)/add-court';
+import { AddCourtSchema } from '@/app/(tabs)/(home)/add-court';
 import { Activity } from '@/types/activity';
 import { Court, CourtListEntry, CourtSession, Place } from '@/types/court';
 import { EncounteredPlayer } from '@/types/encounteredPlayer';
