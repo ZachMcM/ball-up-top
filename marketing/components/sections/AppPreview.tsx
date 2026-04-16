@@ -1,129 +1,203 @@
-"use client";
-
-import Image from "next/image";
-import { useState } from "react";
 import { Container } from "../ui/Container";
 
-const screenshots = [
+type Archetype = {
+  name: string;
+  position: "Guard" | "Wing" | "Big";
+  overall: number;
+  skills: { label: string; val: number }[];
+  description: string;
+};
+
+const archetypes: Archetype[] = [
   {
-    id: "discover",
-    title: "Discover Courts",
-    description: "Find courts near you with photos and real-time activity",
-    image: "/screenshots/discover-courts.png",
+    name: "3 & D Guard",
+    position: "Guard",
+    overall: 82,
+    skills: [
+      { label: "SHT", val: 88 },
+      { label: "DEF", val: 85 },
+      { label: "FIN", val: 74 },
+      { label: "PLY", val: 72 },
+    ],
+    description: "Spot-up shooter who guards the other team's best player. Never wastes a possession.",
   },
   {
-    id: "players",
-    title: "Find Players",
-    description: "Browse player profiles and see who's hooping",
-    image: "/screenshots/discover-players.png",
+    name: "Playmaking Shot Creator",
+    position: "Guard",
+    overall: 86,
+    skills: [
+      { label: "PLY", val: 90 },
+      { label: "SHT", val: 86 },
+      { label: "FIN", val: 81 },
+      { label: "DEF", val: 68 },
+    ],
+    description: "Creates off the dribble, draws defenders, finds the open man. The floor general.",
   },
   {
-    id: "court",
-    title: "Court Details",
-    description: "Check in, get directions, and see court activity",
-    image: "/screenshots/court-detail.png",
+    name: "Two-Way Wing",
+    position: "Wing",
+    overall: 84,
+    skills: [
+      { label: "DEF", val: 85 },
+      { label: "FIN", val: 84 },
+      { label: "SHT", val: 80 },
+      { label: "PLY", val: 78 },
+    ],
+    description: "Versatile on both ends. Matches up across multiple positions. Never a liability.",
   },
   {
-    id: "profile",
-    title: "Your Profile",
-    description: "Track your ratings across all skill categories",
-    image: "/screenshots/profile.png",
+    name: "Slasher",
+    position: "Wing",
+    overall: 80,
+    skills: [
+      { label: "FIN", val: 92 },
+      { label: "PLY", val: 79 },
+      { label: "DEF", val: 74 },
+      { label: "SHT", val: 64 },
+    ],
+    description: "Gets to the rim every single time. Only thing stopping them is the second unit.",
   },
   {
-    id: "activity",
-    title: "Activity Feed",
-    description: "See your game history and achievements",
-    image: "/screenshots/activity.png",
+    name: "Paint Beast",
+    position: "Big",
+    overall: 83,
+    skills: [
+      { label: "FIN", val: 91 },
+      { label: "DEF", val: 88 },
+      { label: "PLY", val: 72 },
+      { label: "SHT", val: 52 },
+    ],
+    description: "Dominant at the rim. Controls the glass. Makes life hard for anyone posting up.",
   },
   {
-    id: "leaderboard",
-    title: "Leaderboards",
-    description: "Compete with players at your local courts",
-    image: "/screenshots/leaderboard.png",
+    name: "Stretch 5",
+    position: "Big",
+    overall: 79,
+    skills: [
+      { label: "SHT", val: 84 },
+      { label: "FIN", val: 82 },
+      { label: "DEF", val: 76 },
+      { label: "PLY", val: 70 },
+    ],
+    description: "Big who can step out and hit threes. Spreads the floor, creates driving lanes.",
   },
 ];
 
-export function AppPreview() {
-  const [activeIndex, setActiveIndex] = useState(0);
+const positionColors: Record<Archetype["position"], string> = {
+  Guard: "text-sky-400 bg-sky-400/10 border-sky-400/25",
+  Wing: "text-accent bg-accent/10 border-accent/25",
+  Big: "text-amber-400 bg-amber-400/10 border-amber-400/25",
+};
+
+const positionBarColors: Record<Archetype["position"], string> = {
+  Guard: "bg-sky-400",
+  Wing: "bg-accent",
+  Big: "bg-amber-400",
+};
+
+function ArchetypeCard({ archetype }: { archetype: Archetype }) {
+  const colorClass = positionColors[archetype.position];
+  const barColor = positionBarColors[archetype.position];
 
   return (
-    <section className="py-20 md:py-32 bg-card/50">
+    <div className="group relative bg-card border border-border rounded-2xl p-5 hover:border-border/60 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/40">
+      {/* Position badge */}
+      <div className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 border text-[10px] font-semibold uppercase tracking-wide mb-4 ${colorClass}`}>
+        <span className="w-1 h-1 rounded-full bg-current" />
+        {archetype.position}
+      </div>
+
+      {/* Name + overall */}
+      <div className="flex items-start justify-between mb-4">
+        <h3 className="font-heading text-[22px] sm:text-[26px] uppercase leading-tight tracking-tight flex-1 mr-3">
+          {archetype.name}
+        </h3>
+        <div className="text-right shrink-0">
+          <p className="font-heading text-[32px] leading-none text-foreground">
+            {archetype.overall}
+          </p>
+          <p className="text-[9px] text-muted-foreground uppercase tracking-widest">overall</p>
+        </div>
+      </div>
+
+      {/* Description */}
+      <p className="text-[13px] text-muted-foreground leading-relaxed mb-5">
+        {archetype.description}
+      </p>
+
+      {/* Skill bars */}
+      <div className="space-y-2">
+        {archetype.skills.map(({ label, val }) => (
+          <div key={label} className="flex items-center gap-2.5">
+            <span className="text-[10px] text-muted-foreground w-6 shrink-0 tracking-wide font-medium">
+              {label}
+            </span>
+            <div className="flex-1 h-[3px] bg-border rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full ${barColor}`}
+                style={{ width: `${(val / 99) * 100}%` }}
+              />
+            </div>
+            <span className="text-[10px] text-muted-foreground w-5 text-right">{val}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function AppPreview() {
+  return (
+    <section className="py-24 md:py-36">
       <Container>
-        <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            See It in Action
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            A clean, intuitive interface designed for hoopers who want to focus on the game.
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-16">
+          <div>
+            <p className="text-sm text-accent font-semibold uppercase tracking-widest mb-4">
+              Player Identity
+            </p>
+            <h2 className="font-heading text-[52px] sm:text-[68px] uppercase leading-[0.9] tracking-tight">
+              What's your<br />archetype?
+            </h2>
+          </div>
+          <p className="text-[16px] text-muted-foreground max-w-sm leading-relaxed lg:text-right">
+            After enough rated sessions, you earn one of 40+ archetypes based
+            on how opponents actually rated you — not what you think you are.
           </p>
         </div>
 
-        {/* Screenshot tabs */}
-        <div className="flex flex-wrap justify-center gap-2 mb-12">
-          {screenshots.map((screen, index) => (
-            <button
-              key={screen.id}
-              onClick={() => setActiveIndex(index)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                activeIndex === index
-                  ? "bg-white text-black"
-                  : "bg-card border border-border text-muted-foreground hover:text-white hover:border-white/20"
-              }`}
-            >
-              {screen.title}
-            </button>
+        {/* Archetype cards grid */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {archetypes.map((archetype) => (
+            <ArchetypeCard key={archetype.name} archetype={archetype} />
           ))}
         </div>
 
-        {/* Phone mockup with active screenshot */}
-        <div className="flex flex-col lg:flex-row items-center gap-12">
-          <div className="flex-1 flex justify-center">
-            <div className="relative w-[280px] sm:w-[300px] h-[580px] sm:h-[620px] bg-card rounded-[3rem] p-2 border border-border shadow-2xl">
-              {/* Screen */}
-              <div className="relative w-full h-full rounded-[2.5rem] overflow-hidden bg-black">
-                {screenshots.map((screen, index) => (
-                  <Image
-                    key={screen.id}
-                    src={screen.image}
-                    alt={screen.title}
-                    fill
-                    className={`object-cover object-top transition-opacity duration-300 ${
-                      activeIndex === index ? "opacity-100" : "opacity-0"
-                    }`}
-                    priority={index === 0}
-                  />
-                ))}
-              </div>
-              {/* Notch */}
-              <div className="absolute top-4 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-full" />
+        {/* Bottom callout */}
+        <div className="mt-12 grid sm:grid-cols-3 gap-5">
+          {[
+            {
+              stat: "40+",
+              label: "Unique archetypes",
+              sub: "Guards, Wings, and Bigs each have their own type system",
+            },
+            {
+              stat: "4",
+              label: "Skill dimensions",
+              sub: "Shooting, Finishing, Playmaking, and Defense rated separately",
+            },
+            {
+              stat: "EMA",
+              label: "Weighted algorithm",
+              sub: "Credibility-weighted ratings resist inflation and gaming",
+            },
+          ].map(({ stat, label, sub }) => (
+            <div key={label} className="bg-card border border-border rounded-2xl p-5">
+              <p className="font-heading text-[42px] text-accent leading-none mb-2">{stat}</p>
+              <p className="font-semibold text-sm mb-1">{label}</p>
+              <p className="text-[13px] text-muted-foreground leading-relaxed">{sub}</p>
             </div>
-          </div>
-
-          {/* Description */}
-          <div className="flex-1 text-center lg:text-left">
-            <h3 className="text-2xl font-bold mb-4">
-              {screenshots[activeIndex].title}
-            </h3>
-            <p className="text-lg text-muted-foreground mb-8">
-              {screenshots[activeIndex].description}
-            </p>
-
-            {/* Navigation dots */}
-            <div className="flex gap-2 justify-center lg:justify-start">
-              {screenshots.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setActiveIndex(index)}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    activeIndex === index
-                      ? "bg-white w-6"
-                      : "bg-muted-foreground/50 hover:bg-muted-foreground"
-                  }`}
-                  aria-label={`View screenshot ${index + 1}`}
-                />
-              ))}
-            </div>
-          </div>
+          ))}
         </div>
       </Container>
     </section>

@@ -1,40 +1,43 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Barlow_Condensed, DM_Sans } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const barlowCondensed = Barlow_Condensed({
+  variable: "--font-heading",
   subsets: ["latin"],
+  weight: ["400", "600", "700", "800", "900"],
+  style: ["normal", "italic"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const dmSans = DM_Sans({
+  variable: "--font-sans",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Ball Up Top - Find Courts, Rate Players, Track Your Game",
+  title: "Ball Up Top — Your Campus's Pickup Basketball Community",
   description:
-    "Discover basketball courts near you, rate players, track your game time, and climb the leaderboards. The ultimate app for hoopers.",
+    "Check in at your school's rec center, get rated by real opponents, earn your player archetype, and see where you rank on the campus leaderboard.",
   keywords: [
-    "basketball",
-    "courts",
+    "college pickup basketball",
+    "campus basketball app",
     "player ratings",
-    "pickup basketball",
-    "hoops",
-    "basketball app",
+    "basketball leaderboard",
+    "basketball archetype",
+    "Purdue basketball",
+    "pickup basketball community",
   ],
   openGraph: {
-    title: "Ball Up Top - Find Courts, Rate Players, Track Your Game",
+    title: "Ball Up Top — Who Runs Your Court?",
     description:
-      "Discover basketball courts near you, rate players, track your game time, and climb the leaderboards.",
+      "The social layer for college pickup basketball. Check in. Get rated. See where you rank on your campus leaderboard.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ball Up Top",
+    title: "Ball Up Top — Who Runs Your Court?",
     description:
-      "Discover basketball courts near you, rate players, track your game time, and climb the leaderboards.",
+      "Check in. Get rated. See who runs your campus court.",
   },
 };
 
@@ -44,8 +47,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${geistSans.variable} ${geistMono.variable} font-sans`}>
+    <html lang="en">
+      <body className={`${barlowCondensed.variable} ${dmSans.variable} font-sans`}>
         {children}
       </body>
     </html>

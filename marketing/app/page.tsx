@@ -2,8 +2,9 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/sections/Hero";
 import { Features } from "@/components/sections/Features";
-import { AppPreview } from "@/components/sections/AppPreview";
 import { HowItWorks } from "@/components/sections/HowItWorks";
+import { AppPreview } from "@/components/sections/AppPreview";
+import { CampusExpansion } from "@/components/sections/CampusExpansion";
 import { DownloadCTA } from "@/components/sections/DownloadCTA";
 
 export default function Home() {
@@ -13,8 +14,9 @@ export default function Home() {
       <main>
         <Hero />
         <Features />
-        <AppPreview />
         <HowItWorks />
+        <AppPreview />
+        <CampusExpansion />
         <DownloadCTA />
       </main>
       <Footer />

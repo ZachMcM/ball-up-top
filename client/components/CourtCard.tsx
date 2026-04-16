@@ -2,18 +2,14 @@ import { getCityState } from '@/lib/utils';
 import { CourtListEntry } from '@/types/court';
 import { Image } from 'expo-image';
 import { Link } from 'expo-router';
-import {
-  HomeIcon,
-  MapPinIcon,
-  SunIcon,
-  UsersIcon
-} from 'lucide-react-native';
+import { HomeIcon, MapPinIcon, SunIcon, UsersIcon } from 'lucide-react-native';
 import { View } from 'react-native';
 import { AspectRatio } from './ui/aspect-ratio';
 import { Badge } from './ui/badge';
-import { Card } from './ui/card';
+import { Card, CardContent, CardFooter } from './ui/card';
 import { Icon } from './ui/icon';
 import { Text } from './ui/text';
+import { Button } from './ui/button';
 
 export default function CourtCard({ court }: { court: CourtListEntry }) {
   return (
@@ -24,8 +20,8 @@ export default function CourtCard({ court }: { court: CourtListEntry }) {
           courtId: court.id,
         },
       }}>
-      <Card className="flex w-full flex-col gap-4 p-4">
-        <AspectRatio ratio={2 / 1} className="relative overflow-hidden rounded-lg">
+      <Card className="flex w-full gap-0 p-0">
+        <AspectRatio ratio={2 / 1} className="relative overflow-hidden rounded-t-lg">
           <Image
             source={{
               uri: court.image,
@@ -34,50 +30,47 @@ export default function CourtCard({ court }: { court: CourtListEntry }) {
             className="absolute inset-0 object-cover"
           />
         </AspectRatio>
-        <View className="flex flex-col gap-2">
-          <View className="flex flex-col gap-1">
-            <View className="flex flex-row items-center justify-between gap-4">
-              <Text className="text-lg font-semibold flex-1">{court.name}</Text>
-              <Text className="font-medium text-muted-foreground">
-                {court.distance.toFixed(1)} mi
-              </Text>
-            </View>
-            <View className="flex flex-row items-center gap-1.5">
-              <Icon as={MapPinIcon} className="text-muted-foreground" size={14} />
-              <Text className="text-sm font-medium text-muted-foreground" numberOfLines={1}>
-                {getCityState(court.address)}
-              </Text>
+        <CardContent className="flex w-full flex-col gap-4 p-4">
+          <View className="flex flex-col gap-2">
+            <View className="flex flex-col gap-1.5">
+              <View className="flex flex-row items-center justify-between gap-4">
+                <Text className="text-lg font-semibold">{court.name}</Text>
+                <Badge variant="secondary">
+                  <Icon size={12} as={court.indoor ? HomeIcon : SunIcon} />
+                  <Text>{court.indoor ? 'Indoor' : 'Outdoor'}</Text>
+                </Badge>
+              </View>
+              <View className="flex flex-row items-center gap-1.5">
+                <Icon as={MapPinIcon} className="text-muted-foreground" size={14} />
+                <Text className="text-sm font-medium text-muted-foreground" numberOfLines={1}>
+                  {getCityState(court.address)} • {court.distance.toFixed(1)} miles
+                </Text>
+              </View>
+              <View className="flex flex-row items-center gap-2">
+                <Icon as={UsersIcon} size={16} className="text-muted-foreground" />
+                <Text className="font-medium text-muted-foreground">
+                  {court.currentActiveSessions === 0
+                    ? 'No active players'
+                    : `${court.currentActiveSessions} Playing Now`}
+                </Text>
+              </View>
             </View>
           </View>
-          <View className="flex flex-row items-center gap-2">
-            <Icon as={UsersIcon} size={16} className="text-muted-foreground" />
-            <Text className="font-medium text-muted-foreground">
-              {court.currentActiveSessions === 0
-                ? 'No active players'
-                : `${court.currentActiveSessions} Playing Now`}
-            </Text>
-          </View>
-        </View>
-        <View className="flex flex-row items-center gap-1">
-          {/* @deprecated */}
-          {/* {court.popular && (
-            <Badge variant="secondary">
-              <Icon size={12} as={StarIcon} />
-              <Text>Popular</Text>
-            </Badge>
-          )} */}
-          <Badge variant="secondary">
-            <Icon size={12} as={court.indoor ? HomeIcon : SunIcon} />
-            <Text>{court.indoor ? 'Indoor' : 'Outdoor'}</Text>
-          </Badge>
-          {/* @deprecated */}
-          {/* {court.verified && (
-            <Badge variant="secondary">
-              <Icon size={12} as={VerifiedIcon} />
-              <Text>Verified</Text>
-            </Badge>
-          )} */}
-        </View>
+        </CardContent>
+        <CardFooter className="rounded-b-lg border-t border-border bg-muted/50 p-4">
+          <Link
+            asChild
+            href={{
+              pathname: '/(tabs)/(home)/court/[courtId]',
+              params: {
+                courtId: court.id,
+              },
+            }}>
+            <Button size="sm" className="w-full">
+              <Text>View Court</Text>
+            </Button>
+          </Link>
+        </CardFooter>
       </Card>
     </Link>
   );

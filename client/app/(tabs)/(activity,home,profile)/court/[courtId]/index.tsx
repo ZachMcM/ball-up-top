@@ -233,33 +233,21 @@ export default function CourtPage() {
                   />
                 </AspectRatio>
                 <View className="flex flex-col gap-4">
-                  <View className="flex flex-1 flex-col gap-1">
+                  <View className="flex flex-1 flex-col gap-1.5">
                     <Text className="flex-1 text-2xl font-bold">{court.name}</Text>
-                    <Text className="font-medium text-muted-foreground">{court.address}</Text>
+                    <Pressable onPress={() => openDirections(court.address)}>
+                      <Text className="text-sm font-medium text-muted-foreground underline">
+                        {court.address}
+                      </Text>
+                    </Pressable>
                     <Text className="font-medium text-muted-foreground">
-                      {court.distance.toFixed(1)} mi
+                      {court.distance.toFixed(1)} miles
                     </Text>
                   </View>
-                  <View className="flex flex-row items-center gap-1">
-                    {/* @deprecated */}
-                    {/* {court.popular && (
-                      <Badge variant="secondary">
-                        <Icon size={12} as={StarIcon} />
-                        <Text>Popular</Text>
-                      </Badge>
-                    )} */}
-                    <Badge variant="secondary" className="self-start">
-                      <Icon size={12} as={court.indoor ? HomeIcon : SunIcon} />
-                      <Text>{court.indoor ? 'Indoor' : 'Outdoor'}</Text>
-                    </Badge>
-                    {/* @deprecated */}
-                    {/* {court.verified && (
-                      <Badge variant="secondary">
-                        <Icon size={12} as={VerifiedIcon} />
-                        <Text>Verified</Text>
-                      </Badge>
-                    )} */}
-                  </View>
+                  <Badge variant="secondary" className="self-start">
+                    <Icon size={12} as={court.indoor ? HomeIcon : SunIcon} />
+                    <Text>{court.indoor ? 'Indoor' : 'Outdoor'}</Text>
+                  </Badge>
                 </View>
                 <View className="flex w-full flex-1 flex-row items-center gap-2">
                   {activeCourtSession && activeCourtSession.courtId == court.id ? (
