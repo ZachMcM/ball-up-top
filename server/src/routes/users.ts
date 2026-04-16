@@ -111,25 +111,26 @@ usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
       .orderBy(desc(courtSession.startTime))
       .limit(5);
 
-    const bookmarkedCourts = await db
-      .select({
-        id: court.id,
-        name: court.name,
-        address: court.address,
-        lat: court.lat,
-        lng: court.lng,
-        indoor: court.indoor,
-        verified: court.verified,
-        image: court.image,
-      })
-      .from(courtBookmark)
-      .innerJoin(court, eq(courtBookmark.courtId, court.id));
+    // @deprecated 
+    // const bookmarkedCourts = await db
+    //   .select({
+    //     id: court.id,
+    //     name: court.name,
+    //     address: court.address,
+    //     lat: court.lat,
+    //     lng: court.lng,
+    //     indoor: court.indoor,
+    //     verified: court.verified,
+    //     image: court.image,
+    //   })
+    //   .from(courtBookmark)
+    //   .innerJoin(court, eq(courtBookmark.courtId, court.id));
 
     res.json({
       ...targetUser,
       ratingHistory,
       recentSessions,
-      bookmarkedCourts,
+      // bookmarkedCourts,
     });
   } catch (error) {
     handleError(error, res, "GET /users/:id");

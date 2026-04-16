@@ -166,7 +166,8 @@ export default function ProfilePage() {
                     <Text className="text-center text-xs font-medium">No ratings data yet.</Text>
                   )}
                 </View>
-                <View className="flex flex-col gap-4 rounded-2xl border border-border p-4">
+                {/* @deprecated */}
+                {/* <View className="flex flex-col gap-4 rounded-2xl border border-border p-4">
                   <Text className="font-heading text-lg font-semibold">Bookmarked Courts</Text>
                   {user.bookmarkedCourts.length > 0 ? (
                     <View className="flex flex-col gap-3">
@@ -203,8 +204,8 @@ export default function ProfilePage() {
                   ) : (
                     <Text className="text-center text-xs font-medium">No sessions yet.</Text>
                   )}
-                </View>
-                <View className="flex flex-col gap-4 rounded-2xl border border-border p-4">
+                </View> */}
+                <View className="flex flex-col gap-4 rounded-2xl border border-border py-3 px-4">
                   <Text className="font-heading text-lg font-semibold">Recent Sessions</Text>
                   {user.recentSessions.length > 0 ? (
                     <View className="flex flex-col gap-3">

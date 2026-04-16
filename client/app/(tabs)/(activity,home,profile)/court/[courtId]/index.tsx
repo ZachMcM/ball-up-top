@@ -236,7 +236,7 @@ export default function CourtPage() {
                   <View className="flex flex-1 flex-col gap-1.5">
                     <Text className="font-heading flex-1 text-2xl font-bold">{court.name}</Text>
                     <Pressable onPress={() => openDirections(court.address)}>
-                      <Text className="text-sm font-medium text-muted-foreground underline">
+                      <Text className="font-medium text-muted-foreground underline">
                         {court.address}
                       </Text>
                     </Pressable>

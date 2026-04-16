@@ -14,12 +14,7 @@ import { Router } from "express";
 import { handleError } from "../utils/handleError";
 import { authMiddleware } from "../utils/middleware";
 import { db } from "../db";
-import {
-  courtSession,
-  encounteredPlayer,
-  rating,
-  user,
-} from "../db/schema";
+import { courtSession, encounteredPlayer, rating, user } from "../db/schema";
 
 import * as z from "zod";
 import { clamp } from "../utils/clamp";
@@ -47,7 +42,7 @@ import {
 } from "../config/ratings";
 import { logger } from "../utils/logger";
 import { invalidateQueries } from "../utils/invalidateQueries";
-import { notificationsQueue } from "../queues/notifications.queue";
+import { notificationsQueue } from "../queues/notificationsQueue";
 
 export const courtSessionsRoute = Router();
 
@@ -80,7 +75,9 @@ courtSessionsRoute.get("/court-sessions", authMiddleware, async (req, res) => {
             ? isNull(courtSession.endTime)
             : isNotNull(courtSession.endTime)
           : undefined,
-        hasRated !== undefined ? eq(courtSession.hasRated, hasRated) : undefined
+        hasRated !== undefined
+          ? eq(courtSession.hasRated, hasRated)
+          : undefined,
       ),
     });
 
@@ -91,7 +88,7 @@ courtSessionsRoute.get("/court-sessions", authMiddleware, async (req, res) => {
 });
 
 async function getEncounteredPlayers(
-  targetCourtSession: InferSelectModel<typeof courtSession>
+  targetCourtSession: InferSelectModel<typeof courtSession>,
 ): Promise<
   {
     overlapWeight: number;
@@ -105,10 +102,10 @@ async function getEncounteredPlayers(
       lt(courtSession.startTime, targetCourtSession.endTime!),
       or(
         isNull(courtSession.endTime),
-        gt(courtSession.endTime, targetCourtSession.startTime)
+        gt(courtSession.endTime, targetCourtSession.startTime),
       ),
       // Protect against lingering sessions from previous days
-      sql`DATE(${courtSession.startTime}) = DATE(${targetCourtSession.startTime})`
+      sql`DATE(${courtSession.startTime}) = DATE(${targetCourtSession.startTime})`,
     ),
     with: {
       user: true,
@@ -127,7 +124,7 @@ async function getEncounteredPlayers(
     const otherEnd = s.endTime ?? now;
 
     const overlapStart = new Date(
-      Math.max(myStart.getTime(), otherStart.getTime())
+      Math.max(myStart.getTime(), otherStart.getTime()),
     );
     const overlapEnd = new Date(Math.min(myEnd.getTime(), otherEnd.getTime()));
 
@@ -140,7 +137,7 @@ async function getEncounteredPlayers(
           overlapWeight: clamp(
             MIN_OVERLAP_WT,
             MAX_OVERLAP_WT,
-            overlapMs / maxOverlapMs
+            overlapMs / maxOverlapMs,
           ),
         });
       }
@@ -153,7 +150,7 @@ async function getEncounteredPlayers(
 function computeExperienceWeight(sessionsPlayed: number, ratingsGiven: number) {
   const base = Math.max(
     sessionsPlayed,
-    Math.floor(ratingsGiven / EST_RATINGS_PER_SESS)
+    Math.floor(ratingsGiven / EST_RATINGS_PER_SESS),
   );
   const raw = MIN_EXPERIENCE_WT + Math.log1p(base) / EXPERIENCE_GROWTH_RT;
   return clamp(MIN_EXPERIENCE_WT, MAX_EXPERIENCE_WT, raw);
@@ -162,7 +159,7 @@ function computeExperienceWeight(sessionsPlayed: number, ratingsGiven: number) {
 function computeOutlierWeight(
   newRaw: number,
   oldRaw: number,
-  lifetimeCount: number
+  lifetimeCount: number,
 ) {
   if (lifetimeCount < MIN_LIFETIME_CT) {
     return 1.0;
@@ -221,15 +218,14 @@ courtSessionsRoute.get(
           .json({ error: "Unauthorized for this court session." });
       }
 
-      const encounteredPlayers = await getEncounteredPlayers(
-        targetCourtSession
-      );
+      const encounteredPlayers =
+        await getEncounteredPlayers(targetCourtSession);
 
       return res.json(encounteredPlayers.map((ep) => ep.user));
     } catch (error) {
       handleError(error, res, "GET /court-sessions/:sessionId/players");
     }
-  }
+  },
 );
 
 courtSessionsRoute.get(
@@ -267,10 +263,10 @@ courtSessionsRoute.get(
       handleError(
         error,
         res,
-        "GET /court-sessions/:sessionId/encountered-players"
+        "GET /court-sessions/:sessionId/encountered-players",
       );
     }
-  }
+  },
 );
 
 const EncounteredPlayerPatchSchema = z.object({
@@ -348,7 +344,7 @@ courtSessionsRoute.patch(
     } catch (error) {
       handleError(error, res, "PATCH /encountered-players/:id");
     }
-  }
+  },
 );
 
 courtSessionsRoute.post(
@@ -425,22 +421,22 @@ courtSessionsRoute.post(
           const owDef = computeOutlierWeight(
             defenseRating,
             ep.rateeDefenseAtTime,
-            ep.rateeLifetimeCount
+            ep.rateeLifetimeCount,
           );
           const owFin = computeOutlierWeight(
             finishingRating,
             ep.rateeFinishingAtTime,
-            ep.rateeLifetimeCount
+            ep.rateeLifetimeCount,
           );
           const owSho = computeOutlierWeight(
             shootingRating,
             ep.rateeShootingAtTime,
-            ep.rateeLifetimeCount
+            ep.rateeLifetimeCount,
           );
           const owPlay = computeOutlierWeight(
             playmakingRating,
             ep.rateePlaymakingAtTime,
-            ep.rateeLifetimeCount
+            ep.rateeLifetimeCount,
           );
 
           // Compute final weights using precomputed combined weight
@@ -469,22 +465,22 @@ courtSessionsRoute.post(
           const newDefense = applyEMA(
             ratee.defenseRating,
             defenseRating,
-            finalWeightDef
+            finalWeightDef,
           );
           const newFinishing = applyEMA(
             ratee.finishingRating,
             finishingRating,
-            finalWeightFin
+            finalWeightFin,
           );
           const newShooting = applyEMA(
             ratee.shootingRating,
             shootingRating,
-            finalWeightSho
+            finalWeightSho,
           );
           const newPlaymaking = applyEMA(
             ratee.playmakingRating,
             playmakingRating,
-            finalWeightPlay
+            finalWeightPlay,
           );
 
           const newOverall =
@@ -495,7 +491,7 @@ courtSessionsRoute.post(
             newPlaymaking,
             newFinishing,
             newShooting,
-            ratee.height!
+            ratee.height!,
           );
 
           await tx
@@ -547,9 +543,7 @@ courtSessionsRoute.post(
           .where(eq(courtSession.id, sessionId));
       });
 
-      invalidateQueries(
-        ["court", targetCourtSession.courtId],
-      );
+      invalidateQueries(["court", targetCourtSession.courtId]);
 
       res.json({ success: true });
 
@@ -563,7 +557,7 @@ courtSessionsRoute.post(
     } catch (error) {
       handleError(error, res, "POST /court-sessions/:sessionId/ratings");
     }
-  }
+  },
 );
 
 courtSessionsRoute.patch(
@@ -580,7 +574,7 @@ courtSessionsRoute.patch(
       const targetCourtSession = await db.query.courtSession.findFirst({
         where: and(
           eq(courtSession.id, sessionId),
-          isNull(courtSession.endTime)
+          isNull(courtSession.endTime),
         ),
       });
 
@@ -605,9 +599,8 @@ courtSessionsRoute.patch(
         .where(eq(courtSession.id, sessionId))
         .returning();
 
-      const encounteredPlayersData = await getEncounteredPlayers(
-        updatedCourtSession
-      );
+      const encounteredPlayersData =
+        await getEncounteredPlayers(updatedCourtSession);
 
       // bypass rating if no encountered players
       if (encounteredPlayersData.length === 0) {
@@ -644,21 +637,21 @@ courtSessionsRoute.patch(
           RUN_COMP_MAX_WT,
           encounteredPlayersData.reduce(
             (accum, curr) => accum + curr.user.overall,
-            0
+            0,
           ) /
             encounteredPlayersData.length /
-            100
+            100,
         );
 
         const raterWeight = clamp(
           RATER_MIN_WT,
           RATER_MAX_WT,
-          rater.overall / 100
+          rater.overall / 100,
         );
 
         const experienceWeight = computeExperienceWeight(
           rater.courtSessions.length,
-          rater.outgoingRatings.length
+          rater.outgoingRatings.length,
         );
 
         // Create encountered_player rows with precomputed data
@@ -678,7 +671,7 @@ courtSessionsRoute.patch(
               experienceWeight *
               runCompetitiveness *
               ep.overlapWeight,
-            WEIGHT_E
+            WEIGHT_E,
           );
 
           await db.insert(encounteredPlayer).values({
@@ -715,10 +708,7 @@ courtSessionsRoute.patch(
         }
       }
 
-      invalidateQueries(
-        ["courts"],
-        ["court", targetCourtSession.courtId],
-      );
+      invalidateQueries(["courts"], ["court", targetCourtSession.courtId]);
 
       res.json({ success: true });
 
@@ -731,5 +721,5 @@ courtSessionsRoute.patch(
     } catch (error) {
       handleError(error, res, "PATCH /court-sessions/:sessionId");
     }
-  }
+  },
 );

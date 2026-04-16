@@ -1,12 +1,25 @@
 import { Worker, Job } from "bullmq";
 import { eq, inArray, isNull, sql } from "drizzle-orm";
 import { redisConnection } from "../queues";
-import { NotificationJobData } from "../queues/notifications.queue";
+import { NotificationJobData } from "../queues/notificationsQueue";
 import { db } from "../db";
-import { activity, court, courtSession, notificationCourt, rating, user } from "../db/schema";
-import { sendPushNotification, sendPushNotifications } from "../utils/pushNotifications";
+import {
+  activity,
+  court,
+  courtSession,
+  notificationCourt,
+  rating,
+  user,
+} from "../db/schema";
+import {
+  sendPushNotification,
+  sendPushNotifications,
+} from "../utils/pushNotifications";
 import { logger } from "../utils/logger";
-import { invalidateQueriesForUser, invalidateQueriesForUsers } from "../utils/invalidateQueries";
+import {
+  invalidateQueriesForUser,
+  invalidateQueriesForUsers,
+} from "../utils/invalidateQueries";
 import { COURT_NOTI_THRESHOLD } from "../config/courts";
 
 async function processNotificationJob(job: Job<NotificationJobData>) {
@@ -50,7 +63,11 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
 
         // Send push notification for rating received
         const avgRating = Math.round(
-          (defenseRating + playmakingRating + shootingRating + finishingRating) / 4
+          (defenseRating +
+            playmakingRating +
+            shootingRating +
+            finishingRating) /
+            4,
         );
         await sendPushNotification({
           userId,
@@ -112,7 +129,7 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
         .where(
           sql`${courtSession.courtId} = ${data.courtId}
             AND ${courtSession.endTime} IS NULL
-            AND DATE(${courtSession.startTime}) = CURRENT_DATE`
+            AND DATE(${courtSession.startTime}) = CURRENT_DATE`,
         );
 
       const activeCount = result?.count ?? 0;
@@ -137,7 +154,7 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
           .from(notificationCourt)
           .where(
             sql`${notificationCourt.courtId} = ${data.courtId}
-              AND ${notificationCourt.userId} != ${data.checkingInUserId}`
+              AND ${notificationCourt.userId} != ${data.checkingInUserId}`,
           );
 
         const userIds = subscribedUsers.map((s) => s.userId);
@@ -173,7 +190,7 @@ export const notificationsWorker = new Worker<NotificationJobData>(
   {
     connection: redisConnection,
     concurrency: 5,
-  }
+  },
 );
 
 notificationsWorker.on("completed", (job) => {

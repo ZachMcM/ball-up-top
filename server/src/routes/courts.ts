@@ -15,7 +15,7 @@ import {
   notificationCourt,
   user,
 } from "../db/schema";
-import { notificationsQueue } from "../queues/notifications.queue";
+import { notificationsQueue } from "../queues/notificationsQueue";
 import { getDistanceInMiles } from "../utils/getDistanceMiles";
 import { handleError } from "../utils/handleError";
 import { invalidateQueries } from "../utils/invalidateQueries";

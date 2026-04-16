@@ -6,6 +6,7 @@ import { PushNotificationProvider } from '@/components/providers/PushNotificatio
 import '@/global.css';
 import { authClient } from '@/lib/auth-client';
 import { BarlowCondensed_700Bold, BarlowCondensed_400Regular } from '@expo-google-fonts/barlow-condensed';
+import {  } from "@expo-google-fonts/dm-sans"
 import { useFonts } from 'expo-font';
 
 import { NAV_THEME, THEME } from '@/lib/theme';
