@@ -42,6 +42,10 @@ module.exports = {
           foreground: 'hsl(var(--card-foreground))',
         },
       },
+      // TODO
+      fontFamily: {
+        heading: [],
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',

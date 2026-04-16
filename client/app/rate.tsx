@@ -118,7 +118,7 @@ function RatingInput({
   return (
     <View className="flex flex-col gap-2">
       <View className="flex flex-row items-center justify-between">
-        <Text className="text-lg font-semibold">{label}</Text>
+        <Text className="font-heading text-lg font-semibold">{label}</Text>
         <View className="flex flex-row items-center gap-5">
           <Button
             onPressIn={startDecrement}
@@ -130,7 +130,7 @@ function RatingInput({
             <Icon size={20} as={MinusIcon} />
           </Button>
           <View className="flex size-12 flex-row items-center justify-center">
-            <Text className="text-2xl font-bold">{value}</Text>
+            <Text className="font-heading text-2xl font-bold">{value}</Text>
           </View>
           <Button
             onPressIn={startIncrement}
@@ -306,7 +306,7 @@ export default function RatePage() {
             <>
               <View className="flex flex-col gap-3">
                 <View className="flex flex-row items-center justify-between">
-                  <Text className="text-lg font-semibold">
+                  <Text className="font-heading text-lg font-semibold">
                     Player {step + 1} of {totalSteps}
                   </Text>
                   <Badge variant="secondary">
@@ -322,13 +322,13 @@ export default function RatePage() {
                   alt={`${currentPlayer.rateeName}'s image`}
                 />
                 <View className="flex flex-1 flex-col">
-                  <Text className="text-lg font-bold">{currentPlayer.rateeName}</Text>
+                  <Text className="font-heading text-lg font-bold">{currentPlayer.rateeName}</Text>
                   <Text className="text-sm text-muted-foreground">
                     {currentPlayer.rateeArchetype}
                   </Text>
                 </View>
                 <View className="flex flex-col items-center">
-                  <Text className="text-2xl font-bold">{currentPlayer.rateeOverallAtTime}</Text>
+                  <Text className="font-heading text-2xl font-bold">{currentPlayer.rateeOverallAtTime}</Text>
                   <Text className="font-medium text-muted-foreground">Overall</Text>
                 </View>
               </View>

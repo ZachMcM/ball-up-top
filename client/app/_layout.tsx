@@ -5,6 +5,8 @@ import { LocationProvider, useLocation } from '@/components/providers/LocationPr
 import { PushNotificationProvider } from '@/components/providers/PushNotificationProvider';
 import '@/global.css';
 import { authClient } from '@/lib/auth-client';
+import { BarlowCondensed_700Bold, BarlowCondensed_400Regular } from '@expo-google-fonts/barlow-condensed';
+import { useFonts } from 'expo-font';
 
 import { NAV_THEME, THEME } from '@/lib/theme';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
@@ -29,6 +31,8 @@ const queryClient = new QueryClient();
 
 export default function RootLayout() {
   const { colorScheme } = useColorScheme();
+  // TODO
+  useFonts({ });
 
   function onAppStateChange(status: AppStateStatus) {
     if (Platform.OS !== 'web') {

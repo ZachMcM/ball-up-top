@@ -234,7 +234,7 @@ export default function CourtPage() {
                 </AspectRatio>
                 <View className="flex flex-col gap-4">
                   <View className="flex flex-1 flex-col gap-1.5">
-                    <Text className="flex-1 text-2xl font-bold">{court.name}</Text>
+                    <Text className="font-heading flex-1 text-2xl font-bold">{court.name}</Text>
                     <Pressable onPress={() => openDirections(court.address)}>
                       <Text className="text-sm font-medium text-muted-foreground underline">
                         {court.address}
@@ -282,7 +282,7 @@ export default function CourtPage() {
                 </View>
                 <View className="flex flex-1 flex-col gap-6 rounded-2xl border border-border p-4">
                   <View className="flex flex-col">
-                    <Text className="font-semibold">Activity</Text>
+                    <Text className="font-heading font-semibold">Activity</Text>
                     <Text className="text-sm font-medium text-muted-foreground">
                       Average players at a given hour
                     </Text>
@@ -297,7 +297,7 @@ export default function CourtPage() {
                 </View>
                 <View className="flex flex-1 flex-col gap-6 rounded-2xl border border-border p-4">
                   <View className="flex flex-col">
-                    <Text className="font-semibold">Currently Playing</Text>
+                    <Text className="font-heading font-semibold">Currently Playing</Text>
                     <Text className="text-sm font-medium text-muted-foreground">
                       {court.currentActiveSessions > 1
                         ? `${court.currentActiveSessions} players • ~${court.avgPlayerOverall.toFixed(0)} overall`
@@ -342,7 +342,7 @@ export default function CourtPage() {
                 </View>
                 <View className="flex flex-1 flex-col gap-6 rounded-2xl border border-border p-4">
                   <View className="flex flex-col">
-                    <Text className="font-semibold">Court Leaderboard</Text>
+                    <Text className="font-heading font-semibold">Court Leaderboard</Text>
                     <Text className="text-sm font-medium text-muted-foreground">
                       Best players from past 30 days
                     </Text>
@@ -391,7 +391,7 @@ export default function CourtPage() {
         handleIndicatorStyle={{ backgroundColor: THEME[colorScheme!].muted }}>
         <BottomSheetView className="flex flex-1 flex-col gap-3.5 px-4 py-8">
           <View className="flex flex-row items-center justify-between">
-            <Text className="text-2xl font-bold">Check In</Text>
+            <Text className="font-heading text-2xl font-bold">Check In</Text>
             <Button
               onPress={handlePresentModalDismissed}
               className="size-7"

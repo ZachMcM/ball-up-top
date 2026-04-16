@@ -92,20 +92,20 @@ export default function ProfilePage() {
                       source={{ uri: user.image ?? undefined }}
                     />
                     <View className="flex flex-col gap-1">
-                      <Text className="text-xl font-bold">{user.name}</Text>
+                      <Text className="font-heading text-xl font-bold">{user.name}</Text>
                       <Text className="font-semibold text-muted-foreground">
                         {user.height} • {user.archetype}
                       </Text>
                     </View>
                   </View>
                   <View className="flex flex-col items-center">
-                    <Text className="text-xl font-bold">{user.overall}</Text>
+                    <Text className="font-heading text-xl font-bold">{user.overall}</Text>
                     <Text className="text-sm font-medium text-muted-foreground">Overall</Text>
                   </View>
                 </View>
                 <View className="flex flex-1 flex-col gap-4 rounded-2xl border border-border p-4">
                   <View className="flex flex-row items-center gap-2">
-                    <Text className="text-lg font-semibold">Ratings</Text>
+                    <Text className="font-heading text-lg font-semibold">Ratings</Text>
                     <Tooltip>
                       <TooltipTrigger>
                         <Icon as={InfoIcon} className="size-4 text-muted-foreground" />
@@ -126,7 +126,7 @@ export default function ProfilePage() {
                   </View>
                 </View>
                 <View className="flex flex-1 flex-col gap-4 rounded-2xl border border-border p-4">
-                  <Text className="text-lg font-semibold">Rating History</Text>
+                  <Text className="font-heading text-lg font-semibold">Rating History</Text>
                   {user.ratingHistory.length > 0 ? (
                     <LineChart
                       isAnimated
@@ -167,7 +167,7 @@ export default function ProfilePage() {
                   )}
                 </View>
                 <View className="flex flex-col gap-4 rounded-2xl border border-border p-4">
-                  <Text className="text-lg font-semibold">Bookmarked Courts</Text>
+                  <Text className="font-heading text-lg font-semibold">Bookmarked Courts</Text>
                   {user.bookmarkedCourts.length > 0 ? (
                     <View className="flex flex-col gap-3">
                       {user.bookmarkedCourts.map((court) => (
@@ -205,7 +205,7 @@ export default function ProfilePage() {
                   )}
                 </View>
                 <View className="flex flex-col gap-4 rounded-2xl border border-border p-4">
-                  <Text className="text-lg font-semibold">Recent Sessions</Text>
+                  <Text className="font-heading text-lg font-semibold">Recent Sessions</Text>
                   {user.recentSessions.length > 0 ? (
                     <View className="flex flex-col gap-3">
                       {user.recentSessions.map(({ court, id, startTime, endTime }) => (
@@ -244,7 +244,7 @@ export default function ProfilePage() {
                 </View>
                 {user.id === currentUserData?.user.id && (
                   <View className="flex flex-1 flex-col gap-4 rounded-2xl border border-border p-4">
-                    <Text className="text-lg font-semibold">Settings</Text>
+                    <Text className="font-heading text-lg font-semibold">Settings</Text>
                     <Button
                       variant="destructive"
                       onPress={() => authClient.signOut()}

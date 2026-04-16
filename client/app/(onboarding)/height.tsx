@@ -70,7 +70,7 @@ export default function HeightPage() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       className="flex-1">
       <View className="flex w-full flex-col items-center gap-4 p-8">
-        <Text className="text-xl font-bold">What's your height?</Text>
+        <Text className="font-heading text-xl font-bold">What's your height?</Text>
         <Controller
           control={control}
           rules={{ required: true }}

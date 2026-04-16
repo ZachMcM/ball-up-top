@@ -70,7 +70,7 @@ export default function AuthPage() {
       <View className="flex w-full flex-col items-center gap-4 p-8">
         {step == 0 ? (
           <Fragment>
-            <Text className="text-xl font-bold">What's your email?</Text>
+            <Text className="font-heading text-xl font-bold">What's your email?</Text>
             <Controller
               control={emailControl}
               rules={{ required: true }}
@@ -104,7 +104,7 @@ export default function AuthPage() {
           </Fragment>
         ) : (
           <Fragment>
-            <Text className="text-xl font-bold">Verify your email</Text>
+            <Text className="font-heading text-xl font-bold">Verify your email</Text>
             <Input
               value={otp}
               onChangeText={setOtp}
