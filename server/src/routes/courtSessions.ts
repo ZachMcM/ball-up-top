@@ -590,123 +590,125 @@ courtSessionsRoute.patch(
           .json({ error: "Unauthorized for this court session." });
       }
 
-      const [updatedCourtSession] = await db
-        .update(courtSession)
-        .set({
-          endTime: new Date(),
-          hasRated: false,
-        })
-        .where(eq(courtSession.id, sessionId))
-        .returning();
-
-      const encounteredPlayersData =
-        await getEncounteredPlayers(updatedCourtSession);
-
-      // bypass rating if no encountered players
-      if (encounteredPlayersData.length === 0) {
-        await db
+      await db.transaction(async (tx) => {
+        const [updatedCourtSession] = await tx
           .update(courtSession)
           .set({
-            hasRated: true,
+            endTime: new Date(),
+            hasRated: false,
           })
-          .where(eq(courtSession.id, sessionId));
-      } else {
-        // Fetch rater info for weight computation
-        const rater = (await db.query.user.findFirst({
-          where: eq(user.id, res.locals.userId!),
-          columns: {
-            overall: true,
-          },
-          with: {
-            courtSessions: {
-              columns: {
-                id: true,
+          .where(eq(courtSession.id, sessionId))
+          .returning();
+
+        const encounteredPlayersData =
+          await getEncounteredPlayers(updatedCourtSession);
+
+        // bypass rating if no encountered players
+        if (encounteredPlayersData.length === 0) {
+          await tx
+            .update(courtSession)
+            .set({
+              hasRated: true,
+            })
+            .where(eq(courtSession.id, sessionId));
+        } else {
+          // Fetch rater info for weight computation
+          const rater = (await tx.query.user.findFirst({
+            where: eq(user.id, res.locals.userId!),
+            columns: {
+              overall: true,
+            },
+            with: {
+              courtSessions: {
+                columns: {
+                  id: true,
+                },
+              },
+              outgoingRatings: {
+                columns: {
+                  id: true,
+                },
               },
             },
-            outgoingRatings: {
-              columns: {
-                id: true,
-              },
-            },
-          },
-        }))!;
+          }))!;
 
-        // Compute session-level weights
-        const runCompetitiveness = clamp(
-          RUN_COMP_MIN_WT,
-          RUN_COMP_MAX_WT,
-          encounteredPlayersData.reduce(
-            (accum, curr) => accum + curr.user.overall,
-            0,
-          ) /
-            encounteredPlayersData.length /
-            100,
-        );
-
-        const raterWeight = clamp(
-          RATER_MIN_WT,
-          RATER_MAX_WT,
-          rater.overall / 100,
-        );
-
-        const experienceWeight = computeExperienceWeight(
-          rater.courtSessions.length,
-          rater.outgoingRatings.length,
-        );
-
-        // Create encountered_player rows with precomputed data
-        for (let i = 0; i < encounteredPlayersData.length; i++) {
-          const ep = encounteredPlayersData[i];
-          const ratee = ep.user;
-
-          // Get ratee's lifetime rating count (not session count)
-          const lifetimeCount = await db
-            .select()
-            .from(rating)
-            .where(eq(rating.rateeId, ratee.id));
-
-          // Compute combined weight (without outlier weight)
-          const combinedWeight = Math.pow(
-            raterWeight *
-              experienceWeight *
-              runCompetitiveness *
-              ep.overlapWeight,
-            WEIGHT_E,
+          // Compute session-level weights
+          const runCompetitiveness = clamp(
+            RUN_COMP_MIN_WT,
+            RUN_COMP_MAX_WT,
+            encounteredPlayersData.reduce(
+              (accum, curr) => accum + curr.user.overall,
+              0,
+            ) /
+              encounteredPlayersData.length /
+              100,
           );
 
-          await db.insert(encounteredPlayer).values({
-            courtSessionId: sessionId,
-            rateeId: ratee.id,
+          const raterWeight = clamp(
+            RATER_MIN_WT,
+            RATER_MAX_WT,
+            rater.overall / 100,
+          );
 
-            // Precomputed weights
-            combinedWeight,
-            raterOverallAtTime: rater.overall,
-            runCompetitivenessAtTime: runCompetitiveness,
+          const experienceWeight = computeExperienceWeight(
+            rater.courtSessions.length,
+            rater.outgoingRatings.length,
+          );
 
-            // Ratee's ratings at checkout (for outlier detection)
-            rateeDefenseAtTime: ratee.defenseRating,
-            rateeFinishingAtTime: ratee.finishingRating,
-            rateeShootingAtTime: ratee.shootingRating,
-            rateePlaymakingAtTime: ratee.playmakingRating,
-            rateeOverallAtTime: ratee.overall,
-            rateeLifetimeCount: lifetimeCount.length,
+          // Create encountered_player rows with precomputed data
+          for (let i = 0; i < encounteredPlayersData.length; i++) {
+            const ep = encounteredPlayersData[i];
+            const ratee = ep.user;
 
-            // Ratee display info (frozen for UI)
-            rateeName: ratee.name,
-            rateeImage: ratee.image,
-            rateeArchetype: ratee.archetype,
-            rateeHeight: ratee.height,
+            // Get ratee's lifetime rating count (not session count)
+            const lifetimeCount = await tx
+              .select()
+              .from(rating)
+              .where(eq(rating.rateeId, ratee.id));
 
-            // Draft ratings (null initially)
-            defenseRating: null,
-            finishingRating: null,
-            shootingRating: null,
-            playmakingRating: null,
-            skipped: false,
-            displayOrder: i,
-          });
+            // Compute combined weight (without outlier weight)
+            const combinedWeight = Math.pow(
+              raterWeight *
+                experienceWeight *
+                runCompetitiveness *
+                ep.overlapWeight,
+              WEIGHT_E,
+            );
+
+            await tx.insert(encounteredPlayer).values({
+              courtSessionId: sessionId,
+              rateeId: ratee.id,
+
+              // Precomputed weights
+              combinedWeight,
+              raterOverallAtTime: rater.overall,
+              runCompetitivenessAtTime: runCompetitiveness,
+
+              // Ratee's ratings at checkout (for outlier detection)
+              rateeDefenseAtTime: ratee.defenseRating,
+              rateeFinishingAtTime: ratee.finishingRating,
+              rateeShootingAtTime: ratee.shootingRating,
+              rateePlaymakingAtTime: ratee.playmakingRating,
+              rateeOverallAtTime: ratee.overall,
+              rateeLifetimeCount: lifetimeCount.length,
+
+              // Ratee display info (frozen for UI)
+              rateeName: ratee.name,
+              rateeImage: ratee.image,
+              rateeArchetype: ratee.archetype,
+              rateeHeight: ratee.height,
+
+              // Draft ratings (null initially)
+              defenseRating: null,
+              finishingRating: null,
+              shootingRating: null,
+              playmakingRating: null,
+              skipped: false,
+              displayOrder: i,
+            });
+          }
         }
-      }
+      });
 
       invalidateQueries(["courts"], ["court", targetCourtSession.courtId]);
 
