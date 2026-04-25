@@ -272,8 +272,8 @@ export default function CourtPage() {
                   </View>
                   {court.leaderboard.length !== 0 ? (
                     court.leaderboard.map((user) => (
-                      <UserItem className="flex-1" key={user.id} user={user}>
-                        <Text className="text-xl font-bold">{user.rank}.</Text>
+                      <UserItem className="flex-1" user={user}>
+                        <Text className="text-lg font-bold">#{user.rank}</Text>
                       </UserItem>
                     ))
                   ) : (

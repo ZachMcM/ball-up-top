@@ -19,7 +19,7 @@ export default function UserItem({ user, className, children, ...props }: { user
       <View
         className={cn('flex w-full flex-row items-center justify-between', className)}
         {...props}>
-        <View className="flex flex-row items-center gap-3">
+        <View className="flex flex-row items-center gap-4">
           {children}
           <Avatar className="size-12" alt={`${user.name}'s image`} source={{ uri: user.image }} />
           <View className="flex flex-col">
@@ -30,7 +30,7 @@ export default function UserItem({ user, className, children, ...props }: { user
           </View>
         </View>
         <View className="flex flex-col items-center">
-          <Text className="text-xl font-extrabold">{user.overall}</Text>
+          <Text className="text-lg font-extrabold">{user.overall}</Text>
           <Text className="text-xs font-medium text-muted-foreground">OVR</Text>
         </View>
       </View>
