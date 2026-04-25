@@ -7,15 +7,12 @@ import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
+import { Separator } from '@/components/ui/separator';
 import { Text } from '@/components/ui/text';
 import UserItem from '@/components/UserItem';
 import { useTabContext } from '@/hooks/useTabContext';
 import { authClient } from '@/lib/auth-client';
-import {
-  deleteCourtNotification,
-  getCourt,
-  postCourtNotification
-} from '@/lib/endpoints';
+import { deleteCourtNotification, getCourt, postCourtNotification } from '@/lib/endpoints';
 import { THEME } from '@/lib/theme';
 import { openDirections } from '@/lib/utils';
 import { Court } from '@/types/court';
@@ -34,13 +31,14 @@ import {
   ArrowRight,
   ArrowRightIcon,
   BellIcon,
+  ChevronRight,
   ClockIcon,
   HomeIcon,
   MapPinIcon,
   MapPinnedIcon,
   SunIcon,
   UsersIcon,
-  XIcon
+  XIcon,
 } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { useCallback, useRef } from 'react';
@@ -53,7 +51,6 @@ export default function CourtPage() {
   const courtId = parseInt(searchParams.courtId as string);
   const queryClient = useQueryClient();
 
-  
   const router = useRouter();
 
   const { data: court, isPending } = useQuery({
@@ -167,22 +164,17 @@ export default function CourtPage() {
                     className="absolute inset-0 object-cover"
                   />
                 </AspectRatio>
-                <View className="flex flex-col gap-4">
-                  <View className="flex flex-1 flex-col gap-1.5">
-                    <Text className="font-heading flex-1 text-2xl font-bold">{court.name}</Text>
-                    <Pressable onPress={() => openDirections(court.address)}>
-                      <Text className="font-medium text-muted-foreground underline">
-                        {court.address}
-                      </Text>
-                    </Pressable>
+                <View className="flex flex-1 flex-col gap-2">
+                  <Text className="flex-1 text-2xl font-bold">{court.name}</Text>
+                  <View className="flex flex-row items-center gap-2">
+                    <Badge variant="secondary" className="self-start">
+                      <Icon size={12} as={court.indoor ? HomeIcon : SunIcon} />
+                      <Text>{court.indoor ? 'Indoor' : 'Outdoor'}</Text>
+                    </Badge>
                     <Text className="font-medium text-muted-foreground">
                       {court.distance.toFixed(1)} miles
                     </Text>
                   </View>
-                  <Badge variant="secondary" className="self-start">
-                    <Icon size={12} as={court.indoor ? HomeIcon : SunIcon} />
-                    <Text>{court.indoor ? 'Indoor' : 'Outdoor'}</Text>
-                  </Badge>
                 </View>
                 <View className="flex w-full flex-1 flex-row items-center gap-2">
                   {activeCourtSession && activeCourtSession.courtId == court.id ? (
@@ -215,13 +207,45 @@ export default function CourtPage() {
                     <Text>Directions</Text>
                   </Button>
                 </View>
-                <View className="flex flex-1 flex-col gap-6 rounded-2xl border border-border p-4">
-                  <View className="flex flex-col">
-                    <Text className="font-heading font-semibold">Activity</Text>
-                    <Text className="text-sm font-medium text-muted-foreground">
-                      Average players at a given hour
-                    </Text>
+                <View className="flex flex-1 flex-col gap-4">
+                  <View className="flex flex-row items-center justify-between">
+                    <View className="flex flex-row items-center gap-2">
+                      {court.currentActiveSessions !== 0 && (
+                        <View className="size-2 animate-pulse rounded-full bg-green-500" />
+                      )}
+                      <Text className="font-semibold">
+                        {court.currentActiveSessions} Active Players
+                      </Text>
+                    </View>
+                    {court.currentActiveSessions > court.currentActiveUsers.length && (
+                      <Pressable
+                        className="flex flex-row items-center gap-1"
+                        onPress={() =>
+                          router.push({
+                            pathname: '/court/[courtId]/players',
+                            params: { courtId },
+                          })
+                        }>
+                        <Text className="text-sm font-medium text-muted-foreground">See All</Text>
+                        <Icon as={ChevronRight} className="text-muted-foreground" size={16} />
+                      </Pressable>
+                    )}
                   </View>
+                  {court.currentActiveSessions !== 0 ? (
+                    <View className="flex flex-col gap-3">
+                      {court.currentActiveUsers.map((user, i) => (
+                        <UserItem key={i} user={user} />
+                      ))}
+                    </View>
+                  ) : (
+                    <Text className="text-center text-sm font-medium text-muted-foreground">
+                      No active runs currently.
+                    </Text>
+                  )}
+                  <Separator />
+                </View>
+                <View className="flex flex-1 flex-col gap-4">
+                  <Text className="font-semibold">Average Activity Stats</Text>
                   {court.activityGraph.filter((point) => point.avgSessions !== 0).length !== 0 ? (
                     <ActivityGraph height={56} points={court.activityGraph} />
                   ) : (
@@ -229,86 +253,34 @@ export default function CourtPage() {
                       No activity data yet.
                     </Text>
                   )}
+                  <Separator />
                 </View>
-                <View className="flex flex-1 flex-col gap-6 rounded-2xl border border-border p-4">
-                  <View className="flex flex-col">
-                    <Text className="font-heading font-semibold">Currently Playing</Text>
-                    <Text className="text-sm font-medium text-muted-foreground">
-                      {court.currentActiveSessions > 1
-                        ? `${court.currentActiveSessions} players • ~${court.avgPlayerOverall.toFixed(0)} overall`
-                        : 'People actively hooping at court'}
-                    </Text>
-                  </View>
-                  {court.currentActiveSessions !== 0 ? (
-                    <View className="flex flex-col gap-3">
-                      {court.currentActiveUsers.map((user, i) => (
-                        <UserItem
-                          className="rounded-2xl border border-border bg-card px-4 py-3"
-                          key={i}
-                          user={user}
-                        />
-                      ))}
-                      {court.currentActiveSessions > court.currentActiveUsers.length && (
-                        <>
-                          <Text className="text-sm text-muted-foreground">
-                            +{court.currentActiveSessions - court.currentActiveUsers.length} more
-                          </Text>
-                          <Button
-                            onPress={() => {
-                              router.push({
-                                pathname: '/court/[courtId]/players',
-                                params: { courtId },
-                              });
-                            }}
-                            size="sm"
-                            variant="outline"
-                            className="self-end">
-                            <Text>View All</Text>
-                            <Icon as={ArrowRight} className="text-secondary-foreground" />
-                          </Button>
-                        </>
-                      )}
-                    </View>
-                  ) : (
-                    <Text className="text-center text-sm font-medium text-muted-foreground">
-                      No active runs currently.
-                    </Text>
-                  )}
-                </View>
-                <View className="flex flex-1 flex-col gap-6 rounded-2xl border border-border p-4">
-                  <View className="flex flex-col">
-                    <Text className="font-heading font-semibold">Court Leaderboard</Text>
-                    <Text className="text-sm font-medium text-muted-foreground">
-                      Best players from past 30 days
-                    </Text>
+                <View className="flex flex-1 flex-col gap-4">
+                  <View className="flex flex-row items-center justify-between">
+                    <Text className="font-semibold">Court Leaderboard</Text>
+                    <Pressable
+                      className="flex flex-row items-center gap-1"
+                      onPress={() => {
+                        router.push({
+                          pathname: '/court/[courtId]/leaderboard',
+                          params: { courtId },
+                        });
+                      }}>
+                      <Text className="text-sm font-medium text-muted-foreground">See All</Text>
+                      <Icon as={ChevronRight} className="text-muted-foreground" size={16} />
+                    </Pressable>
                   </View>
                   {court.leaderboard.length !== 0 ? (
-                    <NativewindScrollView
-                      contentContainerClassName="flex flex-row items-center gap-6"
-                      horizontal
-                      showsHorizontalScrollIndicator={false}>
-                      {court.leaderboard.map((user, i) => (
-                        <LeaderboardCard key={i} user={user} />
-                      ))}
-                    </NativewindScrollView>
+                    court.leaderboard.map((user) => (
+                      <UserItem className="flex-1" key={user.id} user={user}>
+                        <Text className="text-xl font-bold">{user.rank}.</Text>
+                      </UserItem>
+                    ))
                   ) : (
                     <Text className="text-center text-sm font-medium text-muted-foreground">
                       No court leaderboard data.
                     </Text>
                   )}
-                  <Button
-                    onPress={() => {
-                      router.push({
-                        pathname: '/court/[courtId]/leaderboard',
-                        params: { courtId },
-                      });
-                    }}
-                    size="sm"
-                    variant="outline"
-                    className="self-end">
-                    <Text>View All</Text>
-                    <Icon as={ArrowRight} className="text-secondary-foreground" />
-                  </Button>
                 </View>
               </>
             )
@@ -326,7 +298,7 @@ export default function CourtPage() {
         handleIndicatorStyle={{ backgroundColor: THEME[colorScheme!].muted }}>
         <BottomSheetView className="flex flex-1 flex-col gap-3.5 px-4 py-8">
           <View className="flex flex-row items-center justify-between">
-            <Text className="font-heading text-2xl font-bold">Check In</Text>
+            <Text className="text-2xl font-bold">Check In</Text>
             <Button
               onPress={handlePresentModalDismissed}
               className="size-7"
@@ -401,34 +373,5 @@ export default function CourtPage() {
         </BottomSheetView>
       </BottomSheetModal>
     </>
-  );
-}
-
-function LeaderboardCard({ user }: { user: User & { rank: number } }) {
-  const tabContext = useTabContext();
-
-  return (
-    <Link
-      href={{
-        pathname: `/(tabs)/(${tabContext})/user/[userId]` as const,
-        params: { userId: user.id },
-      }}>
-      <View className="flex flex-col items-center gap-2">
-        <View className="relative">
-          <Avatar className="size-14" alt={`${user.name}'s image`} source={{ uri: user.image }} />
-          <View className="absolute -bottom-1 -right-1 rounded-full bg-background p-1">
-            <View className="size-5 items-center justify-center rounded-full bg-secondary">
-              <Text className="text-sm font-semibold text-secondary-foreground">{user.rank}.</Text>
-            </View>
-          </View>
-        </View>
-        <View className="flex flex-col items-center">
-          <Text className="text-sm font-semibold">
-            {user.name.split(' ')[0][0]}. {user.name.split(' ')[1]}
-          </Text>
-          <Text className="text-xs font-medium text-muted-foreground">{user.overall} OVR</Text>
-        </View>
-      </View>
-    </Link>
   );
 }

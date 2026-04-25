@@ -19,7 +19,8 @@ const archetypes: Archetype[] = [
       { label: "FIN", val: 74 },
       { label: "PLY", val: 72 },
     ],
-    description: "Spot-up shooter who guards the other team's best player. Never wastes a possession.",
+    description:
+      "Spot-up shooter who guards the other team's best player. Never wastes a possession.",
   },
   {
     name: "Playmaking Shot Creator",
@@ -31,7 +32,8 @@ const archetypes: Archetype[] = [
       { label: "FIN", val: 81 },
       { label: "DEF", val: 68 },
     ],
-    description: "Creates off the dribble, draws defenders, finds the open man. The floor general.",
+    description:
+      "Creates off the dribble, draws defenders, finds the open man. The floor general.",
   },
   {
     name: "Two-Way Wing",
@@ -43,7 +45,8 @@ const archetypes: Archetype[] = [
       { label: "SHT", val: 80 },
       { label: "PLY", val: 78 },
     ],
-    description: "Versatile on both ends. Matches up across multiple positions. Never a liability.",
+    description:
+      "Versatile on both ends. Matches up across multiple positions. Never a liability.",
   },
   {
     name: "Slasher",
@@ -55,7 +58,8 @@ const archetypes: Archetype[] = [
       { label: "DEF", val: 74 },
       { label: "SHT", val: 64 },
     ],
-    description: "Gets to the rim every single time. Only thing stopping them is the second unit.",
+    description:
+      "Gets to the rim every single time. Only thing stopping them is the second unit.",
   },
   {
     name: "Paint Beast",
@@ -67,7 +71,8 @@ const archetypes: Archetype[] = [
       { label: "PLY", val: 72 },
       { label: "SHT", val: 52 },
     ],
-    description: "Dominant at the rim. Controls the glass. Makes life hard for anyone posting up.",
+    description:
+      "Dominant at the rim. Controls the glass. Makes life hard for anyone posting up.",
   },
   {
     name: "Stretch 5",
@@ -79,7 +84,8 @@ const archetypes: Archetype[] = [
       { label: "DEF", val: 76 },
       { label: "PLY", val: 70 },
     ],
-    description: "Big who can step out and hit threes. Spreads the floor, creates driving lanes.",
+    description:
+      "Big who can step out and hit threes. Spreads the floor, creates driving lanes.",
   },
 ];
 
@@ -102,21 +108,25 @@ function ArchetypeCard({ archetype }: { archetype: Archetype }) {
   return (
     <div className="group relative bg-card border border-border rounded-2xl p-5 hover:border-border/60 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/40">
       {/* Position badge */}
-      <div className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 border text-[10px] font-semibold uppercase tracking-wide mb-4 ${colorClass}`}>
+      <div
+        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 border text-[10px] font-semibold uppercase tracking-wide mb-4 ${colorClass}`}
+      >
         <span className="w-1 h-1 rounded-full bg-current" />
         {archetype.position}
       </div>
 
       {/* Name + overall */}
       <div className="flex items-start justify-between mb-4">
-        <h3 className="font-heading text-[22px] sm:text-[26px] uppercase leading-tight tracking-tight flex-1 mr-3">
+        <h3 className="text-[22px] sm:text-[26px] uppercase leading-tight tracking-tight flex-1 mr-3">
           {archetype.name}
         </h3>
         <div className="text-right shrink-0">
-          <p className="font-heading text-[32px] leading-none text-foreground">
+          <p className="text-[32px] leading-none text-foreground">
             {archetype.overall}
           </p>
-          <p className="text-[9px] text-muted-foreground uppercase tracking-widest">overall</p>
+          <p className="text-[9px] text-muted-foreground uppercase tracking-widest">
+            overall
+          </p>
         </div>
       </div>
 
@@ -138,7 +148,9 @@ function ArchetypeCard({ archetype }: { archetype: Archetype }) {
                 style={{ width: `${(val / 99) * 100}%` }}
               />
             </div>
-            <span className="text-[10px] text-muted-foreground w-5 text-right">{val}</span>
+            <span className="text-[10px] text-muted-foreground w-5 text-right">
+              {val}
+            </span>
           </div>
         ))}
       </div>
@@ -156,13 +168,15 @@ export function AppPreview() {
             <p className="text-sm text-accent font-semibold uppercase tracking-widest mb-4">
               Player Identity
             </p>
-            <h2 className="font-heading text-[52px] sm:text-[68px] uppercase leading-[0.9] tracking-tight">
-              What's your<br />archetype?
+            <h2 className="text-[52px] sm:text-[68px] uppercase leading-[0.9] tracking-tight">
+              What's your
+              <br />
+              archetype?
             </h2>
           </div>
           <p className="text-[16px] text-muted-foreground max-w-sm leading-relaxed lg:text-right">
-            After enough rated sessions, you earn one of 40+ archetypes based
-            on how opponents actually rated you — not what you think you are.
+            After enough rated sessions, you earn one of 40+ archetypes based on
+            how opponents actually rated you — not what you think you are.
           </p>
         </div>
 
@@ -192,10 +206,17 @@ export function AppPreview() {
               sub: "Credibility-weighted ratings resist inflation and gaming",
             },
           ].map(({ stat, label, sub }) => (
-            <div key={label} className="bg-card border border-border rounded-2xl p-5">
-              <p className="font-heading text-[42px] text-accent leading-none mb-2">{stat}</p>
+            <div
+              key={label}
+              className="bg-card border border-border rounded-2xl p-5"
+            >
+              <p className="text-[42px] text-accent leading-none mb-2">
+                {stat}
+              </p>
               <p className="font-semibold text-sm mb-1">{label}</p>
-              <p className="text-[13px] text-muted-foreground leading-relaxed">{sub}</p>
+              <p className="text-[13px] text-muted-foreground leading-relaxed">
+                {sub}
+              </p>
             </div>
           ))}
         </div>

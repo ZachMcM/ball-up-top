@@ -50,7 +50,7 @@ export default function NamePage() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       className="flex-1">
       <View className="flex w-full flex-col items-center gap-4 p-8">
-        <Text className="font-heading text-xl font-bold">What's your name?</Text>
+        <Text className="text-xl font-bold">What's your name?</Text>
         <View className="flex flex-row items-center gap-2">
           <Controller
             control={control}

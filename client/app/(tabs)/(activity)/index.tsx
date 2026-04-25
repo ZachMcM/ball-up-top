@@ -133,7 +133,7 @@ export default function ActivityPage() {
             stickySectionHeadersEnabled={false}
             renderSectionHeader={({ section }) => (
               <View className="px-4 py-3">
-                <Text className="font-heading text-base font-bold">{section.title}</Text>
+                <Text className="text-base font-bold">{section.title}</Text>
               </View>
             )}
             renderItem={({ item }) => <ActivityRow activity={item} />}

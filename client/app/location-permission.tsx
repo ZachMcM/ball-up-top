@@ -15,7 +15,7 @@ export default function LocationPermissionPage() {
         <Icon as={MapPin} size={40} className="text-foreground" />
       </View>
       <View className="items-center gap-2">
-        <Text className="font-heading text-center text-2xl font-bold">Location Access Needed</Text>
+        <Text className="text-center text-2xl font-bold">Location Access Needed</Text>
         <Text className="max-w-xs text-center text-sm font-medium text-muted-foreground">
           We need your location to show you nearby basketball courts and help you find games.
         </Text>

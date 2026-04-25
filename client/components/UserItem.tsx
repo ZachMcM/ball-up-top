@@ -30,8 +30,8 @@ export default function UserItem({ user, className, children, ...props }: { user
           </View>
         </View>
         <View className="flex flex-col items-center">
-          <Text className="text-lg font-bold">{user.overall}</Text>
-          <Text className="text-xs font-medium text-muted-foreground">Overall</Text>
+          <Text className="text-xl font-extrabold">{user.overall}</Text>
+          <Text className="text-xs font-medium text-muted-foreground">OVR</Text>
         </View>
       </View>
     </Link>

@@ -22,17 +22,17 @@ const features = [
             }`}
           >
             <span
-              className={`font-heading text-sm w-5 shrink-0 ${
+              className={`text-sm w-5 shrink-0 ${
                 p.top ? "text-accent" : "text-muted-foreground"
               }`}
             >
               {p.rank}
             </span>
-            <span className="flex-1 truncate text-[13px] font-medium">{p.name}</span>
+            <span className="flex-1 truncate text-[13px] font-medium">
+              {p.name}
+            </span>
             <span
-              className={`font-heading text-lg ${
-                p.top ? "text-accent" : "text-foreground"
-              }`}
+              className={`text-lg ${p.top ? "text-accent" : "text-foreground"}`}
             >
               {p.val}
             </span>
@@ -50,9 +50,11 @@ const features = [
     highlight: false,
     visual: (
       <div className="mt-6 bg-muted/50 rounded-xl p-4">
-        <p className="text-[9px] text-muted-foreground uppercase tracking-widest mb-1">Earned after 4 sessions</p>
-        <p className="font-heading text-2xl uppercase mb-0.5">Playmaking</p>
-        <p className="font-heading text-2xl uppercase text-accent mb-3">Shot Creator</p>
+        <p className="text-[9px] text-muted-foreground uppercase tracking-widest mb-1">
+          Earned after 4 sessions
+        </p>
+        <p className="text-2xl uppercase mb-0.5">Playmaking</p>
+        <p className="text-2xl uppercase text-accent mb-3">Shot Creator</p>
         <div className="space-y-2">
           {[
             { label: "PLY", val: 87 },
@@ -61,14 +63,18 @@ const features = [
             { label: "DEF", val: 71 },
           ].map(({ label, val }) => (
             <div key={label} className="flex items-center gap-2">
-              <span className="text-[10px] text-muted-foreground w-6 shrink-0">{label}</span>
+              <span className="text-[10px] text-muted-foreground w-6 shrink-0">
+                {label}
+              </span>
               <div className="flex-1 h-[3px] bg-border rounded-full overflow-hidden">
                 <div
                   className="h-full bg-accent rounded-full"
                   style={{ width: `${(val / 99) * 100}%` }}
                 />
               </div>
-              <span className="text-[10px] text-muted-foreground w-5 text-right">{val}</span>
+              <span className="text-[10px] text-muted-foreground w-5 text-right">
+                {val}
+              </span>
             </div>
           ))}
         </div>
@@ -85,15 +91,32 @@ const features = [
     visual: (
       <div className="mt-6 bg-muted/50 rounded-xl p-4 flex items-center gap-4">
         <div className="w-12 h-12 bg-green-500/15 border border-green-500/25 rounded-full flex items-center justify-center shrink-0">
-          <svg className="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          <svg
+            className="w-5 h-5 text-green-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+            />
           </svg>
         </div>
         <div>
-          <p className="font-heading text-2xl text-green-400">12</p>
+          <p className="text-2xl text-green-400">12</p>
           <p className="text-sm text-muted-foreground">Players at the CoRec</p>
-          <p className="text-[11px] text-muted-foreground mt-0.5">Updated 2 min ago</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">
+            Updated 2 min ago
+          </p>
         </div>
       </div>
     ),
@@ -114,7 +137,7 @@ const features = [
           { label: "Defense", val: 81 },
         ].map(({ label, val }) => (
           <div key={label} className="bg-muted/50 rounded-lg p-3 text-center">
-            <p className="font-heading text-2xl text-foreground leading-none mb-1">{val}</p>
+            <p className="text-2xl text-foreground leading-none mb-1">{val}</p>
             <p className="text-[10px] text-muted-foreground">{label}</p>
           </div>
         ))}
@@ -132,7 +155,7 @@ export function Features() {
           <p className="text-sm text-accent font-semibold uppercase tracking-widest mb-4">
             The Platform
           </p>
-          <h2 className="font-heading text-[52px] sm:text-[68px] uppercase leading-[0.9] tracking-tight max-w-2xl">
+          <h2 className="text-[52px] sm:text-[68px] uppercase leading-[0.9] tracking-tight max-w-2xl">
             Built for the campus basketball community
           </h2>
         </div>
@@ -151,7 +174,7 @@ export function Features() {
               {/* Tag */}
               <div className="flex items-start justify-between mb-4">
                 <span
-                  className={`font-heading text-[13px] uppercase tracking-widest ${
+                  className={`text-[13px] uppercase tracking-widest ${
                     feature.highlight ? "text-accent" : "text-muted-foreground"
                   }`}
                 >
@@ -164,7 +187,7 @@ export function Features() {
                 )}
               </div>
 
-              <h3 className="font-heading text-[28px] sm:text-[32px] uppercase leading-tight tracking-tight mb-3">
+              <h3 className="text-[28px] sm:text-[32px] uppercase leading-tight tracking-tight mb-3">
                 {feature.title}
               </h3>
 

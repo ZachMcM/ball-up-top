@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Icon } from '@/components/ui/icon';
+import { Separator } from '@/components/ui/separator';
 import { Text } from '@/components/ui/text';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { VerticalRatingBar } from '@/components/ui/vertical-rating-bar';
@@ -92,41 +93,42 @@ export default function ProfilePage() {
                       source={{ uri: user.image ?? undefined }}
                     />
                     <View className="flex flex-col gap-1">
-                      <Text className="font-heading text-xl font-bold">{user.name}</Text>
+                      <Text className="text-xl font-bold">{user.name}</Text>
                       <Text className="font-semibold text-muted-foreground">
                         {user.height} • {user.archetype}
                       </Text>
                     </View>
                   </View>
                   <View className="flex flex-col items-center">
-                    <Text className="font-heading text-xl font-bold">{user.overall}</Text>
+                    <Text className="text-xl font-bold">{user.overall}</Text>
                     <Text className="text-sm font-medium text-muted-foreground">Overall</Text>
                   </View>
                 </View>
-                <View className="flex flex-1 flex-col gap-4 rounded-2xl border border-border p-4">
+                <View className="flex flex-1 flex-col gap-4">
                   <View className="flex flex-row items-center gap-2">
-                    <Text className="font-heading text-lg font-semibold">Ratings</Text>
                     <Tooltip>
                       <TooltipTrigger>
                         <Icon as={InfoIcon} className="size-4 text-muted-foreground" />
                       </TooltipTrigger>
-                      <TooltipContent className="max-w-[100px] m-4">
+                      <TooltipContent className="m-4 max-w-[100px]">
                         <Text>
-                          Ratings are calculated from verified check-ins at real courts. Each session
-                          contributes to your score based on performance data from other players
-                          who've seen you play, keeping ratings honest and community-driven.
+                          Ratings are calculated from verified check-ins at real courts. Each
+                          session contributes to your score based on performance data from other
+                          players who've seen you play, keeping ratings honest and community-driven.
                         </Text>
                       </TooltipContent>
                     </Tooltip>
+                    <Text className="text-lg font-semibold">Ratings</Text>
                   </View>
                   <View className="flex flex-row">
                     {RATING_CATEGORIES.map(({ key, label }) => (
                       <VerticalRatingBar key={key} value={user[key]} label={label} />
                     ))}
                   </View>
+                  <Separator />
                 </View>
-                <View className="flex flex-1 flex-col gap-4 rounded-2xl border border-border p-4">
-                  <Text className="font-heading text-lg font-semibold">Rating History</Text>
+                <View className="flex flex-1 flex-col gap-4">
+                  <Text className="text-lg font-semibold">Rating History</Text>
                   {user.ratingHistory.length > 0 ? (
                     <LineChart
                       isAnimated
@@ -152,7 +154,7 @@ export default function ProfilePage() {
                         fontSize: 12,
                       }}
                       maxValue={99}
-                      data={user.ratingHistory.map((entry, i) => ({
+                      data={user.ratingHistory.map((entry) => ({
                         value: entry.overall,
                         label: timeAgo(entry.createdAt),
                         dataPointLabelComponent: () => (
@@ -165,9 +167,10 @@ export default function ProfilePage() {
                   ) : (
                     <Text className="text-center text-xs font-medium">No ratings data yet.</Text>
                   )}
+                  <Separator/>
                 </View>
-                <View className="flex flex-col gap-4 rounded-2xl border border-border py-3 px-4">
-                  <Text className="font-heading text-lg font-semibold">Recent Sessions</Text>
+                <View className="flex flex-col gap-4">
+                  <Text className="text-lg font-semibold">Recent Sessions</Text>
                   {user.recentSessions.length > 0 ? (
                     <View className="flex flex-col gap-3">
                       {user.recentSessions.map(({ court, id, startTime, endTime }) => (
@@ -203,10 +206,11 @@ export default function ProfilePage() {
                   ) : (
                     <Text className="text-center text-xs font-medium">No sessions yet.</Text>
                   )}
+                  <Separator/>
                 </View>
                 {user.id === currentUserData?.user.id && (
-                  <View className="flex flex-1 flex-col gap-4 rounded-2xl border border-border p-4">
-                    <Text className="font-heading text-lg font-semibold">Settings</Text>
+                  <View className="flex flex-1 flex-col gap-4">
+                    <Text className="text-lg font-semibold">Settings</Text>
                     <Button
                       variant="destructive"
                       onPress={() => authClient.signOut()}

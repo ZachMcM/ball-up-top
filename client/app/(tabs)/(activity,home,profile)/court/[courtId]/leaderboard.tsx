@@ -50,7 +50,7 @@ export default function CourtLeaderboardPage() {
             showsVerticalScrollIndicator={false}
             renderItem={({ item }) => (
               <UserItem className="flex-1" user={item}>
-                <Text className="text-2xl font-bold">{item.rank}.</Text>
+                <Text className="text-xl font-bold">{item.rank}.</Text>
               </UserItem>
             )}
             keyExtractor={(item) => item.id.toString()}

@@ -66,17 +66,20 @@ export function CampusExpansion() {
             <p className="text-sm text-accent font-semibold uppercase tracking-widest mb-4">
               The Expansion Model
             </p>
-            <h2 className="font-heading text-[52px] sm:text-[64px] uppercase leading-[0.9] tracking-tight mb-6">
-              One campus<br />at a time.
+            <h2 className="text-[52px] sm:text-[64px] uppercase leading-[0.9] tracking-tight mb-6">
+              One campus
+              <br />
+              at a time.
             </h2>
             <p className="text-[16px] text-muted-foreground leading-relaxed mb-8">
-              Ball Up Top doesn't launch everywhere at once. Each campus gets its
-              own full launch — ambassador seeding, community building, real
+              Ball Up Top doesn't launch everywhere at once. Each campus gets
+              its own full launch — ambassador seeding, community building, real
               leaderboard density — before the next school goes live.
             </p>
             <p className="text-[14px] text-muted-foreground leading-relaxed mb-10">
-              That's the model that makes the product work. No empty leaderboards.
-              No dead courts. Every campus that goes live is a real community.
+              That's the model that makes the product work. No empty
+              leaderboards. No dead courts. Every campus that goes live is a
+              real community.
             </p>
 
             {/* Waitlist form */}
@@ -108,12 +111,24 @@ export function CampusExpansion() {
             ) : (
               <div className="flex items-center gap-3 bg-green-500/10 border border-green-500/25 rounded-2xl px-5 py-4">
                 <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center shrink-0">
-                  <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-4 h-4 text-green-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.5}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-green-400">You're on the list</p>
+                  <p className="text-sm font-semibold text-green-400">
+                    You're on the list
+                  </p>
                   <p className="text-[12px] text-muted-foreground">
                     We'll let you know when Ball Up Top launches at {school}.
                   </p>
@@ -136,9 +151,7 @@ export function CampusExpansion() {
                 {/* Status indicator */}
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-                    campus.status === "live"
-                      ? "bg-green-500/15"
-                      : "bg-muted"
+                    campus.status === "live" ? "bg-green-500/15" : "bg-muted"
                   }`}
                 >
                   {campus.status === "live" ? (
@@ -151,7 +164,7 @@ export function CampusExpansion() {
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                    <p className="font-heading text-[18px] uppercase tracking-tight leading-tight">
+                    <p className="text-[18px] uppercase tracking-tight leading-tight">
                       {campus.school}
                     </p>
                     {campus.status === "live" && (
@@ -169,7 +182,9 @@ export function CampusExpansion() {
                 <div className="text-right shrink-0">
                   <p
                     className={`text-[12px] font-semibold ${
-                      campus.status === "live" ? "text-green-400" : "text-muted-foreground"
+                      campus.status === "live"
+                        ? "text-green-400"
+                        : "text-muted-foreground"
                     }`}
                   >
                     {campus.season}
@@ -186,8 +201,18 @@ export function CampusExpansion() {
             {/* More to come */}
             <div className="flex items-center gap-3 p-4 rounded-2xl border border-dashed border-border/60">
               <div className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center shrink-0">
-                <svg className="w-4 h-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                <svg
+                  className="w-4 h-4 text-muted-foreground"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
                 </svg>
               </div>
               <p className="text-sm text-muted-foreground">

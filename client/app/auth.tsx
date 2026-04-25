@@ -70,7 +70,7 @@ export default function AuthPage() {
       <View className="flex w-full flex-col items-center gap-4 p-8">
         {step == 0 ? (
           <Fragment>
-            <Text className="font-heading text-xl font-bold">What's your email?</Text>
+            <Text className="text-xl font-bold">What's your email?</Text>
             <Controller
               control={emailControl}
               rules={{ required: true }}
@@ -81,7 +81,7 @@ export default function AuthPage() {
                     placeholder="johndoe@example.com"
                     onBlur={onBlur}
                     onChangeText={onChange}
-                    className={cn(error && 'border-destructive', "rounded-full")}
+                    className={cn(error && 'border-destructive', 'rounded-full')}
                     textContentType="emailAddress"
                     autoComplete="email"
                     value={value}
@@ -104,7 +104,7 @@ export default function AuthPage() {
           </Fragment>
         ) : (
           <Fragment>
-            <Text className="font-heading text-xl font-bold">Verify your email</Text>
+            <Text className="text-xl font-bold">Verify your email</Text>
             <Input
               value={otp}
               onChangeText={setOtp}
@@ -116,7 +116,7 @@ export default function AuthPage() {
               autoComplete="sms-otp"
               textContentType="oneTimeCode"
               onSubmitEditing={onSubmitOtp}
-              className='rounded-full'
+              className="rounded-full"
             />
             <Button
               variant="link"

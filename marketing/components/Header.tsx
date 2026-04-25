@@ -21,9 +21,7 @@ export function Header() {
               height={26}
               className="opacity-90 group-hover:opacity-100 transition-opacity"
             />
-            <span className="font-heading text-xl uppercase tracking-wide">
-              Ball Up Top
-            </span>
+            <span className="text-xl uppercase tracking-wide">Ball Up Top</span>
           </Link>
 
           {/* Desktop Nav */}
@@ -57,7 +55,9 @@ export function Header() {
           <div className="hidden md:flex items-center gap-3">
             <div className="flex items-center gap-1.5 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1.5">
               <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-xs text-green-400 font-medium">Live at Purdue</span>
+              <span className="text-xs text-green-400 font-medium">
+                Live at Purdue
+              </span>
             </div>
             <a
               href="#download"
@@ -73,11 +73,26 @@ export function Header() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               {mobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               )}
             </svg>
           </button>

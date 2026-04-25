@@ -2,7 +2,7 @@ import { getCityState } from '@/lib/utils';
 import { CourtListEntry } from '@/types/court';
 import { Image } from 'expo-image';
 import { Link } from 'expo-router';
-import { HomeIcon, MapPinIcon, SunIcon, UsersIcon } from 'lucide-react-native';
+import { HomeIcon, MapPinIcon, SunIcon, Users, UsersIcon, UserX } from 'lucide-react-native';
 import { View } from 'react-native';
 import { AspectRatio } from './ui/aspect-ratio';
 import { Badge } from './ui/badge';
@@ -40,19 +40,23 @@ export default function CourtCard({ court }: { court: CourtListEntry }) {
                   <Text>{court.indoor ? 'Indoor' : 'Outdoor'}</Text>
                 </Badge>
               </View>
-              <View className="flex flex-row items-center gap-1.5">
-                <Icon as={MapPinIcon} className="text-muted-foreground" size={14} />
-                <Text className="text-sm font-medium text-muted-foreground" numberOfLines={1}>
-                  {getCityState(court.address)} • {court.distance.toFixed(1)} miles
-                </Text>
-              </View>
-              <View className="flex flex-row items-center gap-2">
-                <Icon as={UsersIcon} size={16} className="text-muted-foreground" />
-                <Text className="font-medium text-muted-foreground">
-                  {court.currentActiveSessions === 0
-                    ? 'No active players'
-                    : `${court.currentActiveSessions} Playing Now`}
-                </Text>
+              <View className="flex flex-row items-center gap-3">
+                <View className="flex flex-row items-center gap-1.5">
+                  {court.currentActiveSessions !== 0 && (
+                    <View className="size-2 animate-pulse rounded-full bg-green-500" />
+                  )}
+                  <Text className="text-sm font-medium text-muted-foreground" numberOfLines={1}>
+                    {court.currentActiveSessions === 0
+                      ? 'No active players'
+                      : `${court.currentActiveSessions} Playing Now`}{' '}
+                  </Text>
+                </View>
+                <View className="flex flex-row items-center gap-1">
+                  <Icon as={MapPinIcon} className="text-muted-foreground" size={16} />
+                  <Text className="text-sm font-medium text-muted-foreground" numberOfLines={1}>
+                    {court.distance.toFixed(1)} mi
+                  </Text>
+                </View>
               </View>
             </View>
           </View>
