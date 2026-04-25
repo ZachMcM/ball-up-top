@@ -12,11 +12,9 @@ import UserItem from '@/components/UserItem';
 import { useTabContext } from '@/hooks/useTabContext';
 import { authClient } from '@/lib/auth-client';
 import {
-  deleteCourtBookmark,
   deleteCourtNotification,
   getCourt,
-  postCourtBookmark,
-  postCourtNotification,
+  postCourtNotification
 } from '@/lib/endpoints';
 import { THEME } from '@/lib/theme';
 import { openDirections } from '@/lib/utils';
@@ -36,16 +34,13 @@ import {
   ArrowRight,
   ArrowRightIcon,
   BellIcon,
-  BookmarkIcon,
   ClockIcon,
   HomeIcon,
   MapPinIcon,
   MapPinnedIcon,
-  StarIcon,
   SunIcon,
   UsersIcon,
-  VerifiedIcon,
-  XIcon,
+  XIcon
 } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { useCallback, useRef } from 'react';
@@ -58,8 +53,7 @@ export default function CourtPage() {
   const courtId = parseInt(searchParams.courtId as string);
   const queryClient = useQueryClient();
 
-  const { data: currentUserData } = authClient.useSession();
-
+  
   const router = useRouter();
 
   const { data: court, isPending } = useQuery({
@@ -70,57 +64,6 @@ export default function CourtPage() {
       }),
     queryKey: ['court', courtId],
   });
-
-  const { mutate: bookmarkCourt } = useMutation({
-    mutationFn: async () => postCourtBookmark(courtId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['courts'],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['user', currentUserData?.user.id],
-      });
-      queryClient.setQueryData(['court', courtId], (old: Court) => ({
-        ...old,
-        isBookmarked: true,
-      }));
-    },
-    onError: (error) => {
-      console.log('Error', error);
-      (toast.error(error.message), { position: 'bottom-center' });
-    },
-  });
-
-  const { mutate: unbookmarkCourt } = useMutation({
-    mutationFn: async () => deleteCourtBookmark(courtId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['courts'],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['user', currentUserData?.user.id],
-      });
-      queryClient.setQueryData(['court', courtId], (old: Court) => ({
-        ...old,
-        isBookmarked: false,
-      }));
-    },
-    onError: (error) => {
-      console.log('Error', error);
-      (toast.error(error.message), { position: 'bottom-center' });
-    },
-  });
-
-  const toggleBookmark = () => {
-    if (court?.isBookmarked) {
-      unbookmarkCourt();
-    } else {
-      bookmarkCourt();
-    }
-    queryClient.invalidateQueries({
-      queryKey: ['courts'],
-    });
-  };
 
   const { mutate: enableNotification } = useMutation({
     mutationFn: async () => postCourtNotification(courtId),
@@ -199,14 +142,6 @@ export default function CourtPage() {
                   as={BellIcon}
                 />
               </Pressable>
-              {/* @deprecated */}
-              {/* <Pressable onPress={toggleBookmark}>
-                <Icon
-                  size={22}
-                  fill={court?.isBookmarked ? THEME[colorScheme!].primary : undefined}
-                  as={BookmarkIcon}
-                />
-              </Pressable> */}
             </View>
           ),
         }}

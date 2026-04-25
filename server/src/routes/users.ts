@@ -6,10 +6,9 @@ import { db } from "../db";
 import {
   activity,
   court,
-  courtBookmark,
   courtSession,
   rating,
-  user,
+  user
 } from "../db/schema";
 import { handleError } from "../utils/handleError";
 import { invalidateQueries } from "../utils/invalidateQueries";
@@ -111,26 +110,10 @@ usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
       .orderBy(desc(courtSession.startTime))
       .limit(5);
 
-    // @deprecated 
-    // const bookmarkedCourts = await db
-    //   .select({
-    //     id: court.id,
-    //     name: court.name,
-    //     address: court.address,
-    //     lat: court.lat,
-    //     lng: court.lng,
-    //     indoor: court.indoor,
-    //     verified: court.verified,
-    //     image: court.image,
-    //   })
-    //   .from(courtBookmark)
-    //   .innerJoin(court, eq(courtBookmark.courtId, court.id));
-
     res.json({
       ...targetUser,
       ratingHistory,
       recentSessions,
-      // bookmarkedCourts,
     });
   } catch (error) {
     handleError(error, res, "GET /users/:id");

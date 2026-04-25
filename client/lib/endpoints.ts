@@ -82,9 +82,6 @@ export async function getCourts({
   limit = 25,
   searchQuery,
   indoor,
-  verified = true,
-  popular,
-  bookmarked,
   sortBy,
 }: {
   lat: number;
@@ -92,9 +89,6 @@ export async function getCourts({
   limit?: number;
   searchQuery?: string;
   indoor?: boolean;
-  verified?: true;
-  popular?: true;
-  bookmarked?: true;
   sortBy?: 'distance' | 'active_players';
 }): Promise<CourtListEntry[]> {
   const params = new URLSearchParams();
@@ -108,15 +102,6 @@ export async function getCourts({
   }
   if (indoor !== undefined) {
     params.append('indoor', indoor.toString());
-  }
-  if (verified !== undefined) {
-    params.append('verified', verified.toString());
-  }
-  if (popular !== undefined) {
-    params.append('popular', popular.toString());
-  }
-  if (bookmarked !== undefined) {
-    params.append('bookmarked', bookmarked.toString());
   }
   if (sortBy !== undefined) {
     params.append('sortBy', sortBy);
@@ -270,20 +255,6 @@ export async function getCourtSessions({
   });
 
   return courtSession;
-}
-
-export async function postCourtBookmark(id: number) {
-  await serverRequest({
-    endpoint: `/courts/${id}/bookmark`,
-    method: 'POST',
-  });
-}
-
-export async function deleteCourtBookmark(id: number) {
-  await serverRequest({
-    endpoint: `/courts/${id}/bookmark`,
-    method: 'DELETE',
-  });
 }
 
 export async function getEncounteredPlayers(courtSessionId: number): Promise<EncounteredPlayer[]> {

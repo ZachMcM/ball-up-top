@@ -19,9 +19,6 @@ export default function HomePage() {
   // Courts filter state
   const [courtsFilters, setCourtsFilters] = useState<{
     isIndoor?: boolean;
-    // @deprecated
-    // isBookmarked?: true;
-    // isPopular?: true;
     sortBy?: 'distance' | 'active_players';
   }>({});
 
@@ -37,9 +34,6 @@ export default function HomePage() {
     if (activeTab === 'courts') {
       let count = 0;
       if (courtsFilters.isIndoor !== undefined) count++;
-      // @deprecated
-      // if (courtsFilters.isBookmarked) count++;
-      // if (courtsFilters.isPopular) count++;
       if (courtsFilters.sortBy) count++;
       return count;
     } else {

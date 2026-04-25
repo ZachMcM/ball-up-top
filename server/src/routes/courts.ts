@@ -5,12 +5,10 @@ import * as z from "zod";
 import {
   MAX_DISTANCE,
   MAX_DISTANCE_FOR_CHECK_IN,
-  POPULAR_THRESHOLD,
 } from "../config/courts";
 import { db } from "../db";
 import {
   court,
-  courtBookmark,
   courtSession,
   notificationCourt,
   user,
@@ -24,50 +22,6 @@ import { authMiddleware, upload } from "../utils/middleware";
 import { r2 } from "../utils/r2";
 
 export const courtsRoute = Router();
-
-courtsRoute.post("/courts/:id/bookmark", authMiddleware, async (req, res) => {
-  try {
-    const courtId = parseInt(req.params.id);
-
-    if (!Number.isInteger(courtId)) {
-      logger.error("Court ID is not an integer.");
-      return res.status(400).json({ error: "Court ID is not an integer." });
-    }
-
-    await db.insert(courtBookmark).values({
-      courtId,
-      userId: res.locals.userId!,
-    });
-
-    return res.json({ success: true });
-  } catch (error) {
-    handleError(error, res, "POST /courts/:id/bookmark");
-  }
-});
-
-courtsRoute.delete("/courts/:id/bookmark", authMiddleware, async (req, res) => {
-  try {
-    const courtId = parseInt(req.params.id);
-
-    if (!Number.isInteger(courtId)) {
-      logger.error("Court ID is not an integer.");
-      return res.status(400).json({ error: "Court ID is not an integer." });
-    }
-
-    await db
-      .delete(courtBookmark)
-      .where(
-        and(
-          eq(courtBookmark.courtId, courtId),
-          eq(courtBookmark.userId, res.locals.userId!),
-        ),
-      );
-
-    return res.json({ success: true });
-  } catch (error) {
-    handleError(error, res, "DELETE /courts/:id/bookmark");
-  }
-});
 
 courtsRoute.get(
   "/courts/:id/active-players",
@@ -197,12 +151,7 @@ courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
         lat: court.lat,
         lng: court.lng,
         indoor: court.indoor,
-        verified: court.verified,
         image: court.image,
-        isBookmarked: sql<boolean>`EXISTS (
-          SELECT 1 FROM court_bookmark
-          WHERE court_id = ${courtId} AND user_id = ${res.locals.userId}
-        )`,
         isNotificationEnabled: sql<boolean>`EXISTS (
           SELECT 1 FROM notification_court
           WHERE court_id = ${courtId} AND user_id = ${res.locals.userId}
@@ -308,9 +257,6 @@ courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
       activityGraph: activityResult.rows,
       avgPlayerOverall: Number(sessionStats?.avgPlayerOverall ?? 0),
       currentActiveSessions: Number(sessionStats?.currentActiveSessions ?? 0),
-      popular:
-        Number(avgPlayersPerDayResult.rows[0]?.avgPlayersPerDay ?? 0) >
-        POPULAR_THRESHOLD,
       currentActiveUsers: activeUsers,
       leaderboard: leaderboardResult.rows,
     });
@@ -412,14 +358,6 @@ const CourtsParamsSchema = z.object({
     .enum(["true"])
     .transform((val) => val === "true")
     .optional(),
-  popular: z
-    .enum(["true"])
-    .transform((val) => val === "true")
-    .optional(),
-  bookmarked: z
-    .enum(["true"])
-    .transform((val) => val === "true")
-    .optional(),
   sortBy: z.enum(["distance", "active_players"]).optional().default("distance"),
 });
 
@@ -436,9 +374,6 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
       limit,
       searchQuery,
       indoor,
-      verified,
-      popular,
-      bookmarked,
       sortBy,
     } = validQueryParams.data;
 
@@ -502,9 +437,7 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
     if (indoor !== undefined) {
       conditions.push(eq(court.indoor, indoor));
     }
-    if (verified !== undefined) {
-      conditions.push(eq(court.verified, verified));
-    }
+
     if (searchQuery) {
       conditions.push(
         sql`(
@@ -512,24 +445,6 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
           ${court.address} ILIKE ${`%${searchQuery}%`} OR
           ${sql`array_to_string(${court.aliases}, ' ')`} ILIKE ${`%${searchQuery}%`}
         )`,
-      );
-    }
-
-    const bookmarkStatus = db
-      .select({
-        courtId: courtBookmark.courtId,
-      })
-      .from(courtBookmark)
-      .where(eq(courtBookmark.userId, res.locals.userId!))
-      .as("bookmark_status");
-
-    if (bookmarked !== undefined) {
-      conditions.push(sql`${bookmarkStatus.courtId} IS NOT NULL`);
-    }
-
-    if (popular !== undefined) {
-      conditions.push(
-        sql`COALESCE(${avgPlayersPerDayStats.avgPlayersPerDay}, 0) > ${POPULAR_THRESHOLD}`,
       );
     }
 
@@ -541,13 +456,10 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
         lat: court.lat,
         lng: court.lng,
         indoor: court.indoor,
-        verified: court.verified,
         image: court.image,
         distance: distanceFormula,
-        popular: sql<boolean>`COALESCE(${avgPlayersPerDayStats.avgPlayersPerDay}, 0) > ${POPULAR_THRESHOLD}`,
         avgPlayerOverall: sql<number>`COALESCE(${sessionStats.avgPlayerOverall}, 0)::float`,
         currentActiveSessions: sql<number>`COALESCE(${sessionStats.currentActiveSessions}, 0)::integer`,
-        isBookmarked: sql<boolean>`${bookmarkStatus.courtId} IS NOT NULL`,
       })
       .from(court)
       .leftJoin(
@@ -555,7 +467,6 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
         eq(court.id, avgPlayersPerDayStats.courtId),
       )
       .leftJoin(sessionStats, eq(court.id, sessionStats.courtId))
-      .leftJoin(bookmarkStatus, eq(court.id, bookmarkStatus.courtId))
       .where(and(...conditions))
       .orderBy(
         sortBy === "active_players"
@@ -588,84 +499,6 @@ const PostCourtsBodySchema = z.object({
     .pipe(z.array(z.string()))
     .optional(),
 });
-
-courtsRoute.post(
-  "/courts",
-  authMiddleware,
-  upload.single("image"),
-  async (req, res) => {
-    try {
-      const file = req.file;
-
-      if (!file) {
-        return res.status(400).json({ error: "No image file provided" });
-      }
-
-      const allowedMimeTypes = [
-        "image/jpeg",
-        "image/jpg",
-        "image/png",
-        "image/webp",
-        "image/gif",
-      ];
-      if (!allowedMimeTypes.includes(file.mimetype)) {
-        return res.status(400).json({
-          error:
-            "Invalid file type. Only JPEG, PNG, WebP, and GIF images are allowed",
-        });
-      }
-
-      const validBody = PostCourtsBodySchema.safeParse(req.body);
-      if (!validBody.success) {
-        return res.status(400).json({ error: validBody.error.message });
-      }
-
-      const { name, indoor, googlePlaceId, lat, lng, address, aliases } =
-        validBody.data;
-
-      const existingCourt = await db.query.court.findFirst({
-        where: eq(court.googlePlaceId, googlePlaceId),
-      });
-
-      if (existingCourt) {
-        return res
-          .status(409)
-          .json({ error: "A court with that place already exists" });
-      }
-
-      const fileName = `courts/${
-        res.locals.userId
-      }-${Date.now()}.${file.originalname.split(".").pop()}`;
-
-      await r2.send(
-        new PutObjectCommand({
-          Bucket: process.env.R2_BUCKET_NAME!,
-          Key: fileName,
-          Body: file.buffer,
-          ContentType: file.mimetype,
-        }),
-      );
-
-      const imageUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
-
-      await db.insert(court).values({
-        name,
-        indoor,
-        googlePlaceId,
-        lat,
-        lng,
-        address,
-        aliases,
-        createdByUserId: res.locals.userId,
-        image: imageUrl,
-      });
-
-      return res.json({ success: true });
-    } catch (error) {
-      handleError(error, res, "POST /courts");
-    }
-  },
-);
 
 courtsRoute.post(
   "/courts/:id/notifications",

@@ -23,16 +23,12 @@ import { useDebounce } from 'use-debounce';
 interface CourtsListProps {
   searchQuery?: string;
   isIndoor?: boolean;
-  isBookmarked?: true;
-  isPopular?: true;
   sortBy?: 'distance' | 'active_players';
 }
 
 export function CourtsList({
   searchQuery,
   isIndoor,
-  isBookmarked,
-  isPopular,
   sortBy,
 }: CourtsListProps) {
   const { location, isLocationPending } = useLocation();
@@ -45,8 +41,6 @@ export function CourtsList({
         lat: location?.coords.latitude!,
         lng: location?.coords.longitude!,
         isIndoor,
-        isBookmarked,
-        isPopular,
         searchQuery: debouncedSearchQuery,
       },
     ],
@@ -55,8 +49,6 @@ export function CourtsList({
         lat: location?.coords.latitude!,
         lng: location?.coords.longitude!,
         indoor: isIndoor,
-        popular: isPopular,
-        bookmarked: isBookmarked,
         searchQuery: debouncedSearchQuery,
         sortBy,
       });
@@ -81,13 +73,6 @@ export function CourtsList({
             No courts found nearby. Try a different search or adding a new court.
           </EmptyDescription>
         </EmptyHeader>
-        {/* @deprecated */}
-        {/* <EmptyContent>
-          <Button onPress={() => router.navigate('/add-court')}>
-            <Text>Add Court</Text>
-            <Icon size={16} className="text-primary-foreground" as={PlusCircle} />
-          </Button>
-        </EmptyContent> */}
       </Empty>
     );
   }

@@ -7,9 +7,6 @@ import { Pressable, View } from 'react-native';
 interface CourtsFiltersContentProps {
   filters: {
     isIndoor?: boolean;
-    // @deprecated
-    // isBookmarked?: true;
-    // isPopular?: true;
     sortBy?: 'distance' | 'active_players';
   };
   onChange: (filters: CourtsFiltersContentProps['filters']) => void;
@@ -18,9 +15,6 @@ interface CourtsFiltersContentProps {
 export function CourtsFiltersContent({ filters, onChange }: CourtsFiltersContentProps) {
   const {
     isIndoor,
-    // @deprecated
-    // isBookmarked,
-    // isPopular,
     sortBy,
   } = filters;
 
@@ -55,42 +49,6 @@ export function CourtsFiltersContent({ filters, onChange }: CourtsFiltersContent
           </Button>
         </View>
       </View>
-      {/* @deprecated */}
-      {/* <View className="flex flex-col gap-2 border-b border-border px-4 py-5">
-        <Text className="text-lg font-bold">Filters</Text>
-        <Pressable
-          onPress={() =>
-            onChange({
-              ...filters,
-              isPopular: isPopular ? undefined : true,
-            })
-          }
-          className="flex flex-row items-center justify-between py-3">
-          <Text className="text-base">Popular</Text>
-          <View
-            className={`size-6 items-center justify-center rounded-md border-2 ${
-              isPopular ? 'border-primary bg-primary' : 'border-muted-foreground'
-            }`}>
-            {isPopular && <Icon as={CheckIcon} size={16} className="text-primary-foreground" />}
-          </View>
-        </Pressable>
-        <Pressable
-          onPress={() =>
-            onChange({
-              ...filters,
-              isBookmarked: isBookmarked ? undefined : true,
-            })
-          }
-          className="flex flex-row items-center justify-between py-3">
-          <Text className="text-base">Bookmarked</Text>
-          <View
-            className={`size-6 items-center justify-center rounded-md border-2 ${
-              isBookmarked ? 'border-primary bg-primary' : 'border-muted-foreground'
-            }`}>
-            {isBookmarked && <Icon as={CheckIcon} size={16} className="text-primary-foreground" />}
-          </View>
-        </Pressable>
-      </View> */}
       <View className="flex flex-col gap-2 px-4 py-5">
         <Text className="text-lg font-bold">Sort</Text>
         <Pressable

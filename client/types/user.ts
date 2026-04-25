@@ -30,15 +30,4 @@ export type UserSession = {
 export type ExtendedUser = User & {
   ratingHistory: RatingHistoryPoint[];
   recentSessions: UserSession[];
-  // @deprecated
-  // bookmarkedCourts: {
-  //   id: number;
-  //   name: string;
-  //   address: string;
-  //   lat: number;
-  //   lng: number;
-  //   indoor: boolean;
-  //   verified: boolean;
-  //   image: string;
-  // }[];
 };

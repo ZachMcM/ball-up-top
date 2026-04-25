@@ -123,7 +123,6 @@ export const court = pgTable(
     lng: doublePrecision("lng").notNull(),
 
     indoor: boolean("indoor").notNull().default(false),
-    verified: boolean("verified").notNull().default(false),
 
     image: text("image").notNull(),
 
@@ -137,29 +136,8 @@ export const court = pgTable(
   },
   (table) => [
     index("court_lat_lng_idx").on(table.lat, table.lng),
-    index("court_verified_idx").on(table.verified),
     index("court_created_by_user_id_idx").on(table.createdByUserId),
     index("court_indoor_idx").on(table.indoor),
-  ]
-);
-
-export const courtBookmark = pgTable(
-  "court_bookmark",
-  {
-    id: serial().primaryKey().notNull(),
-    userId: text("user_id")
-      .notNull()
-      .references(() => user.id),
-    courtId: integer("court_id")
-      .notNull()
-      .references(() => court.id),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-  },
-  (table) => [
-    uniqueIndex("court_bookmark_user_id_court_id_idx").on(
-      table.userId,
-      table.courtId
-    ),
   ]
 );
 

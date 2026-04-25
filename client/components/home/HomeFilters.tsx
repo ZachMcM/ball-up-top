@@ -19,8 +19,6 @@ interface HomeFiltersProps {
 
   courtsFilters: {
     isIndoor?: boolean;
-    isBookmarked?: true;
-    isPopular?: true;
     sortBy?: 'distance' | 'active_players';
   };
   onCourtsFiltersChange: (filters: HomeFiltersProps['courtsFilters']) => void;

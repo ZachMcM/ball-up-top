@@ -20,13 +20,10 @@ export type CourtListEntry = {
   lat: number;
   lng: number;
   indoor: boolean;
-  verified: boolean;
   image: string;
   distance: number;
   avgPlayerOverall: number;
   currentActiveSessions: number;
-  popular: boolean;
-  isBookmarked: boolean;
   isNotificationEnabled?: boolean;
 };
 
