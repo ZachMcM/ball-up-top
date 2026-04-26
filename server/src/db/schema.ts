@@ -1,15 +1,15 @@
 import { isNull } from "drizzle-orm";
 import {
+  boolean,
+  doublePrecision,
+  index,
+  integer,
   pgTable,
+  serial,
   text,
   timestamp,
-  boolean,
-  index,
-  doublePrecision,
-  integer,
-  serial,
-  uniqueIndex,
   unique,
+  uniqueIndex
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable(
@@ -35,6 +35,10 @@ export const user = pgTable(
     defenseRating: integer("defense_rating").default(60).notNull(),
     shootingRating: integer("shooting_rating").default(60).notNull(),
 
+    primaryCourtId: integer("primary_court_id")
+      .notNull()
+      .references(() => court.id),
+
     // archetype
     archetype: text().default("Unranked").notNull(),
 
@@ -48,7 +52,7 @@ export const user = pgTable(
 
     expoPushToken: text("expo_push_token"),
   },
-  (table) => [index("user_overall_idx").on(table.overall)]
+  (table) => [index("user_overall_idx").on(table.overall)],
 );
 
 export const session = pgTable(
@@ -67,7 +71,7 @@ export const session = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
   },
-  (table) => [index("session_userId_idx").on(table.userId)]
+  (table) => [index("session_userId_idx").on(table.userId)],
 );
 
 export const account = pgTable(
@@ -91,7 +95,7 @@ export const account = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("account_userId_idx").on(table.userId)]
+  (table) => [index("account_userId_idx").on(table.userId)],
 );
 
 export const verification = pgTable(
@@ -107,7 +111,7 @@ export const verification = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("verification_identifier_idx").on(table.identifier)]
+  (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
 export const court = pgTable(
@@ -119,14 +123,15 @@ export const court = pgTable(
     googlePlaceId: text("google_place_id").notNull().unique(),
     address: text("address").notNull(),
 
+    collegeName: text("college_name").notNull().default("Purdue University"),
+    collegeColor: text("college_color").notNull().default("#cfb991"),
+
     lat: doublePrecision("lat").notNull(),
     lng: doublePrecision("lng").notNull(),
 
     indoor: boolean("indoor").notNull().default(false),
 
     image: text("image").notNull(),
-
-    createdByUserId: text("created_by_user_id").references(() => user.id),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
@@ -136,9 +141,8 @@ export const court = pgTable(
   },
   (table) => [
     index("court_lat_lng_idx").on(table.lat, table.lng),
-    index("court_created_by_user_id_idx").on(table.createdByUserId),
     index("court_indoor_idx").on(table.indoor),
-  ]
+  ],
 );
 
 export const courtSession = pgTable(
@@ -163,7 +167,7 @@ export const courtSession = pgTable(
     uniqueIndex("one_active_session_per_user")
       .on(table.userId)
       .where(isNull(table.endTime)),
-  ]
+  ],
 );
 
 export const rating = pgTable(
@@ -190,20 +194,20 @@ export const rating = pgTable(
     raterOverallAtTime: integer("rater_overall_at_time").notNull(),
 
     runCompetitivenessAtTime: doublePrecision(
-      "run_competitiveness_at_time"
+      "run_competitiveness_at_time",
     ).notNull(),
 
     finalWeightAppliedShooting: doublePrecision(
-      "final_weight_applied_shooting"
+      "final_weight_applied_shooting",
     ).notNull(),
     finalWeightAppliedPlaymaking: doublePrecision(
-      "final_weight_applied_playmaking"
+      "final_weight_applied_playmaking",
     ).notNull(),
     finalWeightAppliedDefense: doublePrecision(
-      "final_weight_applied_defense"
+      "final_weight_applied_defense",
     ).notNull(),
     finalWeightAppliedFinishing: doublePrecision(
-      "final_weight_applied_finishing"
+      "final_weight_applied_finishing",
     ).notNull(),
 
     rateeNewOverall: integer("ratee_new_overall").notNull(),
@@ -219,7 +223,7 @@ export const rating = pgTable(
     index("rating_rater_idx").on(table.raterId),
     index("rating_rater_court_session_idx").on(table.raterCourtSession),
     index("rating_created_at_idx").on(table.createdAt),
-  ]
+  ],
 );
 
 export const encounteredPlayer = pgTable(
@@ -243,7 +247,7 @@ export const encounteredPlayer = pgTable(
     // For history/audit in rating table
     raterOverallAtTime: integer("rater_overall_at_time").notNull(),
     runCompetitivenessAtTime: doublePrecision(
-      "run_competitiveness_at_time"
+      "run_competitiveness_at_time",
     ).notNull(),
 
     // Ratee's ratings at checkout (for outlier detection at submit time)
@@ -284,9 +288,9 @@ export const encounteredPlayer = pgTable(
     index("encountered_player_court_session_idx").on(table.courtSessionId),
     uniqueIndex("encountered_player_court_session_ratee_idx").on(
       table.courtSessionId,
-      table.rateeId
+      table.rateeId,
     ),
-  ]
+  ],
 );
 
 export const activity = pgTable("activity", {
@@ -325,5 +329,5 @@ export const notificationCourt = pgTable(
       .references(() => court.id),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => [unique().on(table.userId, table.courtId)]
+  (table) => [unique().on(table.userId, table.courtId)],
 );

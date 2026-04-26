@@ -106,6 +106,13 @@
       "when": 1777142994961,
       "tag": "0014_magical_rocket_raccoon",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1777230685456,
+      "tag": "0015_oval_ted_forrester",
+      "breakpoints": true
     }
   ]
 }

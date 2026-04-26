@@ -11,7 +11,7 @@ import {
   user,
 } from "./schema";
 
-export const userRelations = relations(user, ({ many }) => ({
+export const userRelations = relations(user, ({ many, one }) => ({
   sessions: many(session),
   accounts: many(account),
   createdCourts: many(court),
@@ -20,6 +20,10 @@ export const userRelations = relations(user, ({ many }) => ({
   outgoingRatings: many(rating, { relationName: "outgoingRatings" }),
   encounteredPlayersAsRatee: many(encounteredPlayer),
   notificationCourts: many(notificationCourt),
+  primaryCourt: one(court, {
+    fields: [user.primaryCourtId],
+    references: [court.id],
+  }),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -37,10 +41,7 @@ export const accountRelations = relations(account, ({ one }) => ({
 }));
 
 export const courtRelations = relations(court, ({ one, many }) => ({
-  createdByUser: one(user, {
-    fields: [court.createdByUserId],
-    references: [user.id],
-  }),
+  createdByUser: many(user),
   courtSessions: many(courtSession),
 }));
 
@@ -57,7 +58,7 @@ export const courtSessionRelations = relations(
     }),
     ratings: many(rating),
     encounteredPlayers: many(encounteredPlayer),
-  })
+  }),
 );
 
 export const ratingRelations = relations(rating, ({ one, many }) => ({
@@ -88,7 +89,7 @@ export const encounteredPlayerRelations = relations(
       fields: [encounteredPlayer.rateeId],
       references: [user.id],
     }),
-  })
+  }),
 );
 
 export const activityRelations = relations(activity, ({ one }) => ({
@@ -117,5 +118,5 @@ export const notificationCourtRelations = relations(
       fields: [notificationCourt.courtId],
       references: [court.id],
     }),
-  })
+  }),
 );
