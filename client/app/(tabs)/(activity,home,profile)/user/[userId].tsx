@@ -1,22 +1,20 @@
 import { NativewindScrollView } from '@/components/NativewindScrollView';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Avatar } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Icon } from '@/components/ui/icon';
 import { Separator } from '@/components/ui/separator';
 import { Text } from '@/components/ui/text';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { VerticalRatingBar } from '@/components/ui/vertical-rating-bar';
 import { authClient } from '@/lib/auth-client';
 import { getUser } from '@/lib/endpoints';
 import { THEME } from '@/lib/theme';
-import { getCityState, timeAgo } from '@/lib/utils';
+import { timeAgo } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
-import { InfoIcon, LogOutIcon } from 'lucide-react-native';
+import { LogOutIcon } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
@@ -105,21 +103,9 @@ export default function ProfilePage() {
                   </View>
                 </View>
                 <View className="flex flex-1 flex-col gap-4">
-                  <View className="flex flex-row items-center gap-2">
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Icon as={InfoIcon} className="size-4 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent className="m-4 max-w-[100px]">
-                        <Text>
-                          Ratings are calculated from verified check-ins at real courts. Each
-                          session contributes to your score based on performance data from other
-                          players who've seen you play, keeping ratings honest and community-driven.
-                        </Text>
-                      </TooltipContent>
-                    </Tooltip>
-                    <Text className="text-lg font-semibold">Ratings</Text>
-                  </View>
+                  <Text className="text-lg font-semibold">
+                    {userId == currentUserData?.user.id && 'Your '}Ratings
+                  </Text>
                   <View className="flex flex-row">
                     {RATING_CATEGORIES.map(({ key, label }) => (
                       <VerticalRatingBar key={key} value={user[key]} label={label} />
@@ -167,7 +153,7 @@ export default function ProfilePage() {
                   ) : (
                     <Text className="text-center text-xs font-medium">No ratings data yet.</Text>
                   )}
-                  <Separator/>
+                  <Separator />
                 </View>
                 <View className="flex flex-col gap-4">
                   <Text className="text-lg font-semibold">Recent Sessions</Text>
@@ -206,7 +192,7 @@ export default function ProfilePage() {
                   ) : (
                     <Text className="text-center text-xs font-medium">No sessions yet.</Text>
                   )}
-                  <Separator/>
+                  <Separator />
                 </View>
                 {user.id === currentUserData?.user.id && (
                   <View className="flex flex-1 flex-col gap-4">
