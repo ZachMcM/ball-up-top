@@ -24,6 +24,9 @@ export const authClient = createAuthClient({
         height: {
           type: 'string',
         },
+        primaryCourtId: {
+          type: 'number',
+        },
       },
     }),
   ],

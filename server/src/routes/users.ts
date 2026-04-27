@@ -4,11 +4,13 @@ import { Router } from "express";
 import * as z from "zod";
 import { db } from "../db";
 import {
+  getRatingHistory,
+  getRecentSessions,
+} from "../db/queries/userQueries";
+import {
   activity,
-  court,
   courtSession,
-  rating,
-  user
+  user,
 } from "../db/schema";
 import { handleError } from "../utils/handleError";
 import { invalidateQueries } from "../utils/invalidateQueries";
@@ -83,32 +85,10 @@ usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const ratingHistory = await db
-      .select({
-        overall: rating.rateeNewOverall,
-        createdAt: rating.createdAt,
-      })
-      .from(rating)
-      .where(eq(rating.rateeId, userId))
-      .orderBy(rating.createdAt)
-      .limit(25);
-
-    const recentSessions = await db
-      .select({
-        id: courtSession.id,
-        startTime: courtSession.startTime,
-        endTime: courtSession.endTime,
-        court: {
-          id: court.id,
-          name: court.name,
-          image: court.image,
-        },
-      })
-      .from(courtSession)
-      .innerJoin(court, eq(courtSession.courtId, court.id))
-      .where(eq(courtSession.userId, userId))
-      .orderBy(desc(courtSession.startTime))
-      .limit(5);
+    const [ratingHistory, recentSessions] = await Promise.all([
+      getRatingHistory({ userId }),
+      getRecentSessions({ userId }),
+    ]);
 
     res.json({
       ...targetUser,

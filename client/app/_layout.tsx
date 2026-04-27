@@ -5,8 +5,11 @@ import { LocationProvider, useLocation } from '@/components/providers/LocationPr
 import { PushNotificationProvider } from '@/components/providers/PushNotificationProvider';
 import '@/global.css';
 import { authClient } from '@/lib/auth-client';
-import { BarlowCondensed_700Bold, BarlowCondensed_400Regular } from '@expo-google-fonts/barlow-condensed';
-import {  } from "@expo-google-fonts/dm-sans"
+import {
+  BarlowCondensed_700Bold,
+  BarlowCondensed_400Regular,
+} from '@expo-google-fonts/barlow-condensed';
+import {} from '@expo-google-fonts/dm-sans';
 import { useFonts } from 'expo-font';
 
 import { NAV_THEME, THEME } from '@/lib/theme';
@@ -31,9 +34,11 @@ export {
 const queryClient = new QueryClient();
 
 export default function RootLayout() {
-  const { colorScheme } = useColorScheme();
+  const { colorScheme, setColorScheme } = useColorScheme();
+  setColorScheme('dark');
+  
   // TODO
-  useFonts({ });
+  useFonts({});
 
   function onAppStateChange(status: AppStateStatus) {
     if (Platform.OS !== 'web') {
@@ -111,7 +116,7 @@ export function RootNavigator() {
       <Stack.Protected guard={!isLoading && currentUserData === null}>
         <Stack.Screen
           name="auth"
-          options={{ title: 'Ball Up Top', headerLeft: () => <BackButton/> }}
+          options={{ title: 'Ball Up Top', headerLeft: () => <BackButton /> }}
         />
       </Stack.Protected>
       <Stack.Protected guard={showOnboarding && onboardingStep === 'name'}>
@@ -134,6 +139,15 @@ export function RootNavigator() {
       <Stack.Protected guard={showOnboarding && onboardingStep === 'image'}>
         <Stack.Screen
           name="(onboarding)/image"
+          options={{
+            title: 'Ball Up Top',
+            headerBackVisible: false,
+          }}
+        />
+      </Stack.Protected>
+      <Stack.Protected guard={showOnboarding && onboardingStep === 'primaryCollege'}>
+        <Stack.Screen
+          name="(onboarding)/primary-college"
           options={{
             title: 'Ball Up Top',
             headerBackVisible: false,

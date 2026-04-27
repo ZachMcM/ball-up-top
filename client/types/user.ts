@@ -24,6 +24,8 @@ export type UserSession = {
     id: number;
     name: string;
     image: string;
+    collegeName: string;
+    collegeColor: string;
   };
 };
 

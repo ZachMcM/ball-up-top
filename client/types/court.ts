@@ -21,10 +21,19 @@ export type CourtListEntry = {
   lng: number;
   indoor: boolean;
   image: string;
+  collegeName: string;
+  collegeColor: string;
   distance: number;
   avgPlayerOverall: number;
   currentActiveSessions: number;
   isNotificationEnabled?: boolean;
+};
+
+export type LeaderboardEntry = User & { rank: number };
+
+export type CourtLeaderboard = {
+  top: LeaderboardEntry[];
+  currentUser: LeaderboardEntry | null;
 };
 
 export type Court = CourtListEntry & {
@@ -33,7 +42,7 @@ export type Court = CourtListEntry & {
     avgSessions: number;
   }[];
   currentActiveUsers: User[];
-  leaderboard: (User & { rank: number })[];
+  leaderboard: CourtLeaderboard;
 };
 
 export type CourtSession = {

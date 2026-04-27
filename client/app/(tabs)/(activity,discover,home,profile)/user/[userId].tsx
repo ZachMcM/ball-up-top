@@ -1,8 +1,7 @@
 import { NativewindScrollView } from '@/components/NativewindScrollView';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { RecentSessionCard } from '@/components/RecentSessionCard';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Icon } from '@/components/ui/icon';
 import { Separator } from '@/components/ui/separator';
 import { Text } from '@/components/ui/text';
@@ -12,18 +11,17 @@ import { getUser } from '@/lib/endpoints';
 import { THEME } from '@/lib/theme';
 import { timeAgo } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
-import { Image } from 'expo-image';
-import { Link, Stack, useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import { LogOutIcon } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
 
 const RATING_CATEGORIES = [
-  { key: 'shootingRating', label: 'Shooting' },
-  { key: 'finishingRating', label: 'Finishing' },
-  { key: 'playmakingRating', label: 'Playmaking' },
-  { key: 'defenseRating', label: 'Defense' },
+  { key: 'shootingRating', label: 'Shooting', color: 'bg-green-600' },
+  { key: 'finishingRating', label: 'Finishing', color: 'bg-sky-600' },
+  { key: 'playmakingRating', label: 'Playmaking', color: 'bg-amber-600' },
+  { key: 'defenseRating', label: 'Defense', color: 'bg-rose-600' },
 ] as const;
 
 function formatSessionTime(startTime: string, endTime: string | null) {
@@ -107,8 +105,8 @@ export default function ProfilePage() {
                     {userId == currentUserData?.user.id && 'Your '}Ratings
                   </Text>
                   <View className="flex flex-row">
-                    {RATING_CATEGORIES.map(({ key, label }) => (
-                      <VerticalRatingBar key={key} value={user[key]} label={label} />
+                    {RATING_CATEGORIES.map(({ key, label, color }) => (
+                      <VerticalRatingBar key={key} value={user[key]} color={color} label={label} />
                     ))}
                   </View>
                   <Separator />
@@ -158,41 +156,14 @@ export default function ProfilePage() {
                 <View className="flex flex-col gap-4">
                   <Text className="text-lg font-semibold">Recent Sessions</Text>
                   {user.recentSessions.length > 0 ? (
-                    <View className="flex flex-col gap-3">
-                      {user.recentSessions.map(({ court, id, startTime, endTime }) => (
-                        <Link
-                          href={{
-                            pathname: '/court/[courtId]',
-                            params: { courtId: court.id },
-                          }}
-                          key={id}
-                          className="w-full">
-                          <Card className="flex flex-row items-center gap-3 px-4 py-3">
-                            <AspectRatio
-                              ratio={1 / 1}
-                              className="relative h-[48px] overflow-hidden rounded-md">
-                              <Image
-                                source={{
-                                  uri: court.image,
-                                }}
-                                style={{ width: '100%', height: '100%' }}
-                                className="absolute inset-0 object-cover"
-                              />
-                            </AspectRatio>
-                            <View className="flex flex-1 flex-col">
-                              <Text className="font-semibold">{court.name}</Text>
-                              <Text className="text-sm text-muted-foreground">
-                                {formatSessionTime(startTime, endTime)}
-                              </Text>
-                            </View>
-                          </Card>
-                        </Link>
+                    <View className="flex flex-col gap-4">
+                      {user.recentSessions.map((recentSession) => (
+                        <RecentSessionCard session={recentSession} />
                       ))}
                     </View>
                   ) : (
                     <Text className="text-center text-xs font-medium">No sessions yet.</Text>
                   )}
-                  <Separator />
                 </View>
                 {user.id === currentUserData?.user.id && (
                   <View className="flex flex-1 flex-col gap-4">

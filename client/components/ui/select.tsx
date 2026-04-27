@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import * as SelectPrimitive from '@rn-primitives/select';
 import { Check, ChevronDown, ChevronDownIcon, ChevronUpIcon } from 'lucide-react-native';
 import * as React from 'react';
-import { Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { Platform, ScrollView, StyleSheet, type TextStyle, View } from 'react-native';
 import { FadeIn, FadeOut } from 'react-native-reanimated';
 import { FullWindowOverlay as RNFullWindowOverlay } from 'react-native-screens';
 
@@ -147,8 +147,10 @@ function SelectLabel({
 function SelectItem({
   className,
   children,
+  textStyle,
   ...props
-}: SelectPrimitive.ItemProps & React.RefAttributes<SelectPrimitive.ItemRef>) {
+}: SelectPrimitive.ItemProps &
+  React.RefAttributes<SelectPrimitive.ItemRef> & { textStyle?: TextStyle }) {
   return (
     <SelectPrimitive.Item
       className={cn(
@@ -165,7 +167,10 @@ function SelectItem({
           <Icon as={Check} className="size-4 shrink-0 text-muted-foreground" />
         </SelectPrimitive.ItemIndicator>
       </View>
-      <SelectPrimitive.ItemText className="select-none text-sm text-foreground group-active:text-accent-foreground" />
+      <SelectPrimitive.ItemText
+        className="select-none text-sm text-foreground group-active:text-accent-foreground"
+        style={textStyle}
+      />
     </SelectPrimitive.Item>
   );
 }

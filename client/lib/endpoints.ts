@@ -1,10 +1,9 @@
-import { AddCourtSchema } from '@/app/(tabs)/(home)/add-court';
 import { Activity } from '@/types/activity';
-import { Court, CourtListEntry, CourtSession, Place } from '@/types/court';
+import { Court, CourtListEntry, CourtSession, LeaderboardEntry, Place } from '@/types/court';
 import { EncounteredPlayer } from '@/types/encounteredPlayer';
+import { HomeResponse } from '@/types/home';
 import { ExtendedUser, User } from '@/types/user';
 import { ImagePickerAsset } from 'expo-image-picker';
-import * as z from 'zod';
 import { authClient } from './auth-client';
 
 export type serverRequestParams = {
@@ -154,39 +153,6 @@ export async function getUsers({
   });
 }
 
-export async function postCourt({
-  place,
-  name,
-  indoor,
-  nickname,
-  image: asset,
-}: z.infer<typeof AddCourtSchema>) {
-  const formData = new FormData();
-
-  formData.append('image', {
-    uri: asset.uri,
-    type: asset.mimeType || 'image/jpeg',
-    name: asset.fileName || 'image.jpg',
-  } as any);
-
-  formData.append('name', name);
-  formData.append('indoor', indoor.toString());
-  formData.append('googlePlaceId', place.id);
-  formData.append('address', place.formattedAddress);
-  formData.append('lat', place.location.latitude.toString());
-  formData.append('lng', place.location.longitude.toString());
-
-  if (nickname) {
-    formData.append('aliases', JSON.stringify([nickname]));
-  }
-
-  await serverRequest({
-    endpoint: '/courts',
-    method: 'POST',
-    formData,
-  });
-}
-
 export async function getCourt(
   id: number,
   { lat, lng }: { lat: number; lng: number }
@@ -199,13 +165,34 @@ export async function getCourt(
   return court;
 }
 
-export async function getCourtLeaderboard(id: number): Promise<(User & { rank: number })[]> {
+export async function getCourtLeaderboard(id: number): Promise<LeaderboardEntry[]> {
   const leaderboard = await serverRequest({
     endpoint: `/courts/${id}/leaderboard`,
     method: 'GET',
   });
 
   return leaderboard;
+}
+
+export async function getHome({ lat, lng }: { lat: number; lng: number }): Promise<HomeResponse> {
+  return await serverRequest({
+    endpoint: `/home?lat=${lat}&lng=${lng}`,
+    method: 'GET',
+  });
+}
+
+export type CollegeOption = {
+  courtId: number;
+  courtName: string;
+  collegeName: string;
+  collegeColor: string;
+};
+
+export async function getColleges(): Promise<CollegeOption[]> {
+  return await serverRequest({
+    endpoint: '/colleges',
+    method: 'GET',
+  });
 }
 
 export async function getCourtActivePlayers(id: number): Promise<User[]> {

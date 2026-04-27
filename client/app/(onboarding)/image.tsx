@@ -19,7 +19,7 @@ export default function ImagePage() {
     mutationFn: async () => {
       await patchUserImage(selectedAsset!);
       await authClient.updateUser({
-        onboardingStep: 'complete',
+        onboardingStep: 'primaryCollege',
       });
     },
     onSuccess: () => {

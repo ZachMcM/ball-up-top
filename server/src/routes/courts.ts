@@ -8,6 +8,12 @@ import {
 } from "../config/courts";
 import { db } from "../db";
 import {
+  getCourtActivePlayers,
+  getCourtActivityGraph,
+  getCourtLeaderboard,
+  getCourtSessionStats,
+} from "../db/queries/courtQueries";
+import {
   court,
   courtSession,
   notificationCourt,
@@ -23,6 +29,24 @@ import { r2 } from "../utils/r2";
 
 export const courtsRoute = Router();
 
+courtsRoute.get("/colleges", authMiddleware, async (_, res) => {
+  try {
+    const colleges = await db
+      .select({
+        courtId: court.id,
+        courtName: court.name,
+        collegeName: court.collegeName,
+        collegeColor: court.collegeColor,
+      })
+      .from(court)
+      .orderBy(asc(court.collegeName), asc(court.name));
+
+    res.json(colleges);
+  } catch (error) {
+    handleError(error, res, "GET /colleges");
+  }
+});
+
 courtsRoute.get(
   "/courts/:id/active-players",
   authMiddleware,
@@ -35,28 +59,7 @@ courtsRoute.get(
         return res.status(400).json({ error: "Court ID is not an integer." });
       }
 
-      const activeUsers = await db
-        .select({
-          id: user.id,
-          name: user.name,
-          image: user.image,
-          height: user.height,
-          archetype: user.archetype,
-          overall: user.overall,
-          finishingRating: user.finishingRating,
-          defenseRating: user.defenseRating,
-          playmakingRating: user.playmakingRating,
-          shootingRating: user.shootingRating,
-        })
-        .from(courtSession)
-        .innerJoin(user, eq(courtSession.userId, user.id))
-        .where(
-          and(
-            eq(courtSession.courtId, courtId),
-            isNull(courtSession.endTime),
-            sql`DATE(${courtSession.startTime}) = CURRENT_DATE`,
-          ),
-        );
+      const activeUsers = await getCourtActivePlayers({ courtId });
 
       res.json(activeUsers);
     } catch (error) {
@@ -64,47 +67,6 @@ courtsRoute.get(
     }
   },
 );
-
-function getCourtLeaderboard({
-  courtId,
-  limit,
-}: {
-  courtId: number;
-  limit?: number;
-}) {
-  return db.execute<{
-    rank: number;
-    id: string;
-    name: string;
-    image: string | null;
-    height: number;
-    archetype: string;
-    overall: number;
-    finishingRating: number;
-    defenseRating: number;
-    playmakingRating: number;
-    shootingRating: number;
-  }>(sql`                                                                                                                                 
-        SELECT                                                                                                                              
-          ROW_NUMBER() OVER (ORDER BY overall DESC)::integer as rank,                                                                       
-          *                                                                                                                                 
-        FROM (                                                                                                                              
-          SELECT DISTINCT ON (u.id)                                                                                                         
-            u.id, u.name, u.image, u.height, u.archetype, u.overall,                                                                        
-            u.finishing_rating as "finishingRating",                                                                                        
-            u.defense_rating as "defenseRating",                                                                                            
-            u.playmaking_rating as "playmakingRating",                                                                                      
-            u.shooting_rating as "shootingRating"                                                                                           
-          FROM court_session cs                                                                                                             
-          INNER JOIN "user" u ON cs.user_id = u.id                                                                                          
-          WHERE cs.court_id = ${courtId}                                                                                                    
-            AND cs.start_time >= NOW() - INTERVAL '30 days'                                                                                 
-          ORDER BY u.id                                                                                                                     
-        ) AS unique_users                                                                                                                   
-        ORDER BY overall DESC                                                                                                               
-        LIMIT ${limit ?? 10}                                                                                                                
-      `);
-}
 
 courtsRoute.get("/courts/:id/leaderboard", authMiddleware, async (req, res) => {
   try {
@@ -115,9 +77,9 @@ courtsRoute.get("/courts/:id/leaderboard", authMiddleware, async (req, res) => {
       return res.status(400).json({ error: "Court ID is not an integer." });
     }
 
-    const courtLeaderboard = await getCourtLeaderboard({ courtId, limit: 50 });
+    const { top } = await getCourtLeaderboard({ courtId, limit: 50 });
 
-    res.json(courtLeaderboard.rows);
+    res.json(top);
   } catch (error) {
     handleError(error, res, "GET /courts/:id/leaderboard");
   }
@@ -152,6 +114,8 @@ courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
         lng: court.lng,
         indoor: court.indoor,
         image: court.image,
+        collegeName: court.collegeName,
+        collegeColor: court.collegeColor,
         isNotificationEnabled: sql<boolean>`EXISTS (
           SELECT 1 FROM notification_court
           WHERE court_id = ${courtId} AND user_id = ${res.locals.userId}
@@ -160,89 +124,22 @@ courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
       .from(court)
       .where(eq(court.id, courtId));
 
-    const activityQuery = db.execute<{ hour: number; avgSessions: number }>(sql`
-      SELECT
-        hours.hour,
-        CASE
-          WHEN COUNT(cs.id) > 0 THEN
-            COUNT(cs.id)::float / GREATEST(COUNT(DISTINCT DATE(cs.start_time AT TIME ZONE 'UTC')), 1)
-          ELSE 0
-        END as "avgSessions"
-      FROM
-        generate_series(0, 23) as hours(hour)
-        LEFT JOIN court_session cs ON
-          cs.court_id = ${courtId} AND
-          EXTRACT(HOUR FROM cs.start_time AT TIME ZONE 'UTC')::integer = hours.hour
-      GROUP BY hours.hour
-      ORDER BY hours.hour
-    `);
-
-    const sessionStatsQuery = db
-      .select({
-        avgPlayerOverall: sql<number>`AVG(${user.overall})::float`,
-        currentActiveSessions: sql<number>`COUNT(*)::integer`,
-      })
-      .from(courtSession)
-      .innerJoin(user, eq(courtSession.userId, user.id))
-      .where(
-        and(
-          eq(courtSession.courtId, courtId),
-          isNull(courtSession.endTime),
-          sql`DATE(${courtSession.startTime}) = CURRENT_DATE`,
-        ),
-      );
-
-    // Calculate average players per day: count unique players per day, then average
-    const avgPlayersPerDayQuery = db.execute<{ avgPlayersPerDay: number }>(sql`
-      SELECT COALESCE(AVG(daily_players), 0) as "avgPlayersPerDay"
-      FROM (
-        SELECT COUNT(DISTINCT user_id)::float as daily_players
-        FROM court_session
-        WHERE court_id = ${courtId}
-        GROUP BY DATE(start_time)
-      ) as daily_counts
-    `);
-
-    const leaderboardQuery = getCourtLeaderboard({ courtId });
-
-    const activeUsersQuery = db
-      .select({
-        id: user.id,
-        name: user.name,
-        image: user.image,
-        height: user.height,
-        archetype: user.archetype,
-        overall: user.overall,
-        finishingRating: user.finishingRating,
-        defenseRating: user.defenseRating,
-        playmakingRating: user.playmakingRating,
-        shootingRating: user.shootingRating,
-      })
-      .from(courtSession)
-      .innerJoin(user, eq(courtSession.userId, user.id))
-      .where(
-        and(
-          eq(courtSession.courtId, courtId),
-          isNull(courtSession.endTime),
-          sql`DATE(${courtSession.startTime}) = CURRENT_DATE`,
-        ),
-      )
-      .limit(5);
-
     const [
       [targetCourt],
-      activityResult,
-      [sessionStats],
-      avgPlayersPerDayResult,
+      activityGraph,
+      sessionStats,
       activeUsers,
-      leaderboardResult,
+      leaderboard,
     ] = await Promise.all([
       courtQuery,
-      activityQuery,
-      sessionStatsQuery,
-      avgPlayersPerDayQuery,
-      activeUsersQuery,
-      leaderboardQuery,
+      getCourtActivityGraph({ courtId }),
+      getCourtSessionStats({ courtId }),
+      getCourtActivePlayers({ courtId, limit: 5 }),
+      getCourtLeaderboard({
+        courtId,
+        limit: 5,
+        currentUserId: res.locals.userId,
+      }),
     ]);
 
     if (!targetCourt) {
@@ -254,11 +151,11 @@ courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
     return res.json({
       ...targetCourt,
       distance: getDistanceInMiles(targetCourt.lat, targetCourt.lng, lat, lng),
-      activityGraph: activityResult.rows,
-      avgPlayerOverall: Number(sessionStats?.avgPlayerOverall ?? 0),
-      currentActiveSessions: Number(sessionStats?.currentActiveSessions ?? 0),
+      activityGraph,
+      avgPlayerOverall: sessionStats.avgPlayerOverall,
+      currentActiveSessions: sessionStats.currentActiveSessions,
       currentActiveUsers: activeUsers,
-      leaderboard: leaderboardResult.rows,
+      leaderboard,
     });
   } catch (error) {
     handleError(error, res, "GET /courts/:courtId");
@@ -457,6 +354,8 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
         lng: court.lng,
         indoor: court.indoor,
         image: court.image,
+        collegeName: court.collegeName,
+        collegeColor: court.collegeColor,
         distance: distanceFormula,
         avgPlayerOverall: sql<number>`COALESCE(${sessionStats.avgPlayerOverall}, 0)::float`,
         currentActiveSessions: sql<number>`COALESCE(${sessionStats.currentActiveSessions}, 0)::integer`,

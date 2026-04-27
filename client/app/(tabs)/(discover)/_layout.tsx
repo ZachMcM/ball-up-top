@@ -1,13 +1,13 @@
 import BackButton from '@/components/BackButton';
 import { Stack } from 'expo-router';
 
-export default function HomeLayout() {
+export default function DiscoverLayout() {
   return (
     <Stack>
       <Stack.Screen
         name="index"
         options={{
-          headerTitle: 'Home',
+          headerTitle: 'Discover',
         }}
       />
       <Stack.Screen
@@ -21,13 +21,19 @@ export default function HomeLayout() {
         name="court/[courtId]/players"
         options={{
           headerTitle: 'Current Players',
-          headerLeft: () => <BackButton />,
         }}
       />
       <Stack.Screen
         name="court/[courtId]/leaderboard"
         options={{
           headerTitle: 'Leaderboard',
+          headerLeft: () => <BackButton />,
+        }}
+      />
+      <Stack.Screen
+        name="add-court"
+        options={{
+          title: 'Add Court',
           headerLeft: () => <BackButton />,
         }}
       />

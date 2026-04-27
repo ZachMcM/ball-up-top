@@ -8,9 +8,10 @@ interface VerticalRatingBarProps {
   value: number;
   label: string;
   className?: string;
+  color?: string;
 }
 
-export function VerticalRatingBar({ value, label, className }: VerticalRatingBarProps) {
+export function VerticalRatingBar({ value, label, className, color }: VerticalRatingBarProps) {
   // Calculate how many segments should be filled (each segment = 4 points)
   const filledSegments = Math.round(value / 4);
 
@@ -24,15 +25,18 @@ export function VerticalRatingBar({ value, label, className }: VerticalRatingBar
   return (
     <View className={cn('flex flex-1 flex-col items-center gap-2', className)}>
       <Text className="text-sm font-bold">{value}</Text>
-      <View className="flex w-10 flex-col gap-0.5">
+      <View className="flex w-9 flex-col gap-0.5">
         {segments.map(({ segmentNumber, isFilled }) => (
           <View
             key={segmentNumber}
-            className={cn('h-1.5 w-full rounded-sm', isFilled ? 'bg-primary' : 'bg-muted')}
+            className={cn(
+              'h-1.5 w-full rounded-sm',
+              !isFilled ? 'bg-muted-foreground/40' : (color ?? 'bg-primary')
+            )}
           />
         ))}
       </View>
-      <Text className="text-sm font-medium text-muted-foreground">{label}</Text>
+      <Text className="text-sm font-medium">{label}</Text>
     </View>
   );
 }

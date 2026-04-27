@@ -13,7 +13,7 @@ import { Pressable, View } from 'react-native';
 import { CourtsFiltersContent } from './CourtsFiltersContent';
 import { PlayersFiltersContent } from './PlayersFiltersContent';
 
-interface HomeFiltersProps {
+interface DiscoverFiltersProps {
   activeTab: 'courts' | 'players';
   bottomSheetRef: React.RefObject<BottomSheetModal | null>;
 
@@ -21,7 +21,7 @@ interface HomeFiltersProps {
     isIndoor?: boolean;
     sortBy?: 'distance' | 'active_players';
   };
-  onCourtsFiltersChange: (filters: HomeFiltersProps['courtsFilters']) => void;
+  onCourtsFiltersChange: (filters: DiscoverFiltersProps['courtsFilters']) => void;
 
   playersFilters: {
     minHeight?: string;
@@ -29,17 +29,17 @@ interface HomeFiltersProps {
     minOverall?: number;
     sortBy?: 'most_active' | 'overall_desc' | 'overall_asc';
   };
-  onPlayersFiltersChange: (filters: HomeFiltersProps['playersFilters']) => void;
+  onPlayersFiltersChange: (filters: DiscoverFiltersProps['playersFilters']) => void;
 }
 
-export function HomeFilters({
+export function DiscoverFilters({
   activeTab,
   bottomSheetRef,
   courtsFilters,
   onCourtsFiltersChange,
   playersFilters,
   onPlayersFiltersChange,
-}: HomeFiltersProps) {
+}: DiscoverFiltersProps) {
   const { colorScheme } = useColorScheme();
 
   const [tempCourtsFilters, setTempCourtsFilters] = useState(courtsFilters);

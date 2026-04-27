@@ -1,21 +1,21 @@
-import { getCityState } from '@/lib/utils';
 import { CourtListEntry } from '@/types/court';
 import { Image } from 'expo-image';
 import { Link } from 'expo-router';
-import { HomeIcon, MapPinIcon, SunIcon, Users, UsersIcon, UserX } from 'lucide-react-native';
+import { HomeIcon, MapPinIcon, SunIcon } from 'lucide-react-native';
 import { View } from 'react-native';
+import { CourtNameLabel } from './CourtNameLabel';
 import { AspectRatio } from './ui/aspect-ratio';
 import { Badge } from './ui/badge';
+import { Button } from './ui/button';
 import { Card, CardContent, CardFooter } from './ui/card';
 import { Icon } from './ui/icon';
 import { Text } from './ui/text';
-import { Button } from './ui/button';
 
 export default function CourtCard({ court }: { court: CourtListEntry }) {
   return (
     <Link
       href={{
-        pathname: '/(tabs)/(home)/court/[courtId]',
+        pathname: '/(tabs)/(discover)/court/[courtId]',
         params: {
           courtId: court.id,
         },
@@ -34,7 +34,13 @@ export default function CourtCard({ court }: { court: CourtListEntry }) {
           <View className="flex flex-col gap-2">
             <View className="flex flex-col gap-1.5">
               <View className="flex flex-row items-center justify-between gap-4">
-                <Text className="text-lg font-semibold">{court.name}</Text>
+                <CourtNameLabel
+                  className="flex-1"
+                  collegeName={court.collegeName}
+                  collegeColor={court.collegeColor}
+                  courtName={court.name}
+                  size="md"
+                />
                 <Badge variant="secondary">
                   <Icon size={12} as={court.indoor ? HomeIcon : SunIcon} />
                   <Text>{court.indoor ? 'Indoor' : 'Outdoor'}</Text>
@@ -65,7 +71,7 @@ export default function CourtCard({ court }: { court: CourtListEntry }) {
           <Link
             asChild
             href={{
-              pathname: '/(tabs)/(home)/court/[courtId]',
+              pathname: '/(tabs)/(discover)/court/[courtId]',
               params: {
                 courtId: court.id,
               },

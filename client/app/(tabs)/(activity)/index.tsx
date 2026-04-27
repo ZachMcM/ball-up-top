@@ -119,7 +119,7 @@ export default function ActivityPage() {
                 </EmptyDescription>
               </EmptyHeader>
               <EmptyContent>
-                <Button onPress={() => router.navigate('/(tabs)/(home)')} size="sm">
+                <Button onPress={() => router.navigate('/(tabs)/(discover)')} size="sm">
                   <Text>View Courts</Text>
                 </Button>
               </EmptyContent>
@@ -225,6 +225,10 @@ function SessionCompletedRow({ activity }: { activity: Activity }) {
         <View className="flex-1">
           <Text className="leading-5">
             <Text>You played at</Text>
+            <Text style={{ color: court.collegeColor }} className="font-bold">
+              {' '}
+              {court.collegeName},
+            </Text>
             <Text className="font-bold"> {court.name} </Text>
             <Text>for {durationStr}</Text>
           </Text>
@@ -288,6 +292,12 @@ function CourtActivityRow({ activity }: { activity: Activity }) {
       <View className="flex flex-row items-center gap-3 px-4 py-3">
         <Icon as={MapPin} size={18} />
         <View className="flex-1">
+          <Text
+            className="text-[10px] font-bold uppercase leading-tight tracking-wide"
+            style={{ color: court.collegeColor }}
+            numberOfLines={1}>
+            {court.collegeName}
+          </Text>
           <Text className="leading-5">
             <Text className="font-bold">{court.name}</Text>
             <Text>

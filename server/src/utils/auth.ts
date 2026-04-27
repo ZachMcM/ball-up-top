@@ -17,6 +17,9 @@ export const auth = betterAuth({
       height: {
         type: "string",
       },
+      primaryCourtId: {
+        type: "number",
+      },
     },
   },
   session: {
