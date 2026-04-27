@@ -9,7 +9,7 @@ import {
   text,
   timestamp,
   unique,
-  uniqueIndex
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable(
@@ -35,9 +35,7 @@ export const user = pgTable(
     defenseRating: integer("defense_rating").default(60).notNull(),
     shootingRating: integer("shooting_rating").default(60).notNull(),
 
-    primaryCourtId: integer("primary_court_id")
-      .notNull()
-      .references(() => court.id),
+    primaryCourtId: integer("primary_court_id").references(() => court.id),
 
     // archetype
     archetype: text().default("Unranked").notNull(),
@@ -123,8 +121,8 @@ export const court = pgTable(
     googlePlaceId: text("google_place_id").notNull().unique(),
     address: text("address").notNull(),
 
-    collegeName: text("college_name").notNull().default("Purdue University"),
-    collegeColor: text("college_color").notNull().default("#cfb991"),
+    collegeName: text("college_name").notNull(),
+    collegeColor: text("college_color").notNull(),
 
     lat: doublePrecision("lat").notNull(),
     lng: doublePrecision("lng").notNull(),
