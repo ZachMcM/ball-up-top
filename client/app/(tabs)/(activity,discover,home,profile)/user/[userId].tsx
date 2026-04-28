@@ -18,10 +18,10 @@ import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-n
 import { LineChart } from 'react-native-gifted-charts';
 
 const RATING_CATEGORIES = [
-  { key: 'shootingRating', label: 'Shooting', color: 'bg-green-600' },
-  { key: 'finishingRating', label: 'Finishing', color: 'bg-sky-600' },
-  { key: 'playmakingRating', label: 'Playmaking', color: 'bg-amber-600' },
-  { key: 'defenseRating', label: 'Defense', color: 'bg-rose-600' },
+  { key: 'shootingRating', label: 'Shooting' },
+  { key: 'finishingRating', label: 'Finishing' },
+  { key: 'playmakingRating', label: 'Playmaking' },
+  { key: 'defenseRating', label: 'Defense' },
 ] as const;
 
 export default function ProfilePage() {
@@ -90,8 +90,8 @@ export default function ProfilePage() {
                     {userId == currentUserData?.user.id && 'Your '}Ratings
                   </Text>
                   <View className="flex flex-row">
-                    {RATING_CATEGORIES.map(({ key, label, color }) => (
-                      <VerticalRatingBar key={key} value={user[key]} color={color} label={label} />
+                    {RATING_CATEGORIES.map(({ key, label }) => (
+                      <VerticalRatingBar key={key} value={user[key]} label={label} />
                     ))}
                   </View>
                   <Separator />

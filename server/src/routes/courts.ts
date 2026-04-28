@@ -22,7 +22,8 @@ import {
 import { notificationsQueue } from "../queues/notificationsQueue";
 import { getDistanceInMiles } from "../utils/getDistanceMiles";
 import { handleError } from "../utils/handleError";
-import { invalidateQueries } from "../utils/invalidateQueries";
+import { invalidateQueries, invalidateQueriesForUser } from "../utils/invalidateQueries";
+import { invalidateHomeForCourt } from "../utils/invalidateHomeForCourt";
 import { logger } from "../utils/logger";
 import { authMiddleware, upload } from "../utils/middleware";
 import { r2 } from "../utils/r2";
@@ -226,6 +227,9 @@ courtsRoute.post(
       });
 
       invalidateQueries(["courts"], ["court", courtId]);
+      invalidateQueries(["user", res.locals.userId!]);
+      invalidateQueriesForUser(res.locals.userId!, ["home"]);
+      await invalidateHomeForCourt(courtId);
 
       res.json({ success: true });
 

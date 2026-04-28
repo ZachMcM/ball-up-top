@@ -1,27 +1,56 @@
 import { Job, Worker } from "bullmq";
-import { and, isNull, lt, sql } from "drizzle-orm";
+import { and, eq, isNull, lt, sql } from "drizzle-orm";
 import { SESSION_TIMEOUT_HOURS } from "../config/courtSessions";
 import { db } from "../db";
 import { courtSession } from "../db/schema";
 import { redisConnection } from "../queues";
+import { createEncounteredPlayersForSession } from "../utils/checkoutSession";
+import { invalidateHomeForCourt } from "../utils/invalidateHomeForCourt";
+import { invalidateQueries } from "../utils/invalidateQueries";
 import { logger } from "../utils/logger";
 
 async function processSesssionTimeoutJob(_: Job) {
-  await db
-    .update(courtSession)
-    .set({
-      endTime: sql`now()`,
-    })
-    .where(
-      and(
-        isNull(courtSession.endTime),
-        lt(
-          courtSession.startTime,
-          sql`now() - interval '${sql.raw(String(SESSION_TIMEOUT_HOURS))} hours'`,
-        ),
+  const staleSessions = await db.query.courtSession.findMany({
+    where: and(
+      isNull(courtSession.endTime),
+      lt(
+        courtSession.startTime,
+        sql`now() - interval '${sql.raw(String(SESSION_TIMEOUT_HOURS))} hours'`,
       ),
-    );
-    logger.info("Successfully completed session timeout cleanup")
+    ),
+  });
+
+  if (staleSessions.length === 0) {
+    return;
+  }
+
+  const now = new Date();
+  const affectedCourtIds = new Set<number>();
+
+  for (const session of staleSessions) {
+    await db.transaction(async (tx) => {
+      const [updatedSession] = await tx
+        .update(courtSession)
+        .set({ endTime: now })
+        .where(and(eq(courtSession.id, session.id), isNull(courtSession.endTime)))
+        .returning();
+
+      if (!updatedSession) return;
+
+      await createEncounteredPlayersForSession(tx, updatedSession, session.userId);
+      affectedCourtIds.add(session.courtId);
+    });
+  }
+
+  if (affectedCourtIds.size > 0) {
+    const courtKeys = [...affectedCourtIds].map((id) => ["court", id] as (string | number)[]);
+    invalidateQueries(["courts"], ...courtKeys);
+    for (const courtId of affectedCourtIds) {
+      await invalidateHomeForCourt(courtId);
+    }
+  }
+
+  logger.info(`Session timeout cleanup: ended ${staleSessions.length} session(s)`);
 }
 
 export const sessionTimeoutWorker = new Worker(

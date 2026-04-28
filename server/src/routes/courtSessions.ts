@@ -1,14 +1,9 @@
 import {
   and,
   eq,
-  gt,
   InferSelectModel,
   isNotNull,
   isNull,
-  lt,
-  ne,
-  or,
-  sql,
 } from "drizzle-orm";
 import { Router } from "express";
 import { handleError } from "../utils/handleError";
@@ -20,29 +15,19 @@ import * as z from "zod";
 import { clamp } from "../utils/clamp";
 import { generateArchetype } from "../utils/generateArchetype";
 import {
-  EST_RATINGS_PER_SESS,
-  EXPERIENCE_GROWTH_RT,
-  MAX_EXPERIENCE_WT,
-  MAX_OVERLAP_WT,
   MAX_OVR,
   MAX_SHIFT,
-  MIN_EXPERIENCE_WT,
   MIN_LIFETIME_CT,
-  MIN_OVERLAP_WT,
   MIN_OVR,
   OVERLAP_DIFF_THRESH_1,
   OVERLAP_DIFF_THRESH_2,
   OVERLAP_DIFF_THRESH_2_WT,
-  OVERLAP_MS_THRESH,
-  RATER_MAX_WT,
-  RATER_MIN_WT,
-  RUN_COMP_MAX_WT,
-  RUN_COMP_MIN_WT,
-  WEIGHT_E,
 } from "../config/ratings";
 import { logger } from "../utils/logger";
-import { invalidateQueries } from "../utils/invalidateQueries";
+import { invalidateQueries, invalidateQueriesForUser } from "../utils/invalidateQueries";
+import { invalidateHomeForCourt } from "../utils/invalidateHomeForCourt";
 import { notificationsQueue } from "../queues/notificationsQueue";
+import { createEncounteredPlayersForSession, getEncounteredPlayers } from "../utils/checkoutSession";
 
 export const courtSessionsRoute = Router();
 
@@ -86,75 +71,6 @@ courtSessionsRoute.get("/court-sessions", authMiddleware, async (req, res) => {
     handleError(error, res, "GET /court-sessions");
   }
 });
-
-async function getEncounteredPlayers(
-  targetCourtSession: InferSelectModel<typeof courtSession>,
-): Promise<
-  {
-    overlapWeight: number;
-    user: InferSelectModel<typeof user>;
-  }[]
-> {
-  const overlappingSessions = await db.query.courtSession.findMany({
-    where: and(
-      eq(courtSession.courtId, targetCourtSession.courtId),
-      ne(courtSession.id, targetCourtSession.id),
-      lt(courtSession.startTime, targetCourtSession.endTime!),
-      or(
-        isNull(courtSession.endTime),
-        gt(courtSession.endTime, targetCourtSession.startTime),
-      ),
-      // Protect against lingering sessions from previous days
-      sql`DATE(${courtSession.startTime}) = DATE(${targetCourtSession.startTime})`,
-    ),
-    with: {
-      user: true,
-    },
-  });
-
-  const myStart = targetCourtSession.startTime;
-  const myEnd = targetCourtSession.endTime!;
-  const maxOverlapMs = myEnd.getTime() - myStart.getTime();
-  const now = new Date();
-
-  const uniquePlayers = new Map();
-
-  overlappingSessions.forEach((s) => {
-    const otherStart = s.startTime;
-    const otherEnd = s.endTime ?? now;
-
-    const overlapStart = new Date(
-      Math.max(myStart.getTime(), otherStart.getTime()),
-    );
-    const overlapEnd = new Date(Math.min(myEnd.getTime(), otherEnd.getTime()));
-
-    const overlapMs = overlapEnd.getTime() - overlapStart.getTime();
-
-    if (overlapMs >= OVERLAP_MS_THRESH) {
-      if (!uniquePlayers.has(s.user.id)) {
-        uniquePlayers.set(s.user.id, {
-          user: s.user,
-          overlapWeight: clamp(
-            MIN_OVERLAP_WT,
-            MAX_OVERLAP_WT,
-            overlapMs / maxOverlapMs,
-          ),
-        });
-      }
-    }
-  });
-
-  return [...uniquePlayers.values()];
-}
-
-function computeExperienceWeight(sessionsPlayed: number, ratingsGiven: number) {
-  const base = Math.max(
-    sessionsPlayed,
-    Math.floor(ratingsGiven / EST_RATINGS_PER_SESS),
-  );
-  const raw = MIN_EXPERIENCE_WT + Math.log1p(base) / EXPERIENCE_GROWTH_RT;
-  return clamp(MIN_EXPERIENCE_WT, MAX_EXPERIENCE_WT, raw);
-}
 
 function computeOutlierWeight(
   newRaw: number,
@@ -535,6 +451,7 @@ courtSessionsRoute.post(
           ratingIds.push(newRating.id);
 
           invalidateQueries(["user", ep.rateeId]);
+          invalidateQueriesForUser(ep.rateeId, ["home"]);
         }
 
         await tx
@@ -544,6 +461,7 @@ courtSessionsRoute.post(
       });
 
       invalidateQueries(["court", targetCourtSession.courtId]);
+      await invalidateHomeForCourt(targetCourtSession.courtId);
 
       res.json({ success: true });
 
@@ -593,124 +511,16 @@ courtSessionsRoute.patch(
       await db.transaction(async (tx) => {
         const [updatedCourtSession] = await tx
           .update(courtSession)
-          .set({
-            endTime: new Date(),
-            hasRated: false,
-          })
+          .set({ endTime: new Date(), hasRated: false })
           .where(eq(courtSession.id, sessionId))
           .returning();
 
-        const encounteredPlayersData =
-          await getEncounteredPlayers(updatedCourtSession);
-
-        // bypass rating if no encountered players
-        if (encounteredPlayersData.length === 0) {
-          await tx
-            .update(courtSession)
-            .set({
-              hasRated: true,
-            })
-            .where(eq(courtSession.id, sessionId));
-        } else {
-          // Fetch rater info for weight computation
-          const rater = (await tx.query.user.findFirst({
-            where: eq(user.id, res.locals.userId!),
-            columns: {
-              overall: true,
-            },
-            with: {
-              courtSessions: {
-                columns: {
-                  id: true,
-                },
-              },
-              outgoingRatings: {
-                columns: {
-                  id: true,
-                },
-              },
-            },
-          }))!;
-
-          // Compute session-level weights
-          const runCompetitiveness = clamp(
-            RUN_COMP_MIN_WT,
-            RUN_COMP_MAX_WT,
-            encounteredPlayersData.reduce(
-              (accum, curr) => accum + curr.user.overall,
-              0,
-            ) /
-              encounteredPlayersData.length /
-              100,
-          );
-
-          const raterWeight = clamp(
-            RATER_MIN_WT,
-            RATER_MAX_WT,
-            rater.overall / 100,
-          );
-
-          const experienceWeight = computeExperienceWeight(
-            rater.courtSessions.length,
-            rater.outgoingRatings.length,
-          );
-
-          // Create encountered_player rows with precomputed data
-          for (let i = 0; i < encounteredPlayersData.length; i++) {
-            const ep = encounteredPlayersData[i];
-            const ratee = ep.user;
-
-            // Get ratee's lifetime rating count (not session count)
-            const lifetimeCount = await tx
-              .select()
-              .from(rating)
-              .where(eq(rating.rateeId, ratee.id));
-
-            // Compute combined weight (without outlier weight)
-            const combinedWeight = Math.pow(
-              raterWeight *
-                experienceWeight *
-                runCompetitiveness *
-                ep.overlapWeight,
-              WEIGHT_E,
-            );
-
-            await tx.insert(encounteredPlayer).values({
-              courtSessionId: sessionId,
-              rateeId: ratee.id,
-
-              // Precomputed weights
-              combinedWeight,
-              raterOverallAtTime: rater.overall,
-              runCompetitivenessAtTime: runCompetitiveness,
-
-              // Ratee's ratings at checkout (for outlier detection)
-              rateeDefenseAtTime: ratee.defenseRating,
-              rateeFinishingAtTime: ratee.finishingRating,
-              rateeShootingAtTime: ratee.shootingRating,
-              rateePlaymakingAtTime: ratee.playmakingRating,
-              rateeOverallAtTime: ratee.overall,
-              rateeLifetimeCount: lifetimeCount.length,
-
-              // Ratee display info (frozen for UI)
-              rateeName: ratee.name,
-              rateeImage: ratee.image,
-              rateeArchetype: ratee.archetype,
-              rateeHeight: ratee.height,
-
-              // Draft ratings (null initially)
-              defenseRating: null,
-              finishingRating: null,
-              shootingRating: null,
-              playmakingRating: null,
-              skipped: false,
-              displayOrder: i,
-            });
-          }
-        }
+        await createEncounteredPlayersForSession(tx, updatedCourtSession, res.locals.userId!);
       });
 
       invalidateQueries(["courts"], ["court", targetCourtSession.courtId]);
+      invalidateQueriesForUser(res.locals.userId!, ["home"]);
+      await invalidateHomeForCourt(targetCourtSession.courtId);
 
       res.json({ success: true });
 
