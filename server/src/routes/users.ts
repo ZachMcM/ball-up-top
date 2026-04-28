@@ -4,7 +4,7 @@ import { Router } from "express";
 import * as z from "zod";
 import { db } from "../db";
 import {
-  getRatingHistory,
+  getOverallHistory,
   getRecentSessions,
 } from "../db/queries/userQueries";
 import {
@@ -85,14 +85,14 @@ usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const [ratingHistory, recentSessions] = await Promise.all([
-      getRatingHistory({ userId }),
+    const [overallHistory, recentSessions] = await Promise.all([
+      getOverallHistory({ userId }),
       getRecentSessions({ userId }),
     ]);
 
     res.json({
       ...targetUser,
-      ratingHistory,
+      overallHistory,
       recentSessions,
     });
   } catch (error) {

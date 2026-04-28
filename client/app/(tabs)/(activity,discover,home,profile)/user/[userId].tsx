@@ -38,8 +38,8 @@ export default function ProfilePage() {
 
   const getHighestOvr = () => {
     let maxIndex = 0;
-    user?.ratingHistory.forEach((point, i) => {
-      if (user.ratingHistory[0].overall < point.overall) {
+    user?.overallHistory.forEach((point, i) => {
+      if (user.overallHistory[0].overall < point.overall) {
         maxIndex = i;
       }
     });
@@ -98,7 +98,7 @@ export default function ProfilePage() {
                 </View>
                 <View className="flex flex-1 flex-col gap-4">
                   <Text className="text-lg font-semibold">Overall History</Text>
-                  {user.ratingHistory.length > 0 ? (
+                  {user.overallHistory.length > 0 ? (
                     <LineChart
                       isAnimated
                       hideYAxisText
@@ -123,7 +123,7 @@ export default function ProfilePage() {
                         fontSize: 12,
                       }}
                       maxValue={99}
-                      data={user.ratingHistory.map((entry) => ({
+                      data={user.overallHistory.map((entry) => ({
                         value: entry.overall,
                         label: timeAgo(entry.createdAt),
                         dataPointLabelComponent: () => (

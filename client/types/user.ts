@@ -30,6 +30,6 @@ export type UserSession = {
 };
 
 export type ExtendedUser = User & {
-  ratingHistory: RatingHistoryPoint[];
+  overallHistory: RatingHistoryPoint[];
   recentSessions: UserSession[];
 };

@@ -8,7 +8,7 @@ import {
   getCourtSessionStats,
 } from "../db/queries/courtQueries";
 import {
-  getRatingHistory,
+  getOverallHistory,
   getRecentSessions,
 } from "../db/queries/userQueries";
 import { court, user } from "../db/schema";
@@ -50,8 +50,8 @@ homeRoute.get("/home", authMiddleware, async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const [ratingHistory, recentSessions] = await Promise.all([
-      getRatingHistory({ userId }),
+    const [overallHistory, recentSessions] = await Promise.all([
+      getOverallHistory({ userId }),
       getRecentSessions({ userId, limit: 1 }),
     ]);
 
@@ -102,7 +102,7 @@ homeRoute.get("/home", authMiddleware, async (req, res) => {
 
     res.json({
       user: userResponse,
-      ratingHistory,
+      overallHistory,
       recentSession,
       primaryCourt,
     });

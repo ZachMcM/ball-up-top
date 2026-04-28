@@ -2,7 +2,7 @@ import { desc, eq } from "drizzle-orm";
 import { db } from "../index";
 import { court, courtSession, rating } from "../schema";
 
-export function getRatingHistory({
+export function getOverallHistory({
   userId,
   limit = 25,
 }: {

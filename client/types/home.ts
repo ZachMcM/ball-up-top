@@ -17,7 +17,7 @@ export type MinimalCourt = {
 
 export type HomeResponse = {
   user: Pick<User, 'id' | 'name' | 'image' | 'overall' | 'height' | 'archetype'>;
-  ratingHistory: RatingHistoryPoint[];
+  overallHistory: RatingHistoryPoint[];
   recentSession: UserSession | null;
   primaryCourt: MinimalCourt;
 };
