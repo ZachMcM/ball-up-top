@@ -227,9 +227,9 @@ function SessionCompletedRow({ activity }: { activity: Activity }) {
             <Text>You played at</Text>
             <Text style={{ color: court.collegeColor }} className="font-bold">
               {' '}
-              {court.collegeName},
+              {court.collegeName}
             </Text>
-            <Text className="font-bold"> {court.name} </Text>
+            <Text className="font-bold">, {court.name} </Text>
             <Text>for {durationStr}</Text>
           </Text>
           <Text className="text-sm text-muted-foreground">{timeAgo(session.startTime)}</Text>

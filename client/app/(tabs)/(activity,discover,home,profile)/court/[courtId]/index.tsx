@@ -135,7 +135,7 @@ export default function CourtPage() {
                     className="absolute inset-0 object-cover"
                   />
                 </AspectRatio>
-                <View className="flex flex-1 flex-col gap-2">
+                <View className="flex flex-1 flex-col gap-1">
                   <CourtNameLabel
                     collegeName={court.collegeName}
                     collegeColor={court.collegeColor}

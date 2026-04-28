@@ -183,7 +183,6 @@ export async function getHome({ lat, lng }: { lat: number; lng: number }): Promi
 
 export type CollegeOption = {
   courtId: number;
-  courtName: string;
   collegeName: string;
   collegeColor: string;
 };

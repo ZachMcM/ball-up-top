@@ -96,17 +96,13 @@ export default function PrimaryCollegePage() {
                         </View>
                       )}
                       {colleges?.map((c) => {
-                        const isAmbiguous = (collegeNameCounts.get(c.collegeName) ?? 0) > 1;
-                        const label = isAmbiguous
-                          ? `${c.collegeName} — ${c.courtName}`
-                          : c.collegeName;
                         return (
                           <SelectItem
                             key={c.courtId}
-                            label={label}
+                            label={c.collegeName}
                             value={String(c.courtId)}
                             textStyle={{ color: c.collegeColor, fontWeight: '600' }}>
-                            {label}
+                            {c.collegeName}
                           </SelectItem>
                         );
                       })}

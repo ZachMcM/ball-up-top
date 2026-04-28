@@ -34,7 +34,6 @@ courtsRoute.get("/colleges", authMiddleware, async (_, res) => {
     const colleges = await db
       .select({
         courtId: court.id,
-        courtName: court.name,
         collegeName: court.collegeName,
         collegeColor: court.collegeColor,
       })

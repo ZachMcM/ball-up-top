@@ -105,7 +105,7 @@ export default function HomePage() {
                 </View>
 
                 <View className="flex flex-col gap-4">
-                  <Text className="text-lg font-semibold">Rating History</Text>
+                  <Text className="text-lg font-semibold">Overall History</Text>
                   <RatingHistoryGraph points={home.ratingHistory} />
                   <Separator />
                 </View>

@@ -24,21 +24,6 @@ const RATING_CATEGORIES = [
   { key: 'defenseRating', label: 'Defense', color: 'bg-rose-600' },
 ] as const;
 
-function formatSessionTime(startTime: string, endTime: string | null) {
-  const start = new Date(startTime);
-  const end = endTime ? new Date(endTime) : null;
-
-  const dateStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  const startTimeStr = start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-
-  if (end) {
-    const endTimeStr = end.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-    return `${dateStr} • ${startTimeStr} - ${endTimeStr}`;
-  }
-
-  return `${dateStr} • ${startTimeStr} - Active`;
-}
-
 export default function ProfilePage() {
   const searchParams = useLocalSearchParams();
   const { userId } = searchParams as { userId: string };
@@ -112,7 +97,7 @@ export default function ProfilePage() {
                   <Separator />
                 </View>
                 <View className="flex flex-1 flex-col gap-4">
-                  <Text className="text-lg font-semibold">Rating History</Text>
+                  <Text className="text-lg font-semibold">Overall History</Text>
                   {user.ratingHistory.length > 0 ? (
                     <LineChart
                       isAnimated
@@ -158,7 +143,7 @@ export default function ProfilePage() {
                   {user.recentSessions.length > 0 ? (
                     <View className="flex flex-col gap-4">
                       {user.recentSessions.map((recentSession) => (
-                        <RecentSessionCard session={recentSession} />
+                        <RecentSessionCard key={recentSession.id} session={recentSession} />
                       ))}
                     </View>
                   ) : (
