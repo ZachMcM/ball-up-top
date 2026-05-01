@@ -1,4 +1,5 @@
 import { isNull } from "drizzle-orm";
+import { primaryKey } from "drizzle-orm/pg-core";
 import {
   boolean,
   doublePrecision,
@@ -183,6 +184,9 @@ export const rating = pgTable(
     raterCourtSession: integer("rater_court_session")
       .notNull()
       .references(() => courtSession.id),
+    rateeCourtSession: integer("ratee_court_session")
+      .notNull()
+      .references(() => courtSession.id),
 
     shootingRating: integer("shooting_rating").notNull(),
     defenseRating: integer("defense_rating").notNull(),
@@ -221,6 +225,7 @@ export const rating = pgTable(
     index("rating_rater_idx").on(table.raterId),
     index("rating_rater_court_session_idx").on(table.raterCourtSession),
     index("rating_created_at_idx").on(table.createdAt),
+    index("rating_ratee_court_session_idx").on(table.rateeCourtSession),
   ],
 );
 
@@ -304,6 +309,7 @@ export const activity = pgTable("activity", {
       | "rating_milestone"
       | "archetype_changed"
       | "court_activity"
+      | "rank_changed"
     >()
     .notNull(),
 
@@ -328,4 +334,28 @@ export const notificationCourt = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [unique().on(table.userId, table.courtId)],
+);
+
+export const leaderboard = pgTable(
+  "leaderboard",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id),
+    courtId: integer("court_id")
+      .notNull()
+      .references(() => court.id),
+    overall: integer("overall").notNull(),
+    rank: integer("rank"),
+    lastRatedAt: timestamp("last_rated_at").notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.courtId] }),
+    index("leaderboard_court_rank_idx").on(table.courtId, table.rank),
+    index("leaderboard_last_rated_idx").on(table.lastRatedAt),
+  ],
 );

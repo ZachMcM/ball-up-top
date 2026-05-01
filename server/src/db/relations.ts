@@ -76,6 +76,10 @@ export const ratingRelations = relations(rating, ({ one, many }) => ({
     fields: [rating.raterCourtSession],
     references: [courtSession.id],
   }),
+  rateeCourtSession: one(courtSession, {
+    fields: [rating.rateeCourtSession],
+    references: [courtSession.id]
+  })
 }));
 
 export const encounteredPlayerRelations = relations(
