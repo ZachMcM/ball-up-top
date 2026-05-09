@@ -9,7 +9,10 @@ import {
 } from "../db/queries/userQueries";
 import { activity, courtSession, leaderboard, user } from "../db/schema";
 import { handleError } from "../utils/handleError";
-import { invalidateQueries, invalidateQueriesForUser } from "../utils/invalidateQueries";
+import {
+  invalidateQueries,
+  invalidateQueriesForUser,
+} from "../utils/invalidateQueries";
 import { authMiddleware, upload } from "../utils/middleware";
 import { r2 } from "../utils/r2";
 
@@ -62,8 +65,8 @@ usersRoute.patch("/users/primary-college", authMiddleware, async (req, res) => {
       }
     });
 
-    invalidateQueries(["leaderboard", primaryCourtId])
-    invalidateQueriesForUser(res.locals.userId!, ["home"])
+    invalidateQueries(["leaderboard", primaryCourtId]);
+    invalidateQueriesForUser(res.locals.userId!, ["home"]);
 
     res.json({ success: true });
   } catch (error) {
@@ -80,13 +83,19 @@ usersRoute.get("/users/activity", authMiddleware, async (_, res) => {
       ),
       orderBy: desc(activity.createdAt),
       with: {
-        court: true,
-        courtSession: {
-          with: {
-            court: true,
+        court: {
+          columns: {
+            id: true,
+            name: true,
+            collegeName: true,
+            collegeColor: true,
           },
         },
         rating: {
+          columns: {
+            rateeOldOverall: true,
+            rateeNewOverall: true,
+          },
           with: {
             rater: {
               columns: {
@@ -102,6 +111,12 @@ usersRoute.get("/users/activity", authMiddleware, async (_, res) => {
                 playmakingRating: true,
               },
             },
+          },
+        },
+        rankChange: {
+          columns: {
+            oldRank: true,
+            newRank: true,
           },
         },
       },

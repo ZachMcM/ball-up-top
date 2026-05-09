@@ -1,5 +1,3 @@
-import { CourtListEntry, CourtSession } from './court';
-import { Rating } from './rating';
 import { User } from './user';
 
 export type Activity = {
@@ -11,7 +9,12 @@ export type Activity = {
   type: 'overall_change' | 'rank_change' | 'archetype_change';
   ratingId: number | null;
   read: boolean;
-  court: CourtListEntry | null;
-  courtSession: (CourtSession & { court: CourtListEntry }) | null;
-  rating: (Rating & { rater: User }) | null;
+  court: {
+    id: number;
+    name: string;
+    collegeName: string;
+    collegeColor: string;
+  };
+  rating: ({ rateeOldOverall: number; rateeNewOverall: number } & { rater: User }) | null;
+  rankChange: { oldRank: number; newRank: number } | null;
 };
