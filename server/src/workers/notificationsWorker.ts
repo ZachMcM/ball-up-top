@@ -8,6 +8,7 @@ import {
   court,
   courtSession,
   notificationCourt,
+  rankChange,
   rating,
   user,
 } from "../db/schema";
@@ -27,70 +28,82 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
 
   switch (data.type) {
     case "rating_effects": {
-      for (const ratingEffectEntry of data.ratingEffects) {
-        // Insert rating_received activity
-        await db.insert(activity).values({
-          userId: ratingEffectEntry.userId,
-          type: "archetype_change",
-          ratingId: ratingEffectEntry,
-        });
-        invalidateQueriesForUser(userId, ["activity"]);
-
-        // Send push notification for rating received
-        const avgRating = Math.round(
-          (defenseRating +
-            playmakingRating +
-            shootingRating +
-            finishingRating) /
-            4,
-        );
-        await sendPushNotification({
-          userId,
-          title: "New Rating Received",
-          body: `Someone rated you ${avgRating} overall!`,
-          data: { type: "rating_received", ratingId },
+      // Process ratings
+      if (data.ratingIds.length > 0) {
+        const ratings = await db.query.rating.findMany({
+          where: inArray(rating.id, data.ratingIds),
         });
 
-        // Check for archetype change
-        if (oldArchetype !== newArchetype) {
-          await db.insert(activity).values({
-            userId,
-            type: "archetype_changed",
-            ratingId,
-          });
-          invalidateQueriesForUser(userId, ["activity"]);
+        for (const r of ratings) {
+          // Overall change activity and notification
+          if (r.rateeOldOverall !== r.rateeNewOverall) {
+            await db.insert(activity).values({
+              userId: r.rateeId,
+              type: "overall_change",
+              ratingId: r.id,
+            });
 
-          await sendPushNotification({
-            userId,
-            title: "Archetype Changed",
-            body: `Your archetype changed to ${newArchetype}!`,
-            data: { type: "archetype_changed", ratingId },
-          });
-        }
+            const direction = r.rateeNewOverall > r.rateeOldOverall ? "increased" : "decreased";
+            await sendPushNotification({
+              userId: r.rateeId,
+              title: "Overall Changed",
+              body: `Your overall ${direction} to ${r.rateeNewOverall}!`,
+              data: { type: "overall_change", ratingId: r.id },
+            });
+          }
 
-        // Check for rating milestones
-        if (
-          (oldOverall < 70 && newOverall >= 70) ||
-          (oldOverall < 75 && newOverall >= 75) ||
-          (oldOverall < 80 && newOverall >= 80) ||
-          (oldOverall < 85 && newOverall >= 85) ||
-          (oldOverall < 90 && newOverall >= 90)
-        ) {
-          await db.insert(activity).values({
-            userId,
-            type: "rating_milestone",
-            ratingId,
-          });
-          invalidateQueriesForUser(userId, ["activity"]);
+          // Archetype change activity and notification
+          if (r.rateeOldArchetype !== r.rateeNewArchetype) {
+            await db.insert(activity).values({
+              userId: r.rateeId,
+              type: "archetype_change",
+              ratingId: r.id,
+            });
 
-          await sendPushNotification({
-            userId,
-            title: "Rating Milestone",
-            body: `Congratulations! You reached ${newOverall} overall!`,
-            data: { type: "rating_milestone", ratingId },
-          });
+            await sendPushNotification({
+              userId: r.rateeId,
+              title: "Archetype Changed",
+              body: `Your archetype is now ${r.rateeNewArchetype}!`,
+              data: { type: "archetype_change", ratingId: r.id },
+            });
+          }
+
+          invalidateQueriesForUser(r.rateeId, ["activity"]);
         }
       }
+
+      // Process rank changes
+      if (data.rankChangeIds.length > 0) {
+        const rankChanges = await db.query.rankChange.findMany({
+          where: inArray(rankChange.id, data.rankChangeIds),
+        });
+
+        for (const rc of rankChanges) {
+          await db.insert(activity).values({
+            userId: rc.userId,
+            type: "rank_change",
+            rankChangeId: rc.id,
+            courtId: rc.courtId,
+          });
+
+          const msg =
+            rc.oldRank === null
+              ? `You entered the leaderboard at #${rc.newRank}!`
+              : rc.newRank < rc.oldRank
+                ? `Your rank rose to #${rc.newRank}!`
+                : `Your rank dropped to #${rc.newRank}`;
+
+          await sendPushNotification({
+            userId: rc.userId,
+            title: "Rank Changed",
+            body: msg,
+            data: { type: "rank_change", rankChangeId: rc.id },
+          });
+
+          invalidateQueriesForUser(rc.userId, ["activity"]);
+        }
+      }
+
       break;
     }
 

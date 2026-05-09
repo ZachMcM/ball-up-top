@@ -15,6 +15,7 @@ import {
   courtSession,
   encounteredPlayer,
   leaderboard,
+  rankChange,
   rating,
   user,
 } from "../db/schema";
@@ -327,13 +328,46 @@ courtSessionsRoute.post(
         });
       }
 
-      const { ratingIds, rateeIds } = await db.transaction(async (tx) => {
+      const { ratingIds, rankChangeIds, rateeIds } = await db.transaction(async (tx) => {
         const courtId = targetCourtSession.courtId;
         const createdRatingIds: number[] = [];
+        const createdRankChangeIds: number[] = [];
         const ratedUserIds: string[] = [];
 
+        // Phase 1: Get potential ratee IDs and snapshot old ranks
+        const potentialRateeIds = encounteredPlayersData
+          .filter(
+            (ep) =>
+              !ep.skipped &&
+              ep.defenseRating !== null &&
+              ep.finishingRating !== null &&
+              ep.shootingRating !== null &&
+              ep.playmakingRating !== null,
+          )
+          .map((ep) => ep.rateeId);
+
+        const leaderboardSnapshot = await tx
+          .select({
+            userId: leaderboard.userId,
+            rank: leaderboard.rank,
+          })
+          .from(leaderboard)
+          .where(
+            and(
+              eq(leaderboard.courtId, courtId),
+              or(
+                isNotNull(leaderboard.rank),
+                inArray(leaderboard.userId, potentialRateeIds),
+              ),
+            ),
+          );
+
+        const oldRankMap = new Map<string, number | null>(
+          leaderboardSnapshot.map((e) => [e.userId, e.rank]),
+        );
+
+        // Phase 2: Process all ratings (NO leaderboard reordering)
         for (const ep of encounteredPlayersData) {
-          // Skip if player was skipped or ratings are incomplete
           if (ep.skipped) continue;
           if (
             ep.defenseRating === null ||
@@ -351,7 +385,7 @@ courtSessionsRoute.post(
             playmakingRating,
           } = ep;
 
-          // Compute outlier weights using frozen ratee ratings and lifetime count
+          // Compute outlier weights
           const owDef = computeOutlierWeight(
             defenseRating,
             ep.rateeDefenseAtTime,
@@ -373,13 +407,11 @@ courtSessionsRoute.post(
             ep.rateeLifetimeCount,
           );
 
-          // Compute final weights using precomputed combined weight
           const finalWeightDef = ep.combinedWeight * owDef;
           const finalWeightFin = ep.combinedWeight * owFin;
           const finalWeightSho = ep.combinedWeight * owSho;
           const finalWeightPlay = ep.combinedWeight * owPlay;
 
-          // Fetch ratee's CURRENT (live) ratings for EMA
           const ratee = await tx.query.user.findFirst({
             where: eq(user.id, ep.rateeId),
             columns: {
@@ -395,31 +427,12 @@ courtSessionsRoute.post(
 
           if (!ratee) continue;
 
-          // Apply EMA to LIVE ratings
-          const newDefense = applyEMA(
-            ratee.defenseRating,
-            defenseRating,
-            finalWeightDef,
-          );
-          const newFinishing = applyEMA(
-            ratee.finishingRating,
-            finishingRating,
-            finalWeightFin,
-          );
-          const newShooting = applyEMA(
-            ratee.shootingRating,
-            shootingRating,
-            finalWeightSho,
-          );
-          const newPlaymaking = applyEMA(
-            ratee.playmakingRating,
-            playmakingRating,
-            finalWeightPlay,
-          );
+          const newDefense = applyEMA(ratee.defenseRating, defenseRating, finalWeightDef);
+          const newFinishing = applyEMA(ratee.finishingRating, finishingRating, finalWeightFin);
+          const newShooting = applyEMA(ratee.shootingRating, shootingRating, finalWeightSho);
+          const newPlaymaking = applyEMA(ratee.playmakingRating, playmakingRating, finalWeightPlay);
 
-          const newOverall =
-            (newDefense + newFinishing + newShooting + newPlaymaking) / 4;
-
+          const newOverall = (newDefense + newFinishing + newShooting + newPlaymaking) / 4;
           const newArchetype = generateArchetype(
             newDefense,
             newPlaymaking,
@@ -427,16 +440,6 @@ courtSessionsRoute.post(
             newShooting,
             ratee.height!,
           );
-
-          // Get ratee's old rank before updating
-          const rateeLeaderboard = await tx.query.leaderboard.findFirst({
-            where: and(
-              eq(leaderboard.userId, ep.rateeId),
-              eq(leaderboard.courtId, courtId),
-            ),
-            columns: { rank: true },
-          });
-          const oldRank = rateeLeaderboard?.rank ?? null;
 
           // Update user ratings
           await tx
@@ -451,46 +454,7 @@ courtSessionsRoute.post(
             })
             .where(eq(user.id, ep.rateeId));
 
-          // Reorder leaderboard for this court
-          const leaderboardEntries = await tx
-            .select({
-              userId: leaderboard.userId,
-              overall: user.overall,
-            })
-            .from(leaderboard)
-            .innerJoin(user, eq(leaderboard.userId, user.id))
-            .where(
-              and(
-                eq(leaderboard.courtId, courtId),
-                or(
-                  isNotNull(leaderboard.rank),
-                  eq(leaderboard.userId, ep.rateeId),
-                ),
-              ),
-            );
-
-          const sorted = leaderboardEntries.sort((a, b) => b.overall - a.overall);
-
-          for (let i = 0; i < sorted.length; i++) {
-            const entry = sorted[i];
-            await tx
-              .update(leaderboard)
-              .set({
-                rank: i + 1,
-                overall: entry.overall,
-              })
-              .where(
-                and(
-                  eq(leaderboard.userId, entry.userId),
-                  eq(leaderboard.courtId, courtId),
-                ),
-              );
-          }
-
-          // Get ratee's new rank after reordering
-          const newRank = sorted.findIndex((e) => e.userId === ep.rateeId) + 1;
-
-          // Insert rating with rank data
+          // Insert rating WITHOUT rank data
           const [newRating] = await tx
             .insert(rating)
             .values({
@@ -515,8 +479,6 @@ courtSessionsRoute.post(
               rateeNewOverall: Math.round(newOverall),
               rateeOldArchetype: ratee.archetype,
               rateeNewArchetype: newArchetype,
-              rateeOldRank: oldRank,
-              rateeNewRank: newRank,
             })
             .returning({ id: rating.id });
 
@@ -524,12 +486,75 @@ courtSessionsRoute.post(
           ratedUserIds.push(ep.rateeId);
         }
 
+        // Phase 3: ONE leaderboard reorder for ALL changes
+        const leaderboardEntries = await tx
+          .select({
+            userId: leaderboard.userId,
+            overall: user.overall,
+          })
+          .from(leaderboard)
+          .innerJoin(user, eq(leaderboard.userId, user.id))
+          .where(
+            and(
+              eq(leaderboard.courtId, courtId),
+              or(
+                isNotNull(leaderboard.rank),
+                inArray(leaderboard.userId, ratedUserIds),
+              ),
+            ),
+          );
+
+        const sorted = leaderboardEntries.sort((a, b) => b.overall - a.overall);
+
+        for (let i = 0; i < sorted.length; i++) {
+          const entry = sorted[i];
+          await tx
+            .update(leaderboard)
+            .set({
+              rank: i + 1,
+              overall: entry.overall,
+              ...(ratedUserIds.includes(entry.userId) && { lastRatedAt: new Date() }),
+            })
+            .where(
+              and(
+                eq(leaderboard.userId, entry.userId),
+                eq(leaderboard.courtId, courtId),
+              ),
+            );
+        }
+
+        // Phase 4: Create rankChange rows for everyone whose rank changed
+        for (let i = 0; i < sorted.length; i++) {
+          const entry = sorted[i];
+          const newRank = i + 1;
+          const oldRank = oldRankMap.get(entry.userId) ?? null;
+
+          if (oldRank !== newRank) {
+            const [rc] = await tx
+              .insert(rankChange)
+              .values({
+                userId: entry.userId,
+                courtId,
+                raterCourtSessionId: sessionId,
+                oldRank,
+                newRank,
+              })
+              .returning({ id: rankChange.id });
+
+            createdRankChangeIds.push(rc.id);
+          }
+        }
+
         await tx
           .update(courtSession)
           .set({ hasRated: true })
           .where(eq(courtSession.id, sessionId));
 
-        return { ratingIds: createdRatingIds, rateeIds: ratedUserIds };
+        return {
+          ratingIds: createdRatingIds,
+          rankChangeIds: createdRankChangeIds,
+          rateeIds: ratedUserIds,
+        };
       });
 
       res.json({ success: true });
@@ -543,10 +568,11 @@ courtSessionsRoute.post(
       invalidateQueries(["court", targetCourtSession.courtId]);
       await invalidateHomeForCourt(targetCourtSession.courtId);
 
-      if (ratingIds.length > 0) {
-        notificationsQueue.add("ratings_activity", {
-          type: "ratings_activity",
+      if (ratingIds.length > 0 || rankChangeIds.length > 0) {
+        notificationsQueue.add("rating_effects", {
+          type: "rating_effects",
           ratingIds,
+          rankChangeIds,
         });
       }
     } catch (error) {

@@ -218,9 +218,6 @@ export const rating = pgTable(
     rateeOldArchetype: text("ratee_old_archetype").notNull(),
     rateeNewArchetype: text("ratee_new_archetype").notNull(),
 
-    rateeOldRank: integer("ratee_old_rank"),
-    rateeNewRank: integer("ratee_new_rank").notNull(),
-
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
@@ -314,6 +311,7 @@ export const activity = pgTable("activity", {
     .notNull(),
 
   ratingId: integer("rating_id").references(() => rating.id),
+  rankChangeId: integer("rank_change_id"),
   courtSessionId: integer("court_session_id").references(() => courtSession.id),
   courtId: integer("court_id").references(() => court.id),
 
@@ -357,5 +355,30 @@ export const leaderboard = pgTable(
     primaryKey({ columns: [table.userId, table.courtId] }),
     index("leaderboard_court_rank_idx").on(table.courtId, table.rank),
     index("leaderboard_last_rated_idx").on(table.lastRatedAt),
+  ],
+);
+
+export const rankChange = pgTable(
+  "rank_change",
+  {
+    id: serial().primaryKey().notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id),
+    courtId: integer("court_id")
+      .notNull()
+      .references(() => court.id),
+    raterCourtSessionId: integer("rater_court_session_id")
+      .notNull()
+      .references(() => courtSession.id),
+    oldRank: integer("old_rank"),
+    newRank: integer("new_rank").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("rank_change_user_id_idx").on(table.userId),
+    index("rank_change_court_id_idx").on(table.courtId),
+    index("rank_change_rater_court_session_idx").on(table.raterCourtSessionId),
+    index("rank_change_created_at_idx").on(table.createdAt),
   ],
 );

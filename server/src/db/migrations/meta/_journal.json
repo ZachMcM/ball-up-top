@@ -127,6 +127,13 @@
       "when": 1778341209560,
       "tag": "0017_thankful_trauma",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1778347588151,
+      "tag": "0018_conscious_doomsday",
+      "breakpoints": true
     }
   ]
 }
