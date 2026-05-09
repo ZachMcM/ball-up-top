@@ -1,16 +1,12 @@
 import { isNull } from "drizzle-orm";
-import { primaryKey } from "drizzle-orm/pg-core";
 import {
   boolean,
   doublePrecision,
   index,
   integer,
-  pgTable,
-  serial,
+  pgTable, primaryKey, serial,
   text,
-  timestamp,
-  unique,
-  uniqueIndex,
+  timestamp, uniqueIndex
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable(
@@ -118,8 +114,6 @@ export const court = pgTable(
   {
     id: serial().primaryKey().notNull(),
     name: text().notNull(),
-    aliases: text().array().notNull().default([]),
-    googlePlaceId: text("google_place_id").notNull().unique(),
     address: text("address").notNull(),
 
     collegeName: text("college_name").notNull(),
@@ -318,21 +312,6 @@ export const activity = pgTable("activity", {
   read: boolean("read").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-
-export const notificationCourt = pgTable(
-  "notification_court",
-  {
-    id: serial().primaryKey().notNull(),
-    userId: text("user_id")
-      .notNull()
-      .references(() => user.id),
-    courtId: integer("court_id")
-      .notNull()
-      .references(() => court.id),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-  },
-  (table) => [unique().on(table.userId, table.courtId)],
-);
 
 export const leaderboard = pgTable(
   "leaderboard",

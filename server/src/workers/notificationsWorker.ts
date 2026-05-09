@@ -1,27 +1,25 @@
-import { Worker, Job } from "bullmq";
-import { eq, inArray, isNull, sql } from "drizzle-orm";
-import { redisConnection } from "../queues";
-import { NotificationJobData } from "../queues/notificationsQueue";
+import { Job, Worker } from "bullmq";
+import { eq, inArray, sql } from "drizzle-orm";
+import { COURT_NOTI_THRESHOLD } from "../config/courts";
 import { db } from "../db";
 import {
   activity,
   court,
   courtSession,
-  notificationCourt,
   rankChange,
   rating,
-  user,
+  user
 } from "../db/schema";
+import { redisConnection } from "../queues";
+import { NotificationJobData } from "../queues/notificationsQueue";
+import {
+  invalidateQueriesForUser
+} from "../utils/invalidateQueries";
+import { logger } from "../utils/logger";
 import {
   sendPushNotification,
   sendPushNotifications,
 } from "../utils/pushNotifications";
-import { logger } from "../utils/logger";
-import {
-  invalidateQueriesForUser,
-  invalidateQueriesForUsers,
-} from "../utils/invalidateQueries";
-import { COURT_NOTI_THRESHOLD } from "../config/courts";
 
 async function processNotificationJob(job: Job<NotificationJobData>) {
   const { data } = job;
@@ -43,7 +41,8 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
               ratingId: r.id,
             });
 
-            const direction = r.rateeNewOverall > r.rateeOldOverall ? "increased" : "decreased";
+            const direction =
+              r.rateeNewOverall > r.rateeOldOverall ? "increased" : "decreased";
             await sendPushNotification({
               userId: r.rateeId,
               title: "Overall Changed",
@@ -135,23 +134,17 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
 
         if (!targetCourt) break;
 
-        // Get subscribed users (excluding the user who just checked in)
-        const subscribedUsers = await db
-          .select({
-            userId: notificationCourt.userId,
-          })
-          .from(notificationCourt)
-          .where(
-            sql`${notificationCourt.courtId} = ${data.courtId}
-              AND ${notificationCourt.userId} != ${data.checkingInUserId}`,
-          );
+        const subscribedUsers = await db.query.user.findMany({
+          where: eq(user.primaryCourtId, targetCourt.id),
+          columns: {
+            id: true,
+          },
+        });
 
-        const userIds = subscribedUsers.map((s) => s.userId);
-
-        if (userIds.length > 0) {
+        if (subscribedUsers.length > 0) {
           // Send push notifications
           await sendPushNotifications({
-            userIds,
+            userIds: subscribedUsers.map((su) => su.id),
             title: `${targetCourt.name} is Active!`,
             body: `${activeCount} ${activeCount === 1 ? "player" : "players"} are currently playing.`,
             data: { type: "court_activity", courtId: data.courtId },

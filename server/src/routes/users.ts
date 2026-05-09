@@ -205,91 +205,92 @@ usersRoute.patch(
   },
 );
 
-const PlayersParamsSchema = z.object({
-  limit: z.coerce.number().default(25),
-  searchQuery: z.string().optional(),
-  minHeight: z.string().optional(),
-  maxHeight: z.string().optional(),
-  minOverall: z.coerce.number().optional(),
-  sortBy: z
-    .enum(["most_active", "overall_desc", "overall_asc"])
-    .optional()
-    .default("overall_desc"),
-});
+// @deprecated
+// const PlayersParamsSchema = z.object({
+//   limit: z.coerce.number().default(25),
+//   searchQuery: z.string().optional(),
+//   minHeight: z.string().optional(),
+//   maxHeight: z.string().optional(),
+//   minOverall: z.coerce.number().optional(),
+//   sortBy: z
+//     .enum(["most_active", "overall_desc", "overall_asc"])
+//     .optional()
+//     .default("overall_desc"),
+// });
 
-usersRoute.get("/users", authMiddleware, async (req, res) => {
-  try {
-    const validQueryParams = PlayersParamsSchema.safeParse(req.query);
-    if (!validQueryParams.success) {
-      return res.status(400).json({ error: validQueryParams.error.message });
-    }
+// usersRoute.get("/users", authMiddleware, async (req, res) => {
+//   try {
+//     const validQueryParams = PlayersParamsSchema.safeParse(req.query);
+//     if (!validQueryParams.success) {
+//       return res.status(400).json({ error: validQueryParams.error.message });
+//     }
 
-    const { limit, searchQuery, minHeight, maxHeight, minOverall, sortBy } =
-      validQueryParams.data;
+//     const { limit, searchQuery, minHeight, maxHeight, minOverall, sortBy } =
+//       validQueryParams.data;
 
-    const conditions = [];
+//     const conditions = [];
 
-    if (searchQuery) {
-      conditions.push(ilike(user.name, searchQuery));
-    }
+//     if (searchQuery) {
+//       conditions.push(ilike(user.name, searchQuery));
+//     }
 
-    if (minOverall !== undefined) {
-      conditions.push(gte(user.overall, minOverall));
-    }
+//     if (minOverall !== undefined) {
+//       conditions.push(gte(user.overall, minOverall));
+//     }
 
-    if (minHeight !== undefined) {
-      conditions.push(gte(user.height, minHeight));
-    }
-    if (maxHeight !== undefined) {
-      conditions.push(lte(user.height, maxHeight));
-    }
+//     if (minHeight !== undefined) {
+//       conditions.push(gte(user.height, minHeight));
+//     }
+//     if (maxHeight !== undefined) {
+//       conditions.push(lte(user.height, maxHeight));
+//     }
 
-    const sessionsCount30Days =
-      sql<number>`COUNT(CASE WHEN ${courtSession.startTime} >= NOW() - INTERVAL '30 days' THEN 1 END)`.as(
-        "sessions_count_30_days",
-      );
+//     const sessionsCount30Days =
+//       sql<number>`COUNT(CASE WHEN ${courtSession.startTime} >= NOW() - INTERVAL '30 days' THEN 1 END)`.as(
+//         "sessions_count_30_days",
+//       );
 
-    const query = db
-      .select({
-        id: user.id,
-        name: user.name,
-        image: user.image,
-        height: user.height,
-        archetype: user.archetype,
-        overall: user.overall,
-        finishingRating: user.finishingRating,
-        defenseRating: user.defenseRating,
-        playmakingRating: user.playmakingRating,
-        shootingRating: user.shootingRating,
-        sessionsCount30Days,
-      })
-      .from(user)
-      .leftJoin(courtSession, sql`${courtSession.userId} = ${user.id}`)
-      .where(conditions.length > 0 ? and(...conditions) : undefined)
-      .groupBy(
-        user.id,
-        user.name,
-        user.image,
-        user.height,
-        user.archetype,
-        user.overall,
-      );
+//     const query = db
+//       .select({
+//         id: user.id,
+//         name: user.name,
+//         image: user.image,
+//         height: user.height,
+//         archetype: user.archetype,
+//         overall: user.overall,
+//         finishingRating: user.finishingRating,
+//         defenseRating: user.defenseRating,
+//         playmakingRating: user.playmakingRating,
+//         shootingRating: user.shootingRating,
+//         sessionsCount30Days,
+//       })
+//       .from(user)
+//       .leftJoin(courtSession, sql`${courtSession.userId} = ${user.id}`)
+//       .where(conditions.length > 0 ? and(...conditions) : undefined)
+//       .groupBy(
+//         user.id,
+//         user.name,
+//         user.image,
+//         user.height,
+//         user.archetype,
+//         user.overall,
+//       );
 
-    if (sortBy === "most_active") {
-      query.orderBy(sql`${sessionsCount30Days} DESC`);
-    } else if (sortBy === "overall_desc") {
-      query.orderBy(sql`${user.overall} DESC`);
-    } else if (sortBy === "overall_asc") {
-      query.orderBy(sql`${user.overall} ASC`);
-    }
+//     if (sortBy === "most_active") {
+//       query.orderBy(sql`${sessionsCount30Days} DESC`);
+//     } else if (sortBy === "overall_desc") {
+//       query.orderBy(sql`${user.overall} DESC`);
+//     } else if (sortBy === "overall_asc") {
+//       query.orderBy(sql`${user.overall} ASC`);
+//     }
 
-    const players = await query.limit(limit);
+//     const players = await query.limit(limit);
 
-    res.json(players);
-  } catch (error) {
-    handleError(error, res, "GET /players");
-  }
-});
+//     res.json(players);
+//   } catch (error) {
+//     handleError(error, res, "GET /players");
+//   }
+// });
 
 const ExpoPushTokenSchema = z.object({
   expoPushToken: z.string(),

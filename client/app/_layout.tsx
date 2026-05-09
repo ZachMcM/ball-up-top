@@ -37,9 +37,6 @@ export default function RootLayout() {
   const { colorScheme, setColorScheme } = useColorScheme();
   setColorScheme('dark');
   
-  // TODO
-  useFonts({});
-
   function onAppStateChange(status: AppStateStatus) {
     if (Platform.OS !== 'web') {
       focusManager.setFocused(status === 'active');

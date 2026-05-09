@@ -82,10 +82,10 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="(discover)"
+        name="(leaderboard)"
         options={{
           headerShown: false,
-          title: 'Discover',
+          title: 'leaderboard',
           tabBarIcon: ({ color }) => <Icon as={SearchIcon} size={18} color={color} />,
         }}
       />

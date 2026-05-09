@@ -1,8 +1,7 @@
-import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { and, asc, desc, eq, isNull, lte, or, sql } from "drizzle-orm";
+import { and, asc, eq, isNull, or, sql } from "drizzle-orm";
 import { Router } from "express";
 import * as z from "zod";
-import { MAX_DISTANCE, MAX_DISTANCE_FOR_CHECK_IN } from "../config/courts";
+import { MAX_DISTANCE_FOR_CHECK_IN } from "../config/courts";
 import { db } from "../db";
 import {
   getCourtActivePlayers,
@@ -10,18 +9,17 @@ import {
   getCourtLeaderboard,
   getCourtSessionStats,
 } from "../db/queries/courtQueries";
-import { court, courtSession, notificationCourt, user } from "../db/schema";
+import { court, courtSession } from "../db/schema";
 import { notificationsQueue } from "../queues/notificationsQueue";
 import { getDistanceInMiles } from "../utils/getDistanceMiles";
 import { handleError } from "../utils/handleError";
+import { invalidateHomeForCourt } from "../utils/invalidateHomeForCourt";
 import {
   invalidateQueries,
   invalidateQueriesForUser,
 } from "../utils/invalidateQueries";
-import { invalidateHomeForCourt } from "../utils/invalidateHomeForCourt";
 import { logger } from "../utils/logger";
-import { authMiddleware, upload } from "../utils/middleware";
-import { r2 } from "../utils/r2";
+import { authMiddleware } from "../utils/middleware";
 
 export const courtsRoute = Router();
 
@@ -236,209 +234,6 @@ courtsRoute.post(
       });
     } catch (error) {
       handleError(error, res, "POST /courts/:courtId/sessions");
-    }
-  },
-);
-
-const CourtsParamsSchema = z.object({
-  lat: z.coerce.number().min(-90).max(90),
-  lng: z.coerce.number().min(-180).max(180),
-  limit: z.coerce.number(),
-  searchQuery: z.string().optional(),
-  indoor: z
-    .enum(["true", "false"])
-    .transform((val) => val === "true")
-    .optional(),
-  verified: z
-    .enum(["true"])
-    .transform((val) => val === "true")
-    .optional(),
-  sortBy: z.enum(["distance", "active_players"]).optional().default("distance"),
-});
-
-courtsRoute.get("/courts", authMiddleware, async (req, res) => {
-  try {
-    const validQueryParams = CourtsParamsSchema.safeParse(req.query);
-    if (!validQueryParams.success) {
-      return res.status(400).json({ error: validQueryParams.error.message });
-    }
-
-    const { lat, lng, limit, searchQuery, indoor, sortBy } =
-      validQueryParams.data;
-
-    // Spherical Law of Cosines formula for calculating distance on Earth's surface
-    // Returns distance in miles (Earth's radius = 3958.8 miles)
-    const distanceFormula = sql<number>`(
-      3958.8 * acos(
-        cos(radians(${lat})) *
-        cos(radians(${court.lat})) *
-        cos(radians(${court.lng}) - radians(${lng})) +
-        sin(radians(${lat})) *
-        sin(radians(${court.lat}))
-      )
-    )`;
-
-    // Subquery to calculate average players per day at each court
-    // Counts unique players per day, then averages across days with activity
-    const avgPlayersPerDayStats = db
-      .select({
-        courtId: sql<number>`court_id`.as("court_id"),
-        avgPlayersPerDay: sql<number>`AVG(daily_players)`.as(
-          "avg_players_per_day",
-        ),
-      })
-      .from(
-        sql`(
-          SELECT
-            court_id,
-            DATE(start_time) as session_date,
-            COUNT(DISTINCT user_id)::float as daily_players
-          FROM court_session
-          GROUP BY court_id, DATE(start_time)
-        ) as daily_counts`,
-      )
-      .groupBy(sql`court_id`)
-      .as("avg_players_per_day_stats");
-
-    // Subquery to calculate average player overall rating and current active sessions
-    // Only count sessions that started today and have no end time (protection against lingering sessions)
-    const sessionStats = db
-      .select({
-        courtId: courtSession.courtId,
-        avgPlayerOverall: sql<number>`
-          AVG(CASE WHEN ${courtSession.endTime} IS NULL AND DATE(${courtSession.startTime}) = CURRENT_DATE THEN ${user.overall} END)::float
-        `.as("avg_player_overall"),
-        currentActiveSessions: sql<number>`
-          COUNT(CASE WHEN ${courtSession.endTime} IS NULL AND DATE(${courtSession.startTime}) = CURRENT_DATE THEN 1 END)::integer
-        `.as("current_active_sessions"),
-      })
-      .from(courtSession)
-      .innerJoin(user, eq(courtSession.userId, user.id))
-      .groupBy(courtSession.courtId)
-      .as("session_stats");
-
-    const conditions = [];
-
-    if (!searchQuery) {
-      conditions.push(lte(distanceFormula, MAX_DISTANCE));
-    }
-
-    if (indoor !== undefined) {
-      conditions.push(eq(court.indoor, indoor));
-    }
-
-    if (searchQuery) {
-      conditions.push(
-        sql`(
-          ${court.name} ILIKE ${`%${searchQuery}%`} OR
-          ${court.address} ILIKE ${`%${searchQuery}%`} OR
-          ${sql`array_to_string(${court.aliases}, ' ')`} ILIKE ${`%${searchQuery}%`}
-        )`,
-      );
-    }
-
-    const query = db
-      .select({
-        id: court.id,
-        name: court.name,
-        address: court.address,
-        lat: court.lat,
-        lng: court.lng,
-        indoor: court.indoor,
-        image: court.image,
-        collegeName: court.collegeName,
-        collegeColor: court.collegeColor,
-        distance: distanceFormula,
-        avgPlayerOverall: sql<number>`COALESCE(${sessionStats.avgPlayerOverall}, 0)::float`,
-        currentActiveSessions: sql<number>`COALESCE(${sessionStats.currentActiveSessions}, 0)::integer`,
-      })
-      .from(court)
-      .leftJoin(
-        avgPlayersPerDayStats,
-        eq(court.id, avgPlayersPerDayStats.courtId),
-      )
-      .leftJoin(sessionStats, eq(court.id, sessionStats.courtId))
-      .where(and(...conditions))
-      .orderBy(
-        sortBy === "active_players"
-          ? desc(sql`COALESCE(${sessionStats.currentActiveSessions}, 0)`)
-          : asc(distanceFormula),
-      )
-      .limit(limit);
-
-    const courts = await query;
-
-    res.json(courts);
-  } catch (error) {
-    handleError(error, res, "GET /courts");
-  }
-});
-
-const PostCourtsBodySchema = z.object({
-  name: z.string().min(1),
-  indoor: z
-    .enum(["true", "false"])
-    .transform((val) => val === "true")
-    .optional(),
-  googlePlaceId: z.string(),
-  lat: z.coerce.number().min(-90).max(90),
-  lng: z.coerce.number().min(-180).max(180),
-  address: z.string(),
-  aliases: z
-    .string()
-    .transform((val) => JSON.parse(val))
-    .pipe(z.array(z.string()))
-    .optional(),
-});
-
-courtsRoute.post(
-  "/courts/:id/notifications",
-  authMiddleware,
-  async (req, res) => {
-    try {
-      const courtId = parseInt(req.params.id);
-
-      if (!Number.isInteger(courtId)) {
-        logger.error("Court ID is not an integer.");
-        return res.status(400).json({ error: "Court ID is not an integer." });
-      }
-
-      await db.insert(notificationCourt).values({
-        courtId,
-        userId: res.locals.userId!,
-      });
-
-      return res.json({ success: true });
-    } catch (error) {
-      handleError(error, res, "POST /courts/:id/notifications");
-    }
-  },
-);
-
-courtsRoute.delete(
-  "/courts/:id/notifications",
-  authMiddleware,
-  async (req, res) => {
-    try {
-      const courtId = parseInt(req.params.id);
-
-      if (!Number.isInteger(courtId)) {
-        logger.error("Court ID is not an integer.");
-        return res.status(400).json({ error: "Court ID is not an integer." });
-      }
-
-      await db
-        .delete(notificationCourt)
-        .where(
-          and(
-            eq(notificationCourt.courtId, courtId),
-            eq(notificationCourt.userId, res.locals.userId!),
-          ),
-        );
-
-      return res.json({ success: true });
-    } catch (error) {
-      handleError(error, res, "DELETE /courts/:id/notifications");
     }
   },
 );
