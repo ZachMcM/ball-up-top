@@ -2,10 +2,7 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { and, asc, desc, eq, isNull, lte, or, sql } from "drizzle-orm";
 import { Router } from "express";
 import * as z from "zod";
-import {
-  MAX_DISTANCE,
-  MAX_DISTANCE_FOR_CHECK_IN,
-} from "../config/courts";
+import { MAX_DISTANCE, MAX_DISTANCE_FOR_CHECK_IN } from "../config/courts";
 import { db } from "../db";
 import {
   getCourtActivePlayers,
@@ -13,16 +10,14 @@ import {
   getCourtLeaderboard,
   getCourtSessionStats,
 } from "../db/queries/courtQueries";
-import {
-  court,
-  courtSession,
-  notificationCourt,
-  user,
-} from "../db/schema";
+import { court, courtSession, notificationCourt, user } from "../db/schema";
 import { notificationsQueue } from "../queues/notificationsQueue";
 import { getDistanceInMiles } from "../utils/getDistanceMiles";
 import { handleError } from "../utils/handleError";
-import { invalidateQueries, invalidateQueriesForUser } from "../utils/invalidateQueries";
+import {
+  invalidateQueries,
+  invalidateQueriesForUser,
+} from "../utils/invalidateQueries";
 import { invalidateHomeForCourt } from "../utils/invalidateHomeForCourt";
 import { logger } from "../utils/logger";
 import { authMiddleware, upload } from "../utils/middleware";
@@ -226,12 +221,12 @@ courtsRoute.post(
         courtId,
       });
 
+      res.json({ success: true });
+
       invalidateQueries(["courts"], ["court", courtId]);
       invalidateQueries(["user", res.locals.userId!]);
       invalidateQueriesForUser(res.locals.userId!, ["home"]);
       await invalidateHomeForCourt(courtId);
-
-      res.json({ success: true });
 
       // Queue court threshold check for notifications
       notificationsQueue.add("court_threshold_check", {
@@ -268,14 +263,8 @@ courtsRoute.get("/courts", authMiddleware, async (req, res) => {
       return res.status(400).json({ error: validQueryParams.error.message });
     }
 
-    const {
-      lat,
-      lng,
-      limit,
-      searchQuery,
-      indoor,
-      sortBy,
-    } = validQueryParams.data;
+    const { lat, lng, limit, searchQuery, indoor, sortBy } =
+      validQueryParams.data;
 
     // Spherical Law of Cosines formula for calculating distance on Earth's surface
     // Returns distance in miles (Earth's radius = 3958.8 miles)

@@ -26,38 +26,13 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
   const { data } = job;
 
   switch (data.type) {
-    case "session_completed": {
-      await db.insert(activity).values({
-        userId: data.userId,
-        type: "session_completed",
-        courtSessionId: data.courtSessionId,
-      });
-      invalidateQueriesForUser(data.userId, ["activity"]);
-      break;
-    }
-
-    case "ratings_activity": {
-      const targetRatings = await db.query.rating.findMany({
-        where: inArray(rating.id, data.ratingIds),
-      });
-
-      for (const {
-        id: ratingId,
-        rateeId: userId,
-        rateeOldArchetype: oldArchetype,
-        rateeNewArchetype: newArchetype,
-        rateeOldOverall: oldOverall,
-        rateeNewOverall: newOverall,
-        defenseRating,
-        playmakingRating,
-        shootingRating,
-        finishingRating,
-      } of targetRatings) {
+    case "rating_effects": {
+      for (const ratingEffectEntry of data.ratingEffects) {
         // Insert rating_received activity
         await db.insert(activity).values({
-          userId,
-          type: "rating_received",
-          ratingId,
+          userId: ratingEffectEntry.userId,
+          type: "archetype_change",
+          ratingId: ratingEffectEntry,
         });
         invalidateQueriesForUser(userId, ["activity"]);
 
@@ -135,6 +110,7 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
       const activeCount = result?.count ?? 0;
 
       if (activeCount >= COURT_NOTI_THRESHOLD) {
+        // TODO change this to all users with this primary court versus subscribers
         // Get court info
         const targetCourt = await db.query.court.findFirst({
           where: eq(court.id, data.courtId),
@@ -160,16 +136,6 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
         const userIds = subscribedUsers.map((s) => s.userId);
 
         if (userIds.length > 0) {
-          // Create activity entries
-          for (const userId of userIds) {
-            await db.insert(activity).values({
-              userId,
-              type: "court_activity",
-              courtId: data.courtId,
-            });
-          }
-          invalidateQueriesForUsers(userIds, ["activity"]);
-
           // Send push notifications
           await sendPushNotifications({
             userIds,

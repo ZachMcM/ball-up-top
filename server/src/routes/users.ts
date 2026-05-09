@@ -7,17 +7,69 @@ import {
   getOverallHistory,
   getRecentSessions,
 } from "../db/queries/userQueries";
-import {
-  activity,
-  courtSession,
-  user,
-} from "../db/schema";
+import { activity, courtSession, leaderboard, user } from "../db/schema";
 import { handleError } from "../utils/handleError";
-import { invalidateQueries } from "../utils/invalidateQueries";
+import { invalidateQueries, invalidateQueriesForUser } from "../utils/invalidateQueries";
 import { authMiddleware, upload } from "../utils/middleware";
 import { r2 } from "../utils/r2";
 
 export const usersRoute = Router();
+
+const PatchPrimaryCollegeSchema = z.object({
+  courtId: z.number(),
+});
+
+usersRoute.patch("/users/primary-college", authMiddleware, async (req, res) => {
+  try {
+    const validBody = PatchPrimaryCollegeSchema.safeParse(req.body);
+    if (!validBody.success) {
+      return res.status(400).json({ error: validBody.error.message });
+    }
+
+    const { courtId: primaryCourtId } = validBody.data;
+
+    await db.transaction(async (tx) => {
+      await tx
+        .update(user)
+        .set({
+          primaryCourtId,
+        })
+        .where(eq(user.id, res.locals.userId!));
+
+      const userResult = await tx.query.user.findFirst({
+        where: eq(user.id, res.locals.userId!),
+        columns: {
+          overall: true,
+          onboardingStep: true,
+        },
+      });
+
+      await tx
+        .insert(leaderboard)
+        .values({
+          userId: res.locals.userId!,
+          courtId: primaryCourtId,
+          rank: null,
+          overall: userResult?.overall!,
+          lastRatedAt: null,
+        })
+        .onConflictDoNothing();
+
+      if (userResult?.onboardingStep !== "complete") {
+        await tx.update(user).set({
+          onboardingStep: "complete",
+        });
+      }
+    });
+
+    invalidateQueries(["leaderboard", primaryCourtId])
+    invalidateQueriesForUser(res.locals.userId!, ["home"])
+
+    res.json({ success: true });
+  } catch (error) {
+    handleError(error, res, "PATCH /users/primary-college");
+  }
+});
 
 usersRoute.get("/users/activity", authMiddleware, async (_, res) => {
   try {

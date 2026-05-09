@@ -10,12 +10,11 @@ import {
 } from '@/components/ui/select';
 import { Text } from '@/components/ui/text';
 import { authClient } from '@/lib/auth-client';
-import { getColleges } from '@/lib/endpoints';
+import { getColleges, patchUserPrimaryCollege } from '@/lib/endpoints';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { ArrowLeftIcon } from 'lucide-react-native';
-import { useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { toast } from 'sonner-native';
@@ -44,19 +43,23 @@ export default function PrimaryCollegePage() {
 
   const router = useRouter();
 
-  const collegeNameCounts = useMemo(() => {
-    const counts = new Map<string, number>();
-    colleges?.forEach((c) => counts.set(c.collegeName, (counts.get(c.collegeName) ?? 0) + 1));
-    return counts;
-  }, [colleges]);
+  const { refetch: refetchAuthClientSession } = authClient.useSession();
+  const queryClient = useQueryClient();
 
   const { mutate: savePrimaryCollege, isPending: isSaving } = useMutation({
-    mutationFn: async (primaryCourtId: number) =>
-      await authClient.updateUser({
-        primaryCourtId,
-        onboardingStep: 'complete',
-      }),
-    onSuccess: () => {
+    mutationFn: async (primaryCourtId: number) => {
+      await patchUserPrimaryCollege(primaryCourtId);
+      return primaryCourtId
+    },
+
+    onSuccess: (primaryCourtId) => {
+      refetchAuthClientSession()
+      queryClient.invalidateQueries({
+        queryKey: ['home'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['leaderboard', primaryCourtId],
+      });
       toast.success('Primary college saved!', { position: 'bottom-center' });
     },
     onError: (error) => {

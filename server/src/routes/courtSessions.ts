@@ -1,12 +1,23 @@
 import {
   and,
+  asc,
+  desc,
   eq,
+  inArray,
   isNotNull,
-  isNull
+  isNull,
+  or,
+  sql,
 } from "drizzle-orm";
 import { Router } from "express";
 import { db } from "../db";
-import { courtSession, encounteredPlayer, rating, user } from "../db/schema";
+import {
+  courtSession,
+  encounteredPlayer,
+  leaderboard,
+  rating,
+  user,
+} from "../db/schema";
 import { handleError } from "../utils/handleError";
 import { authMiddleware } from "../utils/middleware";
 
@@ -21,11 +32,17 @@ import {
   OVERLAP_DIFF_THRESH_2_WT,
 } from "../config/ratings";
 import { notificationsQueue } from "../queues/notificationsQueue";
-import { createEncounteredPlayersForSession, getEncounteredPlayers } from "../utils/checkoutSession";
+import {
+  createEncounteredPlayersForSession,
+  getEncounteredPlayers,
+} from "../utils/checkoutSession";
 import { clamp } from "../utils/clamp";
 import { generateArchetype } from "../utils/generateArchetype";
 import { invalidateHomeForCourt } from "../utils/invalidateHomeForCourt";
-import { invalidateQueries, invalidateQueriesForUser } from "../utils/invalidateQueries";
+import {
+  invalidateQueries,
+  invalidateQueriesForUser,
+} from "../utils/invalidateQueries";
 import { logger } from "../utils/logger";
 
 export const courtSessionsRoute = Router();
@@ -310,9 +327,11 @@ courtSessionsRoute.post(
         });
       }
 
-      const ratingIds: number[] = [];
+      const { ratingIds, rateeIds } = await db.transaction(async (tx) => {
+        const courtId = targetCourtSession.courtId;
+        const createdRatingIds: number[] = [];
+        const ratedUserIds: string[] = [];
 
-      await db.transaction(async (tx) => {
         for (const ep of encounteredPlayersData) {
           // Skip if player was skipped or ratings are incomplete
           if (ep.skipped) continue;
@@ -409,6 +428,17 @@ courtSessionsRoute.post(
             ratee.height!,
           );
 
+          // Get ratee's old rank before updating
+          const rateeLeaderboard = await tx.query.leaderboard.findFirst({
+            where: and(
+              eq(leaderboard.userId, ep.rateeId),
+              eq(leaderboard.courtId, courtId),
+            ),
+            columns: { rank: true },
+          });
+          const oldRank = rateeLeaderboard?.rank ?? null;
+
+          // Update user ratings
           await tx
             .update(user)
             .set({
@@ -421,6 +451,46 @@ courtSessionsRoute.post(
             })
             .where(eq(user.id, ep.rateeId));
 
+          // Reorder leaderboard for this court
+          const leaderboardEntries = await tx
+            .select({
+              userId: leaderboard.userId,
+              overall: user.overall,
+            })
+            .from(leaderboard)
+            .innerJoin(user, eq(leaderboard.userId, user.id))
+            .where(
+              and(
+                eq(leaderboard.courtId, courtId),
+                or(
+                  isNotNull(leaderboard.rank),
+                  eq(leaderboard.userId, ep.rateeId),
+                ),
+              ),
+            );
+
+          const sorted = leaderboardEntries.sort((a, b) => b.overall - a.overall);
+
+          for (let i = 0; i < sorted.length; i++) {
+            const entry = sorted[i];
+            await tx
+              .update(leaderboard)
+              .set({
+                rank: i + 1,
+                overall: entry.overall,
+              })
+              .where(
+                and(
+                  eq(leaderboard.userId, entry.userId),
+                  eq(leaderboard.courtId, courtId),
+                ),
+              );
+          }
+
+          // Get ratee's new rank after reordering
+          const newRank = sorted.findIndex((e) => e.userId === ep.rateeId) + 1;
+
+          // Insert rating with rank data
           const [newRating] = await tx
             .insert(rating)
             .values({
@@ -445,27 +515,34 @@ courtSessionsRoute.post(
               rateeNewOverall: Math.round(newOverall),
               rateeOldArchetype: ratee.archetype,
               rateeNewArchetype: newArchetype,
+              rateeOldRank: oldRank,
+              rateeNewRank: newRank,
             })
             .returning({ id: rating.id });
 
-          ratingIds.push(newRating.id);
-
-          invalidateQueries(["user", ep.rateeId]);
-          invalidateQueriesForUser(ep.rateeId, ["home"]);
+          createdRatingIds.push(newRating.id);
+          ratedUserIds.push(ep.rateeId);
         }
 
         await tx
           .update(courtSession)
           .set({ hasRated: true })
           .where(eq(courtSession.id, sessionId));
+
+        return { ratingIds: createdRatingIds, rateeIds: ratedUserIds };
       });
+
+      res.json({ success: true });
+
+      // Invalidate queries for rated users
+      for (const rateeId of rateeIds) {
+        invalidateQueries(["user", rateeId]);
+        invalidateQueriesForUser(rateeId, ["home"]);
+      }
 
       invalidateQueries(["court", targetCourtSession.courtId]);
       await invalidateHomeForCourt(targetCourtSession.courtId);
 
-      res.json({ success: true });
-
-      // Queue ratings activity processing
       if (ratingIds.length > 0) {
         notificationsQueue.add("ratings_activity", {
           type: "ratings_activity",
@@ -515,21 +592,18 @@ courtSessionsRoute.patch(
           .where(eq(courtSession.id, sessionId))
           .returning();
 
-        await createEncounteredPlayersForSession(tx, updatedCourtSession, res.locals.userId!);
+        await createEncounteredPlayersForSession(
+          tx,
+          updatedCourtSession,
+          res.locals.userId!,
+        );
       });
+
+      res.json({ success: true });
 
       invalidateQueries(["courts"], ["court", targetCourtSession.courtId]);
       invalidateQueriesForUser(res.locals.userId!, ["home"]);
       await invalidateHomeForCourt(targetCourtSession.courtId);
-
-      res.json({ success: true });
-
-      // Queue session completed activity
-      notificationsQueue.add("session_completed", {
-        type: "session_completed",
-        userId: res.locals.userId!,
-        courtSessionId: targetCourtSession.id,
-      });
     } catch (error) {
       handleError(error, res, "PATCH /court-sessions/:sessionId");
     }

@@ -1,5 +1,5 @@
 import { Activity } from '@/types/activity';
-import { Court, CourtListEntry, CourtSession, LeaderboardEntry, Place } from '@/types/court';
+import { CollegeOption, Court, CourtListEntry, CourtSession, LeaderboardEntry, Place } from '@/types/court';
 import { EncounteredPlayer } from '@/types/encounteredPlayer';
 import { HomeResponse } from '@/types/home';
 import { ExtendedUser, User } from '@/types/user';
@@ -47,6 +47,16 @@ export async function serverRequest({ endpoint, method, body, formData }: server
   }
 
   return data;
+}
+
+export async function patchUserPrimaryCollege(primaryCourtId: number) {
+  await serverRequest({
+    endpoint: '/users/primary-college',
+    method: 'PATCH',
+    body: JSON.stringify({
+      primaryCourtId,
+    }),
+  });
 }
 
 export async function patchUserImage(asset: ImagePickerAsset) {
@@ -180,12 +190,6 @@ export async function getHome({ lat, lng }: { lat: number; lng: number }): Promi
     method: 'GET',
   });
 }
-
-export type CollegeOption = {
-  courtId: number;
-  collegeName: string;
-  collegeColor: string;
-};
 
 export async function getColleges(): Promise<CollegeOption[]> {
   return await serverRequest({

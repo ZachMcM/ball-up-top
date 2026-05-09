@@ -13,6 +13,12 @@ export const PlaceSchema = z.object({
   formattedAddress: z.string(),
 });
 
+export type CollegeOption = {
+  courtId: number;
+  collegeName: string;
+  collegeColor: string;
+};
+
 export type CourtListEntry = {
   id: number;
   name: string;

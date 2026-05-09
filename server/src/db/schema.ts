@@ -218,6 +218,9 @@ export const rating = pgTable(
     rateeOldArchetype: text("ratee_old_archetype").notNull(),
     rateeNewArchetype: text("ratee_new_archetype").notNull(),
 
+    rateeOldRank: integer("ratee_old_rank"),
+    rateeNewRank: integer("ratee_new_rank").notNull(),
+
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
@@ -304,12 +307,9 @@ export const activity = pgTable("activity", {
     .notNull(),
   type: text()
     .$type<
-      | "rating_received"
-      | "session_completed"
-      | "rating_milestone"
-      | "archetype_changed"
-      | "court_activity"
-      | "rank_changed"
+      | "overall_change"
+      | "rank_change"
+      | "archetype_change"
     >()
     .notNull(),
 
@@ -347,7 +347,7 @@ export const leaderboard = pgTable(
       .references(() => court.id),
     overall: integer("overall").notNull(),
     rank: integer("rank"),
-    lastRatedAt: timestamp("last_rated_at").notNull(),
+    lastRatedAt: timestamp("last_rated_at"),
     updatedAt: timestamp("updated_at")
       .defaultNow()
       .$onUpdate(() => new Date())

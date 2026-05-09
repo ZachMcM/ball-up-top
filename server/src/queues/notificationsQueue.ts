@@ -1,25 +1,26 @@
 import { Queue } from "bullmq";
 import { redisConnection } from ".";
 
+export type RatingEffect = {
+  userId: string;
+  oldArchetype: string;
+  newArchetype: string;
+  oldOverall: number;
+  newOverall: number;
+  oldRank: number | null;
+  newRank: number;
+  ratingId: number;
+};
+
 export type NotificationJobData =
   | {
-      type: "session_completed";
-      userId: string;
-      courtSessionId: number;
-    }
-  | {
-      type: "ratings_activity";
-      ratingIds: number[];
+      type: "rating_effects";
+      ratingEffects: RatingEffect[];
     }
   | {
       type: "court_threshold_check";
       courtId: number;
       checkingInUserId: string;
-    }
-  | {
-      type: "leaderboard_updated";
-      courtId: number;
-      rateeId: string;
     };
 
 export const notificationsQueue = new Queue<NotificationJobData>(
