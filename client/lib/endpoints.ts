@@ -1,5 +1,5 @@
 import { Activity } from '@/types/activity';
-import { CollegeOption, Court, CourtListEntry, CourtSession, LeaderboardEntry, Place } from '@/types/court';
+import { CollegeOption, Court, CourtSession, LeaderboardEntry } from '@/types/court';
 import { EncounteredPlayer } from '@/types/encounteredPlayer';
 import { HomeResponse } from '@/types/home';
 import { ExtendedUser, User } from '@/types/user';

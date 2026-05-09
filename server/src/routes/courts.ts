@@ -1,4 +1,4 @@
-import { and, asc, eq, isNull, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNotNull, isNull, or, sql } from "drizzle-orm";
 import { Router } from "express";
 import * as z from "zod";
 import { MAX_DISTANCE_FOR_CHECK_IN } from "../config/courts";
@@ -9,7 +9,7 @@ import {
   getCourtLeaderboard,
   getCourtSessionStats,
 } from "../db/queries/courtQueries";
-import { court, courtSession } from "../db/schema";
+import { court, courtSession, leaderboard } from "../db/schema";
 import { notificationsQueue } from "../queues/notificationsQueue";
 import { getDistanceInMiles } from "../utils/getDistanceMiles";
 import { handleError } from "../utils/handleError";
@@ -70,9 +70,15 @@ courtsRoute.get("/courts/:id/leaderboard", authMiddleware, async (req, res) => {
       return res.status(400).json({ error: "Court ID is not an integer." });
     }
 
-    const { top } = await getCourtLeaderboard({ courtId, limit: 50 });
+    // TODO
 
-    res.json(top);
+    const orderedCourtLeaderboard = await db.query.leaderboard.findMany({
+      where: and(
+        eq(leaderboard.courtId, courtId),
+        isNotNull(leaderboard.rank)
+      ),
+      orderBy: desc(leaderboard.rank)
+    })
   } catch (error) {
     handleError(error, res, "GET /courts/:id/leaderboard");
   }
