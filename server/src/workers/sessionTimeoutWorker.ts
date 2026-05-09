@@ -32,25 +32,35 @@ async function processSesssionTimeoutJob(_: Job) {
       const [updatedSession] = await tx
         .update(courtSession)
         .set({ endTime: now })
-        .where(and(eq(courtSession.id, session.id), isNull(courtSession.endTime)))
+        .where(
+          and(eq(courtSession.id, session.id), isNull(courtSession.endTime)),
+        )
         .returning();
 
       if (!updatedSession) return;
 
-      await createEncounteredPlayersForSession(tx, updatedSession, session.userId);
+      await createEncounteredPlayersForSession(
+        tx,
+        updatedSession,
+        session.userId,
+      );
       affectedCourtIds.add(session.courtId);
     });
   }
 
   if (affectedCourtIds.size > 0) {
-    const courtKeys = [...affectedCourtIds].map((id) => ["court", id] as (string | number)[]);
+    const courtKeys = [...affectedCourtIds].map(
+      (id) => ["court", id] as (string | number)[],
+    );
     invalidateQueries(["courts"], ...courtKeys);
     for (const courtId of affectedCourtIds) {
       await invalidateHomeForCourt(courtId);
     }
   }
 
-  logger.info(`Session timeout cleanup: ended ${staleSessions.length} session(s)`);
+  logger.info(
+    `Session timeout cleanup: ended ${staleSessions.length} session(s)`,
+  );
 }
 
 export const sessionTimeoutWorker = new Worker(
@@ -58,3 +68,11 @@ export const sessionTimeoutWorker = new Worker(
   processSesssionTimeoutJob,
   { connection: redisConnection },
 );
+
+sessionTimeoutWorker.on("completed", (job) => {
+  logger.info(`Session timeout job ${job.id} completed`);
+});
+
+sessionTimeoutWorker.on("failed", (job, err) => {
+  logger.error(`Session timeout job ${job?.id} failed`, { error: err });
+});

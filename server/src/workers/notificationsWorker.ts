@@ -168,7 +168,7 @@ export const notificationsWorker = new Worker<NotificationJobData>(
   processNotificationJob,
   {
     connection: redisConnection,
-    concurrency: 5,
+    concurrency: 10,
   },
 );
 

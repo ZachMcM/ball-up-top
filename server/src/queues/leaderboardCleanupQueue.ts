@@ -1,6 +1,6 @@
 import { Queue } from "bullmq";
 import { redisConnection } from ".";
 
-export const sessionTimeoutQueue = new Queue("session_timeout", {
+export const leaderboardCleanupQueue = new Queue("leaderboard_cleanup_queue", {
   connection: redisConnection,
 });
