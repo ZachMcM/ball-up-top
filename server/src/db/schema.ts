@@ -181,10 +181,10 @@ export const rating = pgTable(
       .notNull()
       .references(() => user.id),
 
-    raterCourtSession: integer("rater_court_session")
+    raterCourtSessionId: integer("rater_court_session")
       .notNull()
       .references(() => courtSession.id),
-    rateeCourtSession: integer("ratee_court_session")
+    rateeCourtSessionId: integer("ratee_court_session")
       .notNull()
       .references(() => courtSession.id),
 
@@ -223,9 +223,9 @@ export const rating = pgTable(
   (table) => [
     index("rating_ratee_idx").on(table.rateeId),
     index("rating_rater_idx").on(table.raterId),
-    index("rating_rater_court_session_idx").on(table.raterCourtSession),
+    index("rating_rater_court_session_idx").on(table.raterCourtSessionId),
     index("rating_created_at_idx").on(table.createdAt),
-    index("rating_ratee_court_session_idx").on(table.rateeCourtSession),
+    index("rating_ratee_court_session_idx").on(table.rateeCourtSessionId),
   ],
 );
 

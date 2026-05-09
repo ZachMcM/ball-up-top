@@ -236,7 +236,7 @@ export default function RatePage() {
     onSuccess: () => {
       if (isLastStep) {
         queryClient.invalidateQueries({ queryKey: ['courtSession', 'unrated'] });
-        toast.success('Ratings submicptted successfully!', { position: 'bottom-center' });
+        toast.success('Ratings submitted successfully!', { position: 'bottom-center' });
         router.dismiss();
       } else {
         refetch();
@@ -310,10 +310,10 @@ export default function RatePage() {
                     Player {step + 1} of {totalSteps}
                   </Text>
                   <Badge variant="secondary">
-                    <Text className="text-sm">{((step + 1 / totalSteps) * 100).toFixed(0)}%</Text>
+                    <Text className="text-sm">{(((step + 1) / totalSteps) * 100).toFixed(0)}%</Text>
                   </Badge>
                 </View>
-                <Progress className="h-1" value={(step + 1 / totalSteps) * 100} />
+                <Progress className="h-1" value={((step + 1) / totalSteps) * 100} />
               </View>
               <View className="flex flex-row items-center gap-4">
                 <Avatar

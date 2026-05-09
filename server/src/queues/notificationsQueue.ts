@@ -15,6 +15,11 @@ export type NotificationJobData =
       type: "court_threshold_check";
       courtId: number;
       checkingInUserId: string;
+    }
+  | {
+      type: "leaderboard_updated";
+      courtId: number;
+      rateeId: string;
     };
 
 export const notificationsQueue = new Queue<NotificationJobData>(
@@ -30,5 +35,5 @@ export const notificationsQueue = new Queue<NotificationJobData>(
       removeOnComplete: 100,
       removeOnFail: 1000,
     },
-  }
+  },
 );

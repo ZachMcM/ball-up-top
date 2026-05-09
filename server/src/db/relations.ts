@@ -73,11 +73,11 @@ export const ratingRelations = relations(rating, ({ one, many }) => ({
     relationName: "incomingRatings",
   }),
   raterCourtSession: one(courtSession, {
-    fields: [rating.raterCourtSession],
+    fields: [rating.raterCourtSessionId],
     references: [courtSession.id],
   }),
   rateeCourtSession: one(courtSession, {
-    fields: [rating.rateeCourtSession],
+    fields: [rating.rateeCourtSessionId],
     references: [courtSession.id]
   })
 }));

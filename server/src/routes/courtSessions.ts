@@ -1,19 +1,16 @@
 import {
   and,
   eq,
-  InferSelectModel,
   isNotNull,
-  isNull,
+  isNull
 } from "drizzle-orm";
 import { Router } from "express";
-import { handleError } from "../utils/handleError";
-import { authMiddleware } from "../utils/middleware";
 import { db } from "../db";
 import { courtSession, encounteredPlayer, rating, user } from "../db/schema";
+import { handleError } from "../utils/handleError";
+import { authMiddleware } from "../utils/middleware";
 
 import * as z from "zod";
-import { clamp } from "../utils/clamp";
-import { generateArchetype } from "../utils/generateArchetype";
 import {
   MAX_OVR,
   MAX_SHIFT,
@@ -23,11 +20,13 @@ import {
   OVERLAP_DIFF_THRESH_2,
   OVERLAP_DIFF_THRESH_2_WT,
 } from "../config/ratings";
-import { logger } from "../utils/logger";
-import { invalidateQueries, invalidateQueriesForUser } from "../utils/invalidateQueries";
-import { invalidateHomeForCourt } from "../utils/invalidateHomeForCourt";
 import { notificationsQueue } from "../queues/notificationsQueue";
 import { createEncounteredPlayersForSession, getEncounteredPlayers } from "../utils/checkoutSession";
+import { clamp } from "../utils/clamp";
+import { generateArchetype } from "../utils/generateArchetype";
+import { invalidateHomeForCourt } from "../utils/invalidateHomeForCourt";
+import { invalidateQueries, invalidateQueriesForUser } from "../utils/invalidateQueries";
+import { logger } from "../utils/logger";
 
 export const courtSessionsRoute = Router();
 
@@ -427,7 +426,8 @@ courtSessionsRoute.post(
             .values({
               raterId: res.locals.userId!,
               rateeId: ep.rateeId,
-              raterCourtSession: sessionId,
+              raterCourtSessionId: sessionId,
+              rateeCourtSessionId: ep.courtSessionId,
 
               shootingRating,
               defenseRating,

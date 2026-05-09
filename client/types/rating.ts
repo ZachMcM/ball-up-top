@@ -7,7 +7,7 @@ export type Rating = {
   shootingRating: number;
   raterId: string;
   rateeId: string;
-  raterCourtSession: number;
+  raterCourtSessionId: number;
   raterOverallAtTime: number;
   runCompetitivenessAtTime: number;
   finalWeightAppliedShooting: number;
