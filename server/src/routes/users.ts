@@ -1,5 +1,5 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { and, desc, eq, gte, ilike, lte, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { Router } from "express";
 import * as z from "zod";
 import { db } from "../db";
@@ -7,7 +7,7 @@ import {
   getOverallHistory,
   getRecentSessions,
 } from "../db/queries/userQueries";
-import { activity, courtSession, leaderboard, user } from "../db/schema";
+import { activity, leaderboard, user } from "../db/schema";
 import { handleError } from "../utils/handleError";
 import {
   invalidateQueries,
@@ -53,7 +53,6 @@ usersRoute.patch("/users/primary-college", authMiddleware, async (req, res) => {
           userId: res.locals.userId!,
           courtId: primaryCourtId,
           rank: null,
-          overall: userResult?.overall!,
           lastRatedAt: null,
         })
         .onConflictDoNothing();

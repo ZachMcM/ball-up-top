@@ -1,111 +1,50 @@
-import { eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { Router } from "express";
-import * as z from "zod";
 import { db } from "../db";
-import {
-  getCourtActivePlayers,
-  getCourtLeaderboard,
-  getCourtSessionStats,
-} from "../db/queries/courtQueries";
-import {
-  getOverallHistory,
-  getRecentSessions,
-} from "../db/queries/userQueries";
-import { court, user } from "../db/schema";
-import { getDistanceInMiles } from "../utils/getDistanceMiles";
+import { leaderboard, rankChange, rating, user } from "../db/schema";
 import { handleError } from "../utils/handleError";
 import { authMiddleware } from "../utils/middleware";
 
 export const homeRoute = Router();
 
-const HomeGetSchema = z.object({
-  lat: z.coerce.number().min(-90).max(90),
-  lng: z.coerce.number().min(-180).max(180),
-});
-
-homeRoute.get("/home", authMiddleware, async (req, res) => {
+homeRoute.get("/home", authMiddleware, async (_, res) => {
   try {
     const userId = res.locals.userId!;
 
-    const validParams = HomeGetSchema.safeParse(req.query);
-    if (validParams.error) {
-      return res.status(400).json({ error: validParams.error.message });
-    }
-    const { lat, lng } = validParams.data;
-
-    const targetUser = await db.query.user.findFirst({
-      where: eq(user.id, userId),
-      columns: {
-        id: true,
-        name: true,
-        image: true,
-        overall: true,
-        height: true,
-        archetype: true,
-        primaryCourtId: true,
-      },
-    });
-
-    if (!targetUser) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    const [overallHistory, recentSessions] = await Promise.all([
-      getOverallHistory({ userId }),
-      getRecentSessions({ userId, limit: 1 }),
-    ]);
-
-    const recentSession = recentSessions[0] ?? null;
-
-    let primaryCourt = null;
-    if (targetUser.primaryCourtId !== null) {
-      const courtId = targetUser.primaryCourtId;
-
-      const [
-        [targetCourt],
-        sessionStats,
-        currentActiveUsers,
+    // TODO make sure differenes aren't computed with null old ranks
+    const [userData] = await db
+      .select({
+        name: user.name,
+        archetype: user.archetype,
+        overall: user.overall,
+        rank: leaderboard.rank,
+        overallDelta: sql<number | null>`(
+        SELECT ${rating.rateeNewOverall} - COALESCE(${rating.rateeOldOverall}, ${rating.rateeNewOverall})
+        FROM ${rating}                                                                                                        
+        WHERE ${rating.rateeId} = ${user.id}
+        ORDER BY ${rating.createdAt} DESC                                                                                     
+        LIMIT 1                                                                                                               
+      )`,
+        rankDelta: sql<
+          number | null
+        >`(                                                                                         
+        SELECT ${rankChange.newRank} - COALESCE(${rankChange.oldRank}, ${rankChange.newRank})
+        FROM ${rankChange}
+        WHERE ${rankChange.userId} = ${user.id}
+          AND ${rankChange.courtId} = ${user.primaryCourtId}                                                                  
+        ORDER BY ${rankChange.createdAt} DESC
+        LIMIT 1                                                                                                               
+      )`,
+      })
+      .from(user)
+      .innerJoin(
         leaderboard,
-      ] = await Promise.all([
-        db
-          .select({
-            id: court.id,
-            name: court.name,
-            image: court.image,
-            indoor: court.indoor,
-            address: court.address,
-            lat: court.lat,
-            lng: court.lng,
-            collegeName: court.collegeName,
-            collegeColor: court.collegeColor,
-          })
-          .from(court)
-          .where(eq(court.id, courtId)),
-        getCourtSessionStats({ courtId }),
-        getCourtActivePlayers({ courtId, limit: 5 }),
-        getCourtLeaderboard({ courtId, limit: 5, currentUserId: userId }),
-      ]);
-
-      if (targetCourt) {
-        const { lat: courtLat, lng: courtLng, ...courtRest } = targetCourt;
-        primaryCourt = {
-          ...courtRest,
-          distance: getDistanceInMiles(courtLat, courtLng, lat, lng),
-          currentActiveSessions: sessionStats.currentActiveSessions,
-          currentActiveUsers,
-          leaderboard,
-        };
-      }
-    }
-
-    const { primaryCourtId: _primaryCourtId, ...userResponse } = targetUser;
-
-    res.json({
-      user: userResponse,
-      overallHistory,
-      recentSession,
-      primaryCourt,
-    });
+        and(
+          eq(user.primaryCourtId, leaderboard.courtId),
+          eq(user.id, leaderboard.userId),
+        ),
+      )
+      .where(eq(user.id, userId));
   } catch (error) {
     handleError(error, res, "GET /home");
   }

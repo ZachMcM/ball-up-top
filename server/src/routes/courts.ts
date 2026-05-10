@@ -9,7 +9,13 @@ import {
   getCourtLeaderboard,
   getCourtSessionStats,
 } from "../db/queries/courtQueries";
-import { court, courtSession, leaderboard } from "../db/schema";
+import {
+  court,
+  courtSession,
+  leaderboard,
+  rankChange,
+  user,
+} from "../db/schema";
 import { notificationsQueue } from "../queues/notificationsQueue";
 import { getDistanceInMiles } from "../utils/getDistanceMiles";
 import { handleError } from "../utils/handleError";
@@ -40,26 +46,33 @@ courtsRoute.get("/colleges", authMiddleware, async (_, res) => {
   }
 });
 
-courtsRoute.get(
-  "/courts/:id/active-players",
-  authMiddleware,
-  async (req, res) => {
-    try {
-      const courtId = parseInt(req.params.id);
+courtsRoute.get("/courts/:id/players", authMiddleware, async (req, res) => {
+  try {
+    const courtId = parseInt(req.params.id);
 
-      if (!Number.isInteger(courtId)) {
-        logger.error("Court ID is not an integer.");
-        return res.status(400).json({ error: "Court ID is not an integer." });
-      }
-
-      const activeUsers = await getCourtActivePlayers({ courtId });
-
-      res.json(activeUsers);
-    } catch (error) {
-      handleError(error, res, "GET /courts/:id/active-players");
+    if (!Number.isInteger(courtId)) {
+      logger.error("Court ID is not an integer.");
+      return res.status(400).json({ error: "Court ID is not an integer." });
     }
-  },
-);
+
+    const courtPlayers = await db
+      .select({
+        rank: leaderboard.rank,
+        overall: user.overall,
+        userId: user.id,
+        name: user.name,
+        image: user.image,
+        archetype: user.archetype,
+      })
+      .from(leaderboard)
+      .innerJoin(user, eq(leaderboard.userId, user.id))
+      .where(eq(leaderboard.courtId, courtId));
+
+    res.json(courtPlayers);
+  } catch (error) {
+    handleError(error, res, "GET /courts/:id/players");
+  }
+});
 
 courtsRoute.get("/courts/:id/leaderboard", authMiddleware, async (req, res) => {
   try {
@@ -70,94 +83,55 @@ courtsRoute.get("/courts/:id/leaderboard", authMiddleware, async (req, res) => {
       return res.status(400).json({ error: "Court ID is not an integer." });
     }
 
-    // TODO
-
-    const orderedCourtLeaderboard = await db.query.leaderboard.findMany({
-      where: and(
-        eq(leaderboard.courtId, courtId),
-        isNotNull(leaderboard.rank)
-      ),
-      orderBy: desc(leaderboard.rank)
-    })
-  } catch (error) {
-    handleError(error, res, "GET /courts/:id/leaderboard");
-  }
-});
-
-const CourtGetSchema = z.object({
-  lat: z.coerce.number().min(-90).max(90),
-  lng: z.coerce.number().min(-180).max(180),
-});
-
-courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
-  try {
-    const courtId = parseInt(req.params.id);
-
-    if (!Number.isInteger(courtId)) {
-      logger.error("Court ID is not an integer.");
-      return res.status(400).json({ error: "Court ID is not an integer." });
-    }
-
-    const validParams = CourtGetSchema.safeParse(req.query);
-    if (validParams.error) {
-      logger.error(validParams.error.message);
-      return res.status(400).json({ error: validParams.error.message });
-    }
-
-    const courtQuery = db
-      .select({
-        id: court.id,
-        name: court.name,
-        address: court.address,
-        lat: court.lat,
-        lng: court.lng,
-        indoor: court.indoor,
-        image: court.image,
-        collegeName: court.collegeName,
-        collegeColor: court.collegeColor,
-        isNotificationEnabled: sql<boolean>`EXISTS (
-          SELECT 1 FROM notification_court
-          WHERE court_id = ${courtId} AND user_id = ${res.locals.userId}
-        )`,
-      })
-      .from(court)
-      .where(eq(court.id, courtId));
-
-    const [
-      [targetCourt],
-      activityGraph,
-      sessionStats,
-      activeUsers,
-      leaderboard,
-    ] = await Promise.all([
-      courtQuery,
-      getCourtActivityGraph({ courtId }),
-      getCourtSessionStats({ courtId }),
-      getCourtActivePlayers({ courtId, limit: 5 }),
-      getCourtLeaderboard({
-        courtId,
-        limit: 5,
-        currentUserId: res.locals.userId,
-      }),
+    const [orderedCourtLeaderboard, topMovers] = await Promise.all([
+      db
+        .select({
+          rank: leaderboard.rank,
+          overall: user.overall,
+          userId: user.id,
+          name: user.name,
+          image: user.image,
+          archetype: user.archetype,
+        })
+        .from(leaderboard)
+        .innerJoin(user, eq(leaderboard.userId, user.id))
+        .where(
+          and(eq(leaderboard.courtId, courtId), isNotNull(leaderboard.rank)),
+        )
+        .orderBy(asc(leaderboard.rank)),
+      db
+        .selectDistinctOn([rankChange.userId], {
+          oldRank: rankChange.oldRank,
+          newRank: rankChange.newRank,
+          userId: rankChange.userId,
+          name: user.name,
+          image: user.image,
+          archetype: user.archetype,
+          rankImprovement:
+            sql<number>`(${rankChange.oldRank} - ${rankChange.newRank})`.as(
+              "rank_improvement",
+            ),
+        })
+        .from(rankChange)
+        .innerJoin(user, eq(rankChange.userId, user.id))
+        .where(
+          and(
+            eq(rankChange.courtId, courtId),
+            isNotNull(rankChange.oldRank),
+          ),
+        )
+        .orderBy(rankChange.userId, desc(rankChange.createdAt))
+        .then((rows) =>
+          rows
+            .filter((r) => r.rankImprovement > 0)
+            .sort((a, b) => b.rankImprovement - a.rankImprovement)
+            .slice(0, 3),
+        ),
     ]);
 
-    if (!targetCourt) {
-      return res.status(404).json({ error: "Court not found" });
-    }
-
-    const { lat, lng } = validParams.data;
-
-    return res.json({
-      ...targetCourt,
-      distance: getDistanceInMiles(targetCourt.lat, targetCourt.lng, lat, lng),
-      activityGraph,
-      avgPlayerOverall: sessionStats.avgPlayerOverall,
-      currentActiveSessions: sessionStats.currentActiveSessions,
-      currentActiveUsers: activeUsers,
-      leaderboard,
-    });
+    res.json({ orderedUsers: orderedCourtLeaderboard, topMovers });
   } catch (error) {
-    handleError(error, res, "GET /courts/:courtId");
+    handleError(error, res, "GET /courts/:id/leaderboard");
   }
 });
 

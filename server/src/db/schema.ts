@@ -322,7 +322,6 @@ export const leaderboard = pgTable(
     courtId: integer("court_id")
       .notNull()
       .references(() => court.id),
-    overall: integer("overall").notNull(),
     rank: integer("rank"),
     lastRatedAt: timestamp("last_rated_at"),
     updatedAt: timestamp("updated_at")

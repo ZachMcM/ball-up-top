@@ -1,4 +1,3 @@
-import { User } from './user';
 
 export type CollegeOption = {
   courtId: number;
@@ -13,4 +12,21 @@ export type CourtSession = {
   startTime: Date;
   endTime: Date | null;
   hasRated: boolean;
+};
+
+type UserEntry = {
+  rank: number | null;
+  overall: number;
+  userId: string;
+  name: string;
+  image: string | null;
+  archetype: string;
+};
+
+export type Leaderboard = {
+  orderedUsers: UserEntry[];
+  topMovers: (UserEntry & {
+    oldRank: number | null;
+    rankImprovement: number;
+  })[];
 };

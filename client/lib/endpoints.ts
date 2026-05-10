@@ -1,5 +1,5 @@
 import { Activity } from '@/types/activity';
-import { CollegeOption, Court, CourtSession, LeaderboardEntry } from '@/types/court';
+import { CollegeOption, CourtSession, Leaderboard } from '@/types/court';
 import { EncounteredPlayer } from '@/types/encounteredPlayer';
 import { HomeResponse } from '@/types/home';
 import { ExtendedUser, User } from '@/types/user';
@@ -75,19 +75,7 @@ export async function patchUserImage(asset: ImagePickerAsset) {
   });
 }
 
-export async function getCourt(
-  id: number,
-  { lat, lng }: { lat: number; lng: number }
-): Promise<Court> {
-  const court = await serverRequest({
-    endpoint: `/courts/${id}?lat=${lat}&lng=${lng}`,
-    method: 'GET',
-  });
-
-  return court;
-}
-
-export async function getCourtLeaderboard(id: number): Promise<LeaderboardEntry[]> {
+export async function getCourtLeaderboard(id: number): Promise<Leaderboard[]> {
   const leaderboard = await serverRequest({
     endpoint: `/courts/${id}/leaderboard`,
     method: 'GET',
@@ -96,6 +84,7 @@ export async function getCourtLeaderboard(id: number): Promise<LeaderboardEntry[
   return leaderboard;
 }
 
+// TODO backend needs to be hooked up as well
 export async function getHome({ lat, lng }: { lat: number; lng: number }): Promise<HomeResponse> {
   return await serverRequest({
     endpoint: `/home?lat=${lat}&lng=${lng}`,
@@ -108,15 +97,6 @@ export async function getColleges(): Promise<CollegeOption[]> {
     endpoint: '/colleges',
     method: 'GET',
   });
-}
-
-export async function getCourtActivePlayers(id: number): Promise<User[]> {
-  const users = await serverRequest({
-    endpoint: `/courts/${id}/active-players`,
-    method: 'GET',
-  });
-
-  return users;
 }
 
 export async function postCourtSession(id: number, coords: { lat: number; lng: number }) {

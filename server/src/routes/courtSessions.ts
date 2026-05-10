@@ -512,7 +512,6 @@ courtSessionsRoute.post(
             .update(leaderboard)
             .set({
               rank: i + 1,
-              overall: entry.overall,
               ...(ratedUserIds.includes(entry.userId) && { lastRatedAt: new Date() }),
             })
             .where(
