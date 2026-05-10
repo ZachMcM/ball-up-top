@@ -1,23 +1,21 @@
-import { CourtLeaderboard } from './court';
-import { RatingHistoryPoint, User, UserSession } from './user';
-
-export type MinimalCourt = {
-  id: number;
-  name: string;
-  image: string;
-  indoor: boolean;
-  address: string;
-  collegeName: string;
-  collegeColor: string;
-  distance: number;
-  currentActiveSessions: number;
-  currentActiveUsers: User[];
-  leaderboard: CourtLeaderboard;
-};
-
 export type HomeResponse = {
-  user: Pick<User, 'id' | 'name' | 'image' | 'overall' | 'height' | 'archetype'>;
-  overallHistory: RatingHistoryPoint[];
-  recentSession: UserSession | null;
-  primaryCourt: MinimalCourt;
+  userData: {
+    name: string;
+    archetype: string;
+    overall: number;
+    rank: number | null;
+    overallDelta: number | null;
+    rankDelta: number | null;
+  }[];
+  activePlayers: {
+    name: string;
+    overall: number;
+    archetype: string;
+    image: string | null;
+  }[];
+  primaryCourt: {
+    name: string;
+    collegeName: string;
+    collegeColor: string;
+  }[];
 };

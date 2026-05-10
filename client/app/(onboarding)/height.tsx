@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/select';
 import { Text } from '@/components/ui/text';
 import { authClient } from '@/lib/auth-client';
+import { patchUserHeight } from '@/lib/endpoints';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
@@ -38,7 +39,7 @@ const HeightSchema = z.object({
 });
 
 export default function HeightPage() {
-  const { data: currentUserData } = authClient.useSession();
+  const { data: currentUserData, refetch: refetchAuthClientSession } = authClient.useSession();
 
   const { control, handleSubmit } = useForm<z.infer<typeof HeightSchema>>({
     resolver: zodResolver(HeightSchema),
@@ -50,18 +51,17 @@ export default function HeightPage() {
   const router = useRouter();
 
   const { mutate: saveHeight, isPending } = useMutation({
-    mutationFn: async (height: string) =>
-      await authClient.updateUser({
-        height,
-        onboardingStep: 'image',
-      }),
+    mutationFn: async (height: string) => {
+      await patchUserHeight(height);
+    },
     onSuccess: () => {
+      refetchAuthClientSession();
       toast.success('Height saved!', { position: 'bottom-center' });
       router.push('/image');
     },
     onError: (error) => {
       console.log('Error', error);
-      (toast.error(error.message), { position: 'bottom-center' });
+      toast.error(error.message, { position: 'bottom-center' });
     },
   });
 

@@ -565,6 +565,7 @@ courtSessionsRoute.post(
       }
 
       invalidateQueries(["court", targetCourtSession.courtId]);
+      invalidateQueries(["leaderboard", targetCourtSession.courtId]);
       await invalidateHomeForCourt(targetCourtSession.courtId);
 
       if (ratingIds.length > 0 || rankChangeIds.length > 0) {

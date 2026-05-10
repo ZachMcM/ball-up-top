@@ -13,16 +13,15 @@ import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, View } fr
 import { toast } from 'sonner-native';
 
 export default function ImagePage() {
+  const { refetch: refetchAuthClientSession } = authClient.useSession();
   const [selectedAsset, setSelectedAsset] = useState<ImagePicker.ImagePickerAsset | null>(null);
 
   const { mutate: saveImage, isPending } = useMutation({
     mutationFn: async () => {
-      await patchUserImage(selectedAsset!);
-      await authClient.updateUser({
-        onboardingStep: 'primaryCollege',
-      });
+      await patchUserImage(selectedAsset!, { onboardingStep: 'primaryCollege' });
     },
     onSuccess: () => {
+      refetchAuthClientSession();
       toast.success('Image saved!', { position: 'bottom-center' });
     },
     onError: (error) => {

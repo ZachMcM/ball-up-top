@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { authClient } from '@/lib/auth-client';
+import { patchUserName } from '@/lib/endpoints';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -17,7 +18,7 @@ const NameSchema = z.object({
 });
 
 export default function NamePage() {
-  const { data: currentUserData } = authClient.useSession();
+  const { data: currentUserData, refetch: refetchAuthClientSession } = authClient.useSession();
 
   const { control, handleSubmit } = useForm<z.infer<typeof NameSchema>>({
     resolver: zodResolver(NameSchema),
@@ -30,9 +31,11 @@ export default function NamePage() {
   const router = useRouter();
 
   const { mutate: saveName, isPending } = useMutation({
-    mutationFn: async (name: string) =>
-      await authClient.updateUser({ name, onboardingStep: 'height' }),
+    mutationFn: async (name: string) => {
+      await patchUserName(name);
+    },
     onSuccess: () => {
+      refetchAuthClientSession();
       toast.success('Name saved!', { position: 'bottom-center' });
       router.push('/height');
     },

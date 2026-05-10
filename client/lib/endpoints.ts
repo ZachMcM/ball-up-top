@@ -59,7 +59,26 @@ export async function patchUserPrimaryCollege(primaryCourtId: number) {
   });
 }
 
-export async function patchUserImage(asset: ImagePickerAsset) {
+export async function patchUserName(name: string) {
+  await serverRequest({
+    endpoint: '/users/name',
+    method: 'PATCH',
+    body: JSON.stringify({ name }),
+  });
+}
+
+export async function patchUserHeight(height: string) {
+  await serverRequest({
+    endpoint: '/users/height',
+    method: 'PATCH',
+    body: JSON.stringify({ height }),
+  });
+}
+
+export async function patchUserImage(
+  asset: ImagePickerAsset,
+  options?: { onboardingStep?: 'primaryCollege' }
+) {
   const formData = new FormData();
 
   formData.append('image', {
@@ -67,6 +86,10 @@ export async function patchUserImage(asset: ImagePickerAsset) {
     type: asset.mimeType || 'image/jpeg',
     name: asset.fileName || 'image.jpg',
   } as any);
+
+  if (options?.onboardingStep) {
+    formData.append('onboardingStep', options.onboardingStep);
+  }
 
   return await serverRequest({
     endpoint: '/users/image',

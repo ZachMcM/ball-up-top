@@ -4,12 +4,6 @@ import * as z from "zod";
 import { MAX_DISTANCE_FOR_CHECK_IN } from "../config/courts";
 import { db } from "../db";
 import {
-  getCourtActivePlayers,
-  getCourtActivityGraph,
-  getCourtLeaderboard,
-  getCourtSessionStats,
-} from "../db/queries/courtQueries";
-import {
   court,
   courtSession,
   leaderboard,

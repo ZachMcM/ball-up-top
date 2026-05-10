@@ -7,7 +7,7 @@ import {
   getOverallHistory,
   getRecentSessions,
 } from "../db/queries/userQueries";
-import { activity, leaderboard, user } from "../db/schema";
+import { activity, leaderboard, rankChange, rating, user } from "../db/schema";
 import { handleError } from "../utils/handleError";
 import {
   invalidateQueries,
@@ -73,6 +73,54 @@ usersRoute.patch("/users/primary-college", authMiddleware, async (req, res) => {
   }
 });
 
+const PatchNameSchema = z.object({
+  name: z.string().min(1),
+});
+
+usersRoute.patch("/users/name", authMiddleware, async (req, res) => {
+  try {
+    const validBody = PatchNameSchema.safeParse(req.body);
+    if (!validBody.success) {
+      return res.status(400).json({ error: validBody.error.message });
+    }
+
+    const { name } = validBody.data;
+
+    await db
+      .update(user)
+      .set({ name, onboardingStep: "height" })
+      .where(eq(user.id, res.locals.userId!));
+
+    res.json({ success: true });
+  } catch (error) {
+    handleError(error, res, "PATCH /users/name");
+  }
+});
+
+const PatchHeightSchema = z.object({
+  height: z.string().min(1),
+});
+
+usersRoute.patch("/users/height", authMiddleware, async (req, res) => {
+  try {
+    const validBody = PatchHeightSchema.safeParse(req.body);
+    if (!validBody.success) {
+      return res.status(400).json({ error: validBody.error.message });
+    }
+
+    const { height } = validBody.data;
+
+    await db
+      .update(user)
+      .set({ height, onboardingStep: "image" })
+      .where(eq(user.id, res.locals.userId!));
+
+    res.json({ success: true });
+  } catch (error) {
+    handleError(error, res, "PATCH /users/height");
+  }
+});
+
 usersRoute.get("/users/activity", authMiddleware, async (_, res) => {
   try {
     const activityEntries = await db.query.activity.findMany({
@@ -131,36 +179,50 @@ usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
   try {
     const userId = req.params.id;
 
-    const targetUser = await db.query.user.findFirst({
-      where: eq(user.id, userId),
-      columns: {
-        id: true,
-        name: true,
-        image: true,
-        overall: true,
-        finishingRating: true,
-        playmakingRating: true,
-        defenseRating: true,
-        shootingRating: true,
-        archetype: true,
-        height: true,
-      },
-    });
+    const targetUser = await db
+      .select({
+        name: user.name,
+        archetype: user.archetype,
+        height: user.height,
+        overall: user.overall,
+        finishingRating: user.finishingRating,
+        playmakingRating: user.playmakingRating,
+        defenseRating: user.defenseRating,
+        shootingRating: user.shootingRating,
+        rank: leaderboard.rank,
+        overallDelta: sql<number | null>`(
+        SELECT ${rating.rateeNewOverall} - COALESCE(${rating.rateeOldOverall}, ${rating.rateeNewOverall})
+        FROM ${rating}                                                                                                        
+        WHERE ${rating.rateeId} = ${user.id}
+        ORDER BY ${rating.createdAt} DESC                                                                                     
+        LIMIT 1                                                                                                               
+      )`,
+        rankDelta: sql<
+          number | null
+        >`(                                                                                         
+        SELECT ${rankChange.newRank} - COALESCE(${rankChange.oldRank}, ${rankChange.newRank})
+        FROM ${rankChange}
+        WHERE ${rankChange.userId} = ${user.id}
+          AND ${rankChange.courtId} = ${user.primaryCourtId}                                                                  
+        ORDER BY ${rankChange.createdAt} DESC
+        LIMIT 1                                                                                                               
+      )`,
+      })
+      .from(user)
+      .innerJoin(
+        leaderboard,
+        and(
+          eq(user.primaryCourtId, leaderboard.courtId),
+          eq(user.id, leaderboard.userId),
+        ),
+      )
+      .where(eq(user.id, userId));
 
     if (!targetUser) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const [overallHistory, recentSessions] = await Promise.all([
-      getOverallHistory({ userId }),
-      getRecentSessions({ userId }),
-    ]);
-
-    res.json({
-      ...targetUser,
-      overallHistory,
-      recentSessions,
-    });
+    res.json(targetUser);
   } catch (error) {
     handleError(error, res, "GET /users/:id");
   }
@@ -207,10 +269,25 @@ usersRoute.patch(
 
       const imageUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
 
+      const updateOnboardingStep =
+        req.body?.onboardingStep === "primaryCollege";
+
       await db
         .update(user)
-        .set({ image: imageUrl })
+        .set({
+          image: imageUrl,
+          ...(updateOnboardingStep && { onboardingStep: "primaryCollege" }),
+        })
         .where(eq(user.id, res.locals.userId!));
+
+      const userLeaderboards = await db
+        .select({ courtId: leaderboard.courtId })
+        .from(leaderboard)
+        .where(eq(leaderboard.userId, res.locals.userId!));
+
+      for (const entry of userLeaderboards) {
+        invalidateQueries(["leaderboard", entry.courtId]);
+      }
 
       return res.json({ image: imageUrl });
     } catch (error) {
@@ -218,93 +295,6 @@ usersRoute.patch(
     }
   },
 );
-
-// @deprecated
-// const PlayersParamsSchema = z.object({
-//   limit: z.coerce.number().default(25),
-//   searchQuery: z.string().optional(),
-//   minHeight: z.string().optional(),
-//   maxHeight: z.string().optional(),
-//   minOverall: z.coerce.number().optional(),
-//   sortBy: z
-//     .enum(["most_active", "overall_desc", "overall_asc"])
-//     .optional()
-//     .default("overall_desc"),
-// });
-
-// usersRoute.get("/users", authMiddleware, async (req, res) => {
-//   try {
-//     const validQueryParams = PlayersParamsSchema.safeParse(req.query);
-//     if (!validQueryParams.success) {
-//       return res.status(400).json({ error: validQueryParams.error.message });
-//     }
-
-//     const { limit, searchQuery, minHeight, maxHeight, minOverall, sortBy } =
-//       validQueryParams.data;
-
-//     const conditions = [];
-
-//     if (searchQuery) {
-//       conditions.push(ilike(user.name, searchQuery));
-//     }
-
-//     if (minOverall !== undefined) {
-//       conditions.push(gte(user.overall, minOverall));
-//     }
-
-//     if (minHeight !== undefined) {
-//       conditions.push(gte(user.height, minHeight));
-//     }
-//     if (maxHeight !== undefined) {
-//       conditions.push(lte(user.height, maxHeight));
-//     }
-
-//     const sessionsCount30Days =
-//       sql<number>`COUNT(CASE WHEN ${courtSession.startTime} >= NOW() - INTERVAL '30 days' THEN 1 END)`.as(
-//         "sessions_count_30_days",
-//       );
-
-//     const query = db
-//       .select({
-//         id: user.id,
-//         name: user.name,
-//         image: user.image,
-//         height: user.height,
-//         archetype: user.archetype,
-//         overall: user.overall,
-//         finishingRating: user.finishingRating,
-//         defenseRating: user.defenseRating,
-//         playmakingRating: user.playmakingRating,
-//         shootingRating: user.shootingRating,
-//         sessionsCount30Days,
-//       })
-//       .from(user)
-//       .leftJoin(courtSession, sql`${courtSession.userId} = ${user.id}`)
-//       .where(conditions.length > 0 ? and(...conditions) : undefined)
-//       .groupBy(
-//         user.id,
-//         user.name,
-//         user.image,
-//         user.height,
-//         user.archetype,
-//         user.overall,
-//       );
-
-//     if (sortBy === "most_active") {
-//       query.orderBy(sql`${sessionsCount30Days} DESC`);
-//     } else if (sortBy === "overall_desc") {
-//       query.orderBy(sql`${user.overall} DESC`);
-//     } else if (sortBy === "overall_asc") {
-//       query.orderBy(sql`${user.overall} ASC`);
-//     }
-
-//     const players = await query.limit(limit);
-
-//     res.json(players);
-//   } catch (error) {
-//     handleError(error, res, "GET /players");
-//   }
-// });
 
 const ExpoPushTokenSchema = z.object({
   expoPushToken: z.string(),
