@@ -1,4 +1,3 @@
-
 export type CollegeOption = {
   courtId: number;
   collegeName: string;
@@ -29,4 +28,13 @@ export type Leaderboard = {
     oldRank: number | null;
     rankImprovement: number;
   })[];
+};
+
+export type CourtPlayer = {
+  rank: number | null;
+  overall: number;
+  userId: string;
+  name: string;
+  image: string | null;
+  archetype: string;
 };

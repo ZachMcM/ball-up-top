@@ -31,6 +31,7 @@ usersRoute.patch("/users/primary-college", authMiddleware, async (req, res) => {
 
     const { courtId: primaryCourtId } = validBody.data;
 
+
     await db.transaction(async (tx) => {
       await tx
         .update(user)

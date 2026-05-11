@@ -1,5 +1,5 @@
 import { Activity } from '@/types/activity';
-import { CollegeOption, CourtSession, Leaderboard } from '@/types/court';
+import { CollegeOption, CourtPlayer, CourtSession, Leaderboard } from '@/types/court';
 import { EncounteredPlayer } from '@/types/encounteredPlayer';
 import { HomeResponse } from '@/types/home';
 import { User } from '@/types/user';
@@ -208,6 +208,24 @@ export async function getActivity(): Promise<Activity[]> {
   });
 
   return activityList;
+}
+
+export async function getLeaderboard(id: number): Promise<Leaderboard> {
+  const leaderboard = await serverRequest({
+    endpoint: `/courts/${id}/leaderboard`,
+    method: 'GET',
+  });
+
+  return leaderboard;
+}
+
+export async function getCourtPlayers(id: number): Promise<CourtPlayer[]> {
+  const courtPlayers = await serverRequest({
+    endpoint: `/courts/${id}/players`,
+    method: 'GET',
+  });
+
+  return courtPlayers;
 }
 
 export async function patchExpoPushToken(expoPushToken: string): Promise<void> {
