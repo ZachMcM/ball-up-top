@@ -1,4 +1,3 @@
-import { User } from './user';
 
 export type Activity = {
   id: number;
@@ -15,6 +14,15 @@ export type Activity = {
     collegeName: string;
     collegeColor: string;
   };
-  rating: ({ rateeOldOverall: number; rateeNewOverall: number } & { rater: User }) | null;
+  rating:
+    | ({ rateeOldOverall: number; rateeNewOverall: number } & {
+        rater: {
+          name: string;
+          image: string;
+          overall: number;
+          archetype: string;
+        };
+      })
+    | null;
   rankChange: { oldRank: number; newRank: number } | null;
 };

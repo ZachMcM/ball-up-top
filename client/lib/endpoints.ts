@@ -2,7 +2,7 @@ import { Activity } from '@/types/activity';
 import { CollegeOption, CourtSession, Leaderboard } from '@/types/court';
 import { EncounteredPlayer } from '@/types/encounteredPlayer';
 import { HomeResponse } from '@/types/home';
-import { ExtendedUser, User } from '@/types/user';
+import { User } from '@/types/user';
 import { ImagePickerAsset } from 'expo-image-picker';
 import { authClient } from './auth-client';
 
@@ -107,7 +107,6 @@ export async function getCourtLeaderboard(id: number): Promise<Leaderboard[]> {
   return leaderboard;
 }
 
-// TODO backend needs to be hooked up as well
 export async function getHome({ lat, lng }: { lat: number; lng: number }): Promise<HomeResponse> {
   return await serverRequest({
     endpoint: `/home?lat=${lat}&lng=${lng}`,
@@ -193,7 +192,7 @@ export async function postSessionRatings(sessionId: number): Promise<void> {
   });
 }
 
-export async function getUser(userId: string): Promise<ExtendedUser> {
+export async function getUser(userId: string): Promise<User> {
   const user = await serverRequest({
     endpoint: `/users/${userId}`,
     method: 'GET',

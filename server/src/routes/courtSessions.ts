@@ -328,233 +328,256 @@ courtSessionsRoute.post(
         });
       }
 
-      const { ratingIds, rankChangeIds, rateeIds } = await db.transaction(async (tx) => {
-        const courtId = targetCourtSession.courtId;
-        const createdRatingIds: number[] = [];
-        const createdRankChangeIds: number[] = [];
-        const ratedUserIds: string[] = [];
+      const { ratingIds, rankChangeIds, rateeIds } = await db.transaction(
+        async (tx) => {
+          const courtId = targetCourtSession.courtId;
+          const createdRatingIds: number[] = [];
+          const createdRankChangeIds: number[] = [];
+          const ratedUserIds: string[] = [];
 
-        // Phase 1: Get potential ratee IDs and snapshot old ranks
-        const potentialRateeIds = encounteredPlayersData
-          .filter(
-            (ep) =>
-              !ep.skipped &&
-              ep.defenseRating !== null &&
-              ep.finishingRating !== null &&
-              ep.shootingRating !== null &&
-              ep.playmakingRating !== null,
-          )
-          .map((ep) => ep.rateeId);
+          // Phase 1: Get potential ratee IDs and snapshot old ranks
+          const potentialRateeIds = encounteredPlayersData
+            .filter(
+              (ep) =>
+                !ep.skipped &&
+                ep.defenseRating !== null &&
+                ep.finishingRating !== null &&
+                ep.shootingRating !== null &&
+                ep.playmakingRating !== null,
+            )
+            .map((ep) => ep.rateeId);
 
-        const leaderboardSnapshot = await tx
-          .select({
-            userId: leaderboard.userId,
-            rank: leaderboard.rank,
-          })
-          .from(leaderboard)
-          .where(
-            and(
-              eq(leaderboard.courtId, courtId),
-              or(
-                isNotNull(leaderboard.rank),
-                inArray(leaderboard.userId, potentialRateeIds),
-              ),
-            ),
-          );
-
-        const oldRankMap = new Map<string, number | null>(
-          leaderboardSnapshot.map((e) => [e.userId, e.rank]),
-        );
-
-        // Phase 2: Process all ratings (NO leaderboard reordering)
-        for (const ep of encounteredPlayersData) {
-          if (ep.skipped) continue;
-          if (
-            ep.defenseRating === null ||
-            ep.finishingRating === null ||
-            ep.shootingRating === null ||
-            ep.playmakingRating === null
-          ) {
-            continue;
-          }
-
-          const {
-            defenseRating,
-            finishingRating,
-            shootingRating,
-            playmakingRating,
-          } = ep;
-
-          // Compute outlier weights
-          const owDef = computeOutlierWeight(
-            defenseRating,
-            ep.rateeDefenseAtTime,
-            ep.rateeLifetimeCount,
-          );
-          const owFin = computeOutlierWeight(
-            finishingRating,
-            ep.rateeFinishingAtTime,
-            ep.rateeLifetimeCount,
-          );
-          const owSho = computeOutlierWeight(
-            shootingRating,
-            ep.rateeShootingAtTime,
-            ep.rateeLifetimeCount,
-          );
-          const owPlay = computeOutlierWeight(
-            playmakingRating,
-            ep.rateePlaymakingAtTime,
-            ep.rateeLifetimeCount,
-          );
-
-          const finalWeightDef = ep.combinedWeight * owDef;
-          const finalWeightFin = ep.combinedWeight * owFin;
-          const finalWeightSho = ep.combinedWeight * owSho;
-          const finalWeightPlay = ep.combinedWeight * owPlay;
-
-          const ratee = await tx.query.user.findFirst({
-            where: eq(user.id, ep.rateeId),
-            columns: {
-              overall: true,
-              archetype: true,
-              defenseRating: true,
-              finishingRating: true,
-              shootingRating: true,
-              playmakingRating: true,
-              height: true,
-            },
-          });
-
-          if (!ratee) continue;
-
-          const newDefense = applyEMA(ratee.defenseRating, defenseRating, finalWeightDef);
-          const newFinishing = applyEMA(ratee.finishingRating, finishingRating, finalWeightFin);
-          const newShooting = applyEMA(ratee.shootingRating, shootingRating, finalWeightSho);
-          const newPlaymaking = applyEMA(ratee.playmakingRating, playmakingRating, finalWeightPlay);
-
-          const newOverall = (newDefense + newFinishing + newShooting + newPlaymaking) / 4;
-          const newArchetype = generateArchetype(
-            newDefense,
-            newPlaymaking,
-            newFinishing,
-            newShooting,
-            ratee.height!,
-          );
-
-          // Update user ratings
-          await tx
-            .update(user)
-            .set({
-              overall: Math.round(newOverall),
-              defenseRating: Math.round(newDefense),
-              finishingRating: Math.round(newFinishing),
-              playmakingRating: Math.round(newPlaymaking),
-              shootingRating: Math.round(newShooting),
-              archetype: newArchetype,
+          const leaderboardSnapshot = await tx
+            .select({
+              userId: leaderboard.userId,
+              rank: leaderboard.rank,
             })
-            .where(eq(user.id, ep.rateeId));
-
-          // Insert rating WITHOUT rank data
-          const [newRating] = await tx
-            .insert(rating)
-            .values({
-              raterId: res.locals.userId!,
-              rateeId: ep.rateeId,
-              raterCourtSessionId: sessionId,
-              rateeCourtSessionId: ep.courtSessionId,
-
-              shootingRating,
-              defenseRating,
-              playmakingRating,
-              finishingRating,
-
-              raterOverallAtTime: ep.raterOverallAtTime,
-              runCompetitivenessAtTime: ep.runCompetitivenessAtTime,
-              finalWeightAppliedDefense: finalWeightDef,
-              finalWeightAppliedFinishing: finalWeightFin,
-              finalWeightAppliedPlaymaking: finalWeightPlay,
-              finalWeightAppliedShooting: finalWeightSho,
-
-              rateeOldOverall: ratee.overall,
-              rateeNewOverall: Math.round(newOverall),
-              rateeOldArchetype: ratee.archetype,
-              rateeNewArchetype: newArchetype,
-            })
-            .returning({ id: rating.id });
-
-          createdRatingIds.push(newRating.id);
-          ratedUserIds.push(ep.rateeId);
-        }
-
-        // Phase 3: ONE leaderboard reorder for ALL changes
-        const leaderboardEntries = await tx
-          .select({
-            userId: leaderboard.userId,
-            overall: user.overall,
-          })
-          .from(leaderboard)
-          .innerJoin(user, eq(leaderboard.userId, user.id))
-          .where(
-            and(
-              eq(leaderboard.courtId, courtId),
-              or(
-                isNotNull(leaderboard.rank),
-                inArray(leaderboard.userId, ratedUserIds),
-              ),
-            ),
-          );
-
-        const sorted = leaderboardEntries.sort((a, b) => b.overall - a.overall);
-
-        for (let i = 0; i < sorted.length; i++) {
-          const entry = sorted[i];
-          await tx
-            .update(leaderboard)
-            .set({
-              rank: i + 1,
-              ...(ratedUserIds.includes(entry.userId) && { lastRatedAt: new Date() }),
-            })
+            .from(leaderboard)
             .where(
               and(
-                eq(leaderboard.userId, entry.userId),
                 eq(leaderboard.courtId, courtId),
+                or(
+                  isNotNull(leaderboard.rank),
+                  inArray(leaderboard.userId, potentialRateeIds),
+                ),
               ),
             );
-        }
 
-        // Phase 4: Create rankChange rows for everyone whose rank changed
-        for (let i = 0; i < sorted.length; i++) {
-          const entry = sorted[i];
-          const newRank = i + 1;
-          const oldRank = oldRankMap.get(entry.userId) ?? null;
+          const oldRankMap = new Map<string, number | null>(
+            leaderboardSnapshot.map((e) => [e.userId, e.rank]),
+          );
 
-          if (oldRank !== newRank) {
-            const [rc] = await tx
-              .insert(rankChange)
-              .values({
-                userId: entry.userId,
-                courtId,
-                raterCourtSessionId: sessionId,
-                oldRank,
-                newRank,
+          // Phase 2: Process all ratings (NO leaderboard reordering)
+          for (const ep of encounteredPlayersData) {
+            if (ep.skipped) continue;
+            if (
+              ep.defenseRating === null ||
+              ep.finishingRating === null ||
+              ep.shootingRating === null ||
+              ep.playmakingRating === null
+            ) {
+              continue;
+            }
+
+            const {
+              defenseRating,
+              finishingRating,
+              shootingRating,
+              playmakingRating,
+            } = ep;
+
+            // Compute outlier weights
+            const owDef = computeOutlierWeight(
+              defenseRating,
+              ep.rateeDefenseAtTime,
+              ep.rateeLifetimeCount,
+            );
+            const owFin = computeOutlierWeight(
+              finishingRating,
+              ep.rateeFinishingAtTime,
+              ep.rateeLifetimeCount,
+            );
+            const owSho = computeOutlierWeight(
+              shootingRating,
+              ep.rateeShootingAtTime,
+              ep.rateeLifetimeCount,
+            );
+            const owPlay = computeOutlierWeight(
+              playmakingRating,
+              ep.rateePlaymakingAtTime,
+              ep.rateeLifetimeCount,
+            );
+
+            const finalWeightDef = ep.combinedWeight * owDef;
+            const finalWeightFin = ep.combinedWeight * owFin;
+            const finalWeightSho = ep.combinedWeight * owSho;
+            const finalWeightPlay = ep.combinedWeight * owPlay;
+
+            const ratee = await tx.query.user.findFirst({
+              where: eq(user.id, ep.rateeId),
+              columns: {
+                overall: true,
+                archetype: true,
+                defenseRating: true,
+                finishingRating: true,
+                shootingRating: true,
+                playmakingRating: true,
+                height: true,
+              },
+            });
+
+            if (!ratee) continue;
+
+            const newDefense = applyEMA(
+              ratee.defenseRating,
+              defenseRating,
+              finalWeightDef,
+            );
+            const newFinishing = applyEMA(
+              ratee.finishingRating,
+              finishingRating,
+              finalWeightFin,
+            );
+            const newShooting = applyEMA(
+              ratee.shootingRating,
+              shootingRating,
+              finalWeightSho,
+            );
+            const newPlaymaking = applyEMA(
+              ratee.playmakingRating,
+              playmakingRating,
+              finalWeightPlay,
+            );
+
+            const newOverall =
+              (newDefense + newFinishing + newShooting + newPlaymaking) / 4;
+            const newArchetype = generateArchetype(
+              newDefense,
+              newPlaymaking,
+              newFinishing,
+              newShooting,
+              ratee.height!,
+            );
+
+            // Update user ratings
+            await tx
+              .update(user)
+              .set({
+                overall: Math.round(newOverall),
+                defenseRating: Math.round(newDefense),
+                finishingRating: Math.round(newFinishing),
+                playmakingRating: Math.round(newPlaymaking),
+                shootingRating: Math.round(newShooting),
+                archetype: newArchetype,
               })
-              .returning({ id: rankChange.id });
+              .where(eq(user.id, ep.rateeId));
 
-            createdRankChangeIds.push(rc.id);
+            // Insert rating WITHOUT rank data
+            const [newRating] = await tx
+              .insert(rating)
+              .values({
+                raterId: res.locals.userId!,
+                rateeId: ep.rateeId,
+                raterCourtSessionId: sessionId,
+                rateeCourtSessionId: ep.courtSessionId,
+
+                shootingRating,
+                defenseRating,
+                playmakingRating,
+                finishingRating,
+
+                raterOverallAtTime: ep.raterOverallAtTime,
+                runCompetitivenessAtTime: ep.runCompetitivenessAtTime,
+                finalWeightAppliedDefense: finalWeightDef,
+                finalWeightAppliedFinishing: finalWeightFin,
+                finalWeightAppliedPlaymaking: finalWeightPlay,
+                finalWeightAppliedShooting: finalWeightSho,
+
+                rateeOldOverall: ratee.overall,
+                rateeNewOverall: Math.round(newOverall),
+                rateeOldArchetype: ratee.archetype,
+                rateeNewArchetype: newArchetype,
+              })
+              .returning({ id: rating.id });
+
+            createdRatingIds.push(newRating.id);
+            ratedUserIds.push(ep.rateeId);
           }
-        }
 
-        await tx
-          .update(courtSession)
-          .set({ hasRated: true })
-          .where(eq(courtSession.id, sessionId));
+          // Phase 3: ONE leaderboard reorder for ALL changes
+          const leaderboardEntries = await tx
+            .select({
+              userId: leaderboard.userId,
+              overall: user.overall,
+            })
+            .from(leaderboard)
+            .innerJoin(user, eq(leaderboard.userId, user.id))
+            .where(
+              and(
+                eq(leaderboard.courtId, courtId),
+                or(
+                  isNotNull(leaderboard.rank),
+                  inArray(leaderboard.userId, ratedUserIds),
+                ),
+              ),
+            );
 
-        return {
-          ratingIds: createdRatingIds,
-          rankChangeIds: createdRankChangeIds,
-          rateeIds: ratedUserIds,
-        };
-      });
+          const sorted = leaderboardEntries.sort(
+            (a, b) => b.overall - a.overall,
+          );
+
+          for (let i = 0; i < sorted.length; i++) {
+            const entry = sorted[i];
+            await tx
+              .update(leaderboard)
+              .set({
+                rank: i + 1,
+                ...(ratedUserIds.includes(entry.userId) && {
+                  lastRatedAt: new Date(),
+                }),
+              })
+              .where(
+                and(
+                  eq(leaderboard.userId, entry.userId),
+                  eq(leaderboard.courtId, courtId),
+                ),
+              );
+          }
+
+          // Phase 4: Create rankChange rows for everyone whose rank changed
+          for (let i = 0; i < sorted.length; i++) {
+            const entry = sorted[i];
+            const newRank = i + 1;
+            const oldRank = oldRankMap.get(entry.userId) ?? null;
+
+            if (oldRank !== newRank) {
+              const [rc] = await tx
+                .insert(rankChange)
+                .values({
+                  userId: entry.userId,
+                  courtId,
+                  raterCourtSessionId: sessionId,
+                  oldRank,
+                  newRank,
+                })
+                .returning({ id: rankChange.id });
+
+              createdRankChangeIds.push(rc.id);
+            }
+          }
+
+          await tx
+            .update(courtSession)
+            .set({ hasRated: true })
+            .where(eq(courtSession.id, sessionId));
+
+          return {
+            ratingIds: createdRatingIds,
+            rankChangeIds: createdRankChangeIds,
+            rateeIds: ratedUserIds,
+          };
+        },
+      );
 
       res.json({ success: true });
 

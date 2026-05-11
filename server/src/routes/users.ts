@@ -146,16 +146,10 @@ usersRoute.get("/users/activity", authMiddleware, async (_, res) => {
           with: {
             rater: {
               columns: {
-                id: true,
                 name: true,
                 image: true,
                 overall: true,
                 archetype: true,
-                height: true,
-                shootingRating: true,
-                finishingRating: true,
-                defenseRating: true,
-                playmakingRating: true,
               },
             },
           },
@@ -179,7 +173,7 @@ usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
   try {
     const userId = req.params.id;
 
-    const targetUser = await db
+    const [targetUser] = await db
       .select({
         name: user.name,
         archetype: user.archetype,
