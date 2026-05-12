@@ -5,11 +5,7 @@ import { LocationProvider, useLocation } from '@/components/providers/LocationPr
 import { PushNotificationProvider } from '@/components/providers/PushNotificationProvider';
 import '@/global.css';
 import { authClient } from '@/lib/auth-client';
-import {
-  BarlowCondensed_700Bold,
-  BarlowCondensed_400Regular,
-} from '@expo-google-fonts/barlow-condensed';
-import {} from '@expo-google-fonts/dm-sans';
+import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
 import { useFonts } from 'expo-font';
 
 import { NAV_THEME, THEME } from '@/lib/theme';
@@ -36,7 +32,11 @@ const queryClient = new QueryClient();
 export default function RootLayout() {
   const { colorScheme, setColorScheme } = useColorScheme();
   setColorScheme('dark');
-  
+
+  const [fontsLoaded] = useFonts({
+    BebasNeue_400Regular,
+  });
+
   function onAppStateChange(status: AppStateStatus) {
     if (Platform.OS !== 'web') {
       focusManager.setFocused(status === 'active');

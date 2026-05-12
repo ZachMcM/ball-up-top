@@ -55,7 +55,7 @@ export default function ImagePage() {
           <Pressable onPress={pickImage}>
             <Avatar
               alt="User Image"
-              className="size-32"
+              className="size-32 bg-secondary"
               source={{ uri: selectedAsset?.uri ?? undefined }}
             />
           </Pressable>

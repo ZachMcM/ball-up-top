@@ -5,7 +5,7 @@ import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 import { toast } from 'sonner-native';
 import { Button } from '../ui/button';
 import { Text } from '../ui/text';
@@ -209,22 +209,29 @@ export function SessionFooter() {
   };
 
   return (
-    <View className="border-t border-border px-4 py-3">
-      <View className="flex flex-row items-center justify-between gap-3">
-        <View className="flex flex-1 flex-row items-center gap-3" onTouchEnd={handlePress}>
-          <View className="flex flex-1 flex-col">
-            <Text className="font-semibold" numberOfLines={1}>
+    <View className="border-t border-border bg-card px-4 py-3">
+      <View className="flex flex-row items-center justify-between">
+        <Pressable onPress={handlePress} className="flex flex-row items-center gap-3">
+          <View
+            className="size-2 rounded-full bg-green-400"
+            style={{
+              shadowColor: '#7CD992',
+              shadowOffset: { width: 0, height: 0 },
+              shadowOpacity: 0.6,
+              shadowRadius: 4,
+            }}
+          />
+          <View className="flex flex-col">
+            <Text className="font-mono text-sm font-semibold tabular-nums">{duration} elapsed</Text>
+            <Text className="text-xs text-muted-foreground">
               Playing at {court?.name ?? 'Loading...'}
             </Text>
-            <Text className="text-sm font-medium text-muted-foreground">
-              Session Duration: {duration}
-            </Text>
           </View>
-        </View>
-        <Button disabled={isCheckOutPending} onPress={checkOut}>
-          <Text>Check Out</Text>
+        </Pressable>
+        <Pressable onPress={checkOut} disabled={isCheckOutPending}>
+          <Text className="text-sm font-bold">End ›</Text>
           {isCheckOutPending && <ActivityIndicator />}
-        </Button>
+        </Pressable>
       </View>
     </View>
   );
