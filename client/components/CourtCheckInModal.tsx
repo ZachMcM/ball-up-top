@@ -1,5 +1,4 @@
 import { THEME } from '@/lib/theme';
-import { MinimalCourt } from '@/types/home';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -39,8 +38,7 @@ export default function CourtCheckInModal({
 
   const { colorScheme } = useColorScheme();
 
-  const { activeCourtSession, checkIn, checkOut, isCheckInPending, unratedCourtSession } =
-    useCourtSession();
+
 
   return (
     <BottomSheetModal

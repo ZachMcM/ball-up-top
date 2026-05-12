@@ -18,7 +18,7 @@ homeRoute.get("/home", authMiddleware, async (_, res) => {
   try {
     const userId = res.locals.userId!;
 
-    const [userData, activePlayers, primaryCourt] = await Promise.all([
+    const [[userData], activePlayers, [primaryCourt]] = await Promise.all([
       db
         .select({
           name: user.name,
@@ -54,6 +54,7 @@ homeRoute.get("/home", authMiddleware, async (_, res) => {
         .where(eq(user.id, userId)),
       db
         .select({
+          id: user.id,
           name: user.name,
           overall: user.overall,
           archetype: user.archetype,
@@ -64,6 +65,7 @@ homeRoute.get("/home", authMiddleware, async (_, res) => {
         .where(isNotNull(courtSession.endTime)),
       db
         .select({
+          id: court.id,
           name: court.name,
           collegeName: court.collegeName,
           collegeColor: court.collegeColor,

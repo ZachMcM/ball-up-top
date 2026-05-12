@@ -1,14 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
-import {
-  NativeSelectScrollView,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Text } from '@/components/ui/text';
 import { authClient } from '@/lib/auth-client';
 import { getColleges, patchUserPrimaryCollege } from '@/lib/endpoints';

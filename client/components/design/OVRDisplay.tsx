@@ -23,8 +23,6 @@ export function OVRDisplay({ value, size = 'lg', color, style }: OVRDisplayProps
         {
           fontFamily: 'BebasNeue_400Regular',
           fontSize,
-          lineHeight: fontSize * 0.85,
-          letterSpacing: fontSize * -0.04,
           color: color ?? '#fafafa',
           fontVariant: ['tabular-nums'],
         },

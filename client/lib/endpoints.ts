@@ -1,5 +1,11 @@
 import { Activity } from '@/types/activity';
-import { CollegeOption, CourtPlayer, CourtSession, Leaderboard } from '@/types/court';
+import {
+  CollegeOption,
+  CourtPlayer,
+  CourtResponse,
+  CourtSession,
+  Leaderboard,
+} from '@/types/court';
 import { EncounteredPlayer } from '@/types/encounteredPlayer';
 import { HomeResponse } from '@/types/home';
 import { User } from '@/types/user';
@@ -98,7 +104,16 @@ export async function patchUserImage(
   });
 }
 
-export async function getCourtLeaderboard(id: number): Promise<Leaderboard[]> {
+export async function getCourt(id: number): Promise<CourtResponse> {
+  const court = await serverRequest({
+    endpoint: `/courts/${id}`,
+    method: 'GET',
+  });
+
+  return court;
+}
+
+export async function getCourtLeaderboard(id: number): Promise<Leaderboard> {
   const leaderboard = await serverRequest({
     endpoint: `/courts/${id}/leaderboard`,
     method: 'GET',

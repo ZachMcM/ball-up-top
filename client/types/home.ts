@@ -6,16 +6,18 @@ export type HomeResponse = {
     rank: number | null;
     overallDelta: number | null;
     rankDelta: number | null;
-  }[];
+  };
   activePlayers: {
+    id: string
     name: string;
     overall: number;
     archetype: string;
     image: string | null;
   }[];
   primaryCourt: {
+    id: number,
     name: string;
     collegeName: string;
     collegeColor: string;
-  }[];
+  };
 };

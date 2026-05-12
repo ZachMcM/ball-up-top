@@ -7,7 +7,6 @@ import { useRouter } from 'expo-router';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import { toast } from 'sonner-native';
-import { Button } from '../ui/button';
 import { Text } from '../ui/text';
 import { useLocation } from './LocationProvider';
 
@@ -37,11 +36,7 @@ export function CourtSessionProvider({ children }: { children: ReactNode }) {
   });
 
   const { data: court } = useQuery({
-    queryFn: async () =>
-      getCourt(activeCourtSession?.courtId!, {
-        lat: location?.coords.latitude!,
-        lng: location?.coords.longitude!,
-      }),
+    queryFn: async () => getCourt(activeCourtSession?.courtId!),
     queryKey: ['court', activeCourtSession?.courtId!],
     enabled: !!activeCourtSession?.courtId,
   });
@@ -166,6 +161,70 @@ function formatDuration(startTime: Date): string {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
+// export function SessionFooter({
+//   courtName,
+//   playerCount,
+// }: {
+//   courtName: string;
+//   playerCount: number;
+// }) {
+//   const { activeCourtSession, checkOut, isCheckOutPending } = useCourtSession();
+//   const [duration, setDuration] = useState('0:00');
+
+//   useEffect(() => {
+//     if (!activeCourtSession?.startTime) return;
+
+//     const formatDuration = (start: Date) => {
+//       const now = new Date();
+//       const diffMs = now.getTime() - start.getTime();
+//       const totalSeconds = Math.floor(diffMs / 1000);
+//       const hours = Math.floor(totalSeconds / 3600);
+//       const minutes = Math.floor((totalSeconds % 3600) / 60);
+//       const seconds = totalSeconds % 60;
+//       if (hours > 0) {
+//         return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+//       }
+//       return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+//     };
+
+//     const startTime = new Date(activeCourtSession.startTime);
+//     setDuration(formatDuration(startTime));
+
+//     const interval = setInterval(() => {
+//       setDuration(formatDuration(startTime));
+//     }, 1000);
+
+//     return () => clearInterval(interval);
+//   }, [activeCourtSession?.startTime]);
+
+//   return (
+//     <View className="border-t border-border bg-card px-4 py-3">
+//       <View className="flex flex-row items-center justify-between">
+//         <View className="flex flex-row items-center gap-3">
+//           <View
+//             className="size-2 rounded-full bg-green-400"
+//             style={{
+//               shadowColor: '#7CD992',
+//               shadowOffset: { width: 0, height: 0 },
+//               shadowOpacity: 0.6,
+//               shadowRadius: 4,
+//             }}
+//           />
+//           <View className="flex flex-col">
+//             <Text className="font-mono text-sm font-semibold tabular-nums">{duration} elapsed</Text>
+//             <Text className="text-xs text-muted-foreground">
+//               You + {playerCount - 1} live at {courtName}
+//             </Text>
+//           </View>
+//         </View>
+//         <Pressable onPress={checkOut} disabled={isCheckOutPending}>
+//           <Text className="text-sm font-bold">End ›</Text>
+//         </Pressable>
+//       </View>
+//     </View>
+//   );
+// }
+
 export function SessionFooter() {
   const { activeCourtSession, checkOut, isCheckOutPending } = useCourtSession();
   const { location } = useLocation();
@@ -174,10 +233,7 @@ export function SessionFooter() {
 
   const { data: court } = useQuery({
     queryFn: async () =>
-      getCourt(activeCourtSession?.courtId!, {
-        lat: location?.coords.latitude!,
-        lng: location?.coords.longitude!,
-      }),
+      getCourt(activeCourtSession?.courtId!),
     queryKey: ['court', activeCourtSession?.courtId],
     enabled: !!activeCourtSession?.courtId && !!location,
   });
@@ -199,19 +255,19 @@ export function SessionFooter() {
     return null;
   }
 
-  const handlePress = () => {
-    if (court) {
-      router.push({
-        pathname: '/court/[courtId]',
-        params: { courtId: court.id },
-      });
-    }
-  };
+  // const handlePress = () => {
+  //   if (court) {
+  //     router.push({
+  //       pathname: '/court/[courtId]',
+  //       params: { courtId: court.id },
+  //     });
+  //   }
+  // };
 
   return (
     <View className="border-t border-border bg-card px-4 py-3">
       <View className="flex flex-row items-center justify-between">
-        <Pressable onPress={handlePress} className="flex flex-row items-center gap-3">
+        {/* <Pressable onPress={handlePress} className="flex flex-row items-center gap-3">
           <View
             className="size-2 rounded-full bg-green-400"
             style={{
@@ -227,7 +283,7 @@ export function SessionFooter() {
               Playing at {court?.name ?? 'Loading...'}
             </Text>
           </View>
-        </Pressable>
+        </Pressable> */}
         <Pressable onPress={checkOut} disabled={isCheckOutPending}>
           <Text className="text-sm font-bold">End ›</Text>
           {isCheckOutPending && <ActivityIndicator />}

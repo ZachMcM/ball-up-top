@@ -38,3 +38,13 @@ export type CourtPlayer = {
   image: string | null;
   archetype: string;
 };
+
+export type CourtResponse = {
+  id: number;
+  name: string;
+  address: string;
+  collegeName: string;
+  collegeColor: string;
+  lat: number;
+  lng: number;
+};

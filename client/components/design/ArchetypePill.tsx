@@ -41,7 +41,7 @@ export function ArchetypePill({
 
   return (
     <View
-      className={cn('rounded-full', sizeClasses[size], toneClasses[tone], className)}
+      className={cn('rounded-full flex items-center', sizeClasses[size], toneClasses[tone], className)}
       {...props}>
       <Text
         className={cn(

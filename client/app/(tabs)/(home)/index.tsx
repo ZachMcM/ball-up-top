@@ -17,7 +17,7 @@ import { getHome } from '@/lib/endpoints';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { ArrowLeftIcon } from 'lucide-react-native';
+import { ArrowLeftIcon, ChevronRight } from 'lucide-react-native';
 import React, { useCallback, useRef } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 
@@ -33,8 +33,14 @@ export default function HomePage() {
       }),
   });
 
-  const { activeCourtSession, checkOut, checkIn, isCheckInPending, isCheckOutPending, unratedCourtSession } =
-    useCourtSession();
+  const {
+    activeCourtSession,
+    checkOut,
+    checkIn,
+    isCheckInPending,
+    isCheckOutPending,
+    unratedCourtSession,
+  } = useCourtSession();
 
   const checkInModalRef = useRef<BottomSheetModal>(null);
   const activePlayersModalRef = useRef<BottomSheetModal>(null);
@@ -51,13 +57,7 @@ export default function HomePage() {
   const tabContext = useTabContext();
   const router = useRouter();
 
-  const homeData = home as any;
-  const userData = homeData?.userData?.[0] ?? homeData?.user;
-  const primaryCourt = homeData?.primaryCourt?.[0] ?? homeData?.primaryCourt;
-  const activePlayers = homeData?.activePlayers ?? homeData?.primaryCourt?.currentActiveUsers ?? [];
-  const activePlayerCount = homeData?.primaryCourt?.currentActiveSessions ?? activePlayers.length;
-
-  const isCheckedIn = activeCourtSession && activeCourtSession.courtId === primaryCourt?.id;
+  const isCheckedIn = activeCourtSession && activeCourtSession.courtId === home?.primaryCourt?.id!;
 
   return (
     <>
@@ -73,24 +73,16 @@ export default function HomePage() {
               <ActivityIndicator />
             </View>
           ) : (
-            home && userData && (
+            home &&
+            home.userData && (
               <>
-                {/* Wordmark */}
-                <View className="flex flex-row items-center">
-                  <View className="flex flex-row items-center gap-2">
-                    <View className="size-4 rounded-full border-2 border-foreground bg-foreground" />
-                    <Text className="text-base font-extrabold tracking-tight">Ball Up Top</Text>
-                  </View>
-                </View>
-
                 {/* OVR Card */}
-                <Card className="overflow-hidden p-0">
-                  <View className="p-4">
+                <Card className="gap-0 p-0">
+                  {/* <View className="p-4">
                     <View className="flex flex-row items-center justify-between">
                       <Text className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
                         Your Overall
                       </Text>
-                      {/* TODO: Add new ratings badge when API supports it */}
                     </View>
 
                     <View className="mt-4 flex flex-row items-end gap-4">
@@ -100,52 +92,68 @@ export default function HomePage() {
                         <Text className="text-xs text-muted-foreground">OVR · 45-99 scale</Text>
                       </View>
                     </View>
+                  </View> */}
+                  <View className="flex flex-col p-4">
+                    <Text className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                      Your Overall
+                    </Text>
+                    <View className="flex flex-row gap-4">
+                      <OVRDisplay value={home.userData.overall} size="lg" />
+                      <View className="flex flex-col gap-2 pt-6">
+                        <ArchetypePill archetype={home.userData.archetype} tone="fill" size="md" />
+                        <Text className="text-xs text-muted-foreground">OVR · 45-99 scale</Text>
+                      </View>
+                    </View>
                   </View>
 
                   <View className="flex flex-row items-center justify-between border-t border-border px-4 py-3">
                     <View className="flex flex-row items-center gap-2">
-                      <Text className="text-xl font-extrabold">#{userData.rank ?? '—'}</Text>
+                      <Text className="text-xl font-extrabold">#{home.userData.rank ?? '—'}</Text>
                       <Text className="text-xs text-muted-foreground">on campus</Text>
-                      <DeltaIndicator value={userData.rankDelta} type="rank" size="sm" />
+                      <DeltaIndicator value={home.userData.rankDelta} type="rank" size="sm" />
                       <Text className="text-xs text-muted-foreground/70">this week</Text>
                     </View>
                     <Pressable
+                      className="flex flex-row items-center gap-2"
                       onPress={() =>
                         router.push({
-                          pathname: `/(tabs)/(${tabContext})/user/[userId]` as const,
-                          params: { userId: currentUserData?.user.id! },
+                          pathname: '/(tabs)/(leaderboard)',
                         })
                       }>
-                      <Text className="text-xs font-bold">View ›</Text>
+                      <Text className="text-xs font-medium">View</Text>
+                      <Icon as={ChevronRight} size={14} />
                     </Pressable>
                   </View>
                 </Card>
 
                 {/* Court Activity Card */}
-                {primaryCourt && (
+                {home.primaryCourt && (
                   <Card className="p-0">
                     <View className="flex flex-row items-center justify-between p-4">
                       <View>
                         <View className="flex flex-row items-center gap-2">
-                          {activePlayerCount > 0 && (
-                            <View className="size-2 rounded-full bg-green-400" style={{
-                              shadowColor: '#7CD992',
-                              shadowOffset: { width: 0, height: 0 },
-                              shadowOpacity: 0.6,
-                              shadowRadius: 4,
-                            }} />
+                          {home.activePlayers.length > 0 && (
+                            <View
+                              className="size-2 rounded-full bg-green-400"
+                              style={{
+                                shadowColor: '#7CD992',
+                                shadowOffset: { width: 0, height: 0 },
+                                shadowOpacity: 0.6,
+                                shadowRadius: 4,
+                              }}
+                            />
                           )}
                           <Text className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                            Live · {primaryCourt.collegeName} · {primaryCourt.name}
+                            Live · {home.primaryCourt.collegeName} · {home.primaryCourt.name}
                           </Text>
                         </View>
                         <Text className="mt-1 text-lg font-bold">
-                          {activePlayerCount === 0
+                          {home.activePlayers.length === 0
                             ? 'No active players'
-                            : `${activePlayerCount} live right now`}
+                            : `${home.activePlayers.length} live right now`}
                         </Text>
                       </View>
-                      {activePlayerCount > 0 && (
+                      {home.activePlayers.length > 0 && (
                         <View className="flex flex-row items-center gap-1.5 rounded-full border border-green-400/30 bg-green-400/10 px-2 py-1">
                           <View className="size-1.5 rounded-full bg-green-400" />
                           <Text className="text-[10px] font-extrabold uppercase tracking-wider text-green-400">
@@ -155,9 +163,9 @@ export default function HomePage() {
                       )}
                     </View>
 
-                    {activePlayerCount > 0 ? (
+                    {home.activePlayers.length > 0 ? (
                       <View className="border-t border-border">
-                        {activePlayers.slice(0, 3).map((player: any, i: number) => (
+                        {home.activePlayers.slice(0, 3).map((player: any, i: number) => (
                           <Pressable
                             key={player.userId ?? player.id ?? i}
                             onPress={() => {
@@ -175,7 +183,7 @@ export default function HomePage() {
                                 alt={player.name}
                                 source={{ uri: player.image ?? undefined }}
                               />
-                              <View className="absolute -right-0.5 -bottom-0.5 size-2.5 rounded-full border-2 border-card bg-green-400" />
+                              <View className="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full border-2 border-card bg-green-400" />
                             </View>
                             <View className="flex flex-1 flex-row items-center gap-2">
                               <Text className="font-bold">
@@ -184,16 +192,16 @@ export default function HomePage() {
                               </Text>
                               <ArchetypePill archetype={player.archetype} tone="ghost" size="sm" />
                             </View>
-                            <Text className="font-mono text-sm font-semibold text-muted-foreground tabular-nums">
+                            <Text className="font-mono text-sm font-semibold tabular-nums text-muted-foreground">
                               {player.overall}
                             </Text>
                           </Pressable>
                         ))}
-                        {activePlayerCount > 3 && (
+                        {home.activePlayers.length > 3 && (
                           <Pressable
                             onPress={handlePresentActivePlayersModal}
                             className="flex flex-row items-center justify-between border-t border-border px-4 py-3">
-                            <Text className="font-bold">See all {activePlayerCount} ›</Text>
+                            <Text className="font-bold">See all {home.activePlayers.length} ›</Text>
                           </Pressable>
                         )}
                       </View>
@@ -208,7 +216,7 @@ export default function HomePage() {
                 )}
 
                 {/* Check In/Out Button */}
-                {primaryCourt && (
+                {home.primaryCourt && (
                   <View className="flex flex-col gap-2">
                     {isCheckedIn ? (
                       <Button
@@ -224,15 +232,17 @@ export default function HomePage() {
                     ) : (
                       <>
                         <Button
-                          disabled={isCheckInPending || !!activeCourtSession || !!unratedCourtSession}
-                          onPress={handlePresentCheckInModal}
+                          disabled={
+                            isCheckInPending || !!activeCourtSession || !!unratedCourtSession
+                          }
+                          onPress={() => checkIn(home.primaryCourt.id)}
                           size="lg"
                           className="h-14 rounded-2xl">
-                          <Text className="text-lg font-extrabold">Check In to Play</Text>
+                          <Text className="text-lg font-bold">Check In to Play</Text>
                           {isCheckInPending && <ActivityIndicator />}
                         </Button>
                         <Text className="text-center text-xs text-muted-foreground/70">
-                          GPS verifies you're at {primaryCourt.collegeName}.
+                          GPS verifies you're at {home.primaryCourt.collegeName}.
                         </Text>
                       </>
                     )}
@@ -245,83 +255,27 @@ export default function HomePage() {
       </KeyboardAvoidingView>
 
       {/* Session Footer - shown when checked in */}
-      {isCheckedIn && primaryCourt && <SessionFooterRedesigned courtName={primaryCourt.name} playerCount={activePlayerCount} />}
+      {/* {isCheckedIn && primaryCourt && (
+        <SessionFooterRedesigned courtName={primaryCourt.name} playerCount={activePlayerCount} />
+      )} */}
 
       {/* Modals */}
-      {primaryCourt && (
+      {home?.primaryCourt && (
         <>
-          <CourtCheckInModal bottomSheetModalRef={checkInModalRef} court={primaryCourt} />
+          {/* <CourtCheckInModal bottomSheetModalRef={checkInModalRef} court={primaryCourt} /> */}
           <ActivePlayersModal
             bottomSheetRef={activePlayersModalRef}
-            players={activePlayers.map((p: any) => ({
-              userId: p.userId ?? p.id ?? '',
+            players={home.activePlayers.map((p) => ({
+              userId: p.id,
               name: p.name,
               overall: p.overall,
               archetype: p.archetype,
               image: p.image,
             }))}
-            courtName={primaryCourt.name}
+            courtName={home.primaryCourt.name}
           />
         </>
       )}
     </>
-  );
-}
-
-function SessionFooterRedesigned({ courtName, playerCount }: { courtName: string; playerCount: number }) {
-  const { activeCourtSession, checkOut, isCheckOutPending } = useCourtSession();
-  const [duration, setDuration] = React.useState('0:00');
-
-  React.useEffect(() => {
-    if (!activeCourtSession?.startTime) return;
-
-    const formatDuration = (start: Date) => {
-      const now = new Date();
-      const diffMs = now.getTime() - start.getTime();
-      const totalSeconds = Math.floor(diffMs / 1000);
-      const hours = Math.floor(totalSeconds / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
-      if (hours > 0) {
-        return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-      }
-      return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    };
-
-    const startTime = new Date(activeCourtSession.startTime);
-    setDuration(formatDuration(startTime));
-
-    const interval = setInterval(() => {
-      setDuration(formatDuration(startTime));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [activeCourtSession?.startTime]);
-
-  return (
-    <View className="border-t border-border bg-card px-4 py-3">
-      <View className="flex flex-row items-center justify-between">
-        <View className="flex flex-row items-center gap-3">
-          <View
-            className="size-2 rounded-full bg-green-400"
-            style={{
-              shadowColor: '#7CD992',
-              shadowOffset: { width: 0, height: 0 },
-              shadowOpacity: 0.6,
-              shadowRadius: 4,
-            }}
-          />
-          <View className="flex flex-col">
-            <Text className="font-mono text-sm font-semibold tabular-nums">{duration} elapsed</Text>
-            <Text className="text-xs text-muted-foreground">
-              You + {playerCount - 1} live at {courtName}
-            </Text>
-          </View>
-        </View>
-        <Pressable onPress={checkOut} disabled={isCheckOutPending}>
-          <Text className="text-sm font-bold">End ›</Text>
-        </Pressable>
-      </View>
-    </View>
   );
 }

@@ -109,10 +109,7 @@ courtsRoute.get("/courts/:id/leaderboard", authMiddleware, async (req, res) => {
         .from(rankChange)
         .innerJoin(user, eq(rankChange.userId, user.id))
         .where(
-          and(
-            eq(rankChange.courtId, courtId),
-            isNotNull(rankChange.oldRank),
-          ),
+          and(eq(rankChange.courtId, courtId), isNotNull(rankChange.oldRank)),
         )
         .orderBy(rankChange.userId, desc(rankChange.createdAt))
         .then((rows) =>
@@ -126,6 +123,34 @@ courtsRoute.get("/courts/:id/leaderboard", authMiddleware, async (req, res) => {
     res.json({ orderedUsers: orderedCourtLeaderboard, topMovers });
   } catch (error) {
     handleError(error, res, "GET /courts/:id/leaderboard");
+  }
+});
+
+courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
+  try {
+    const courtId = parseInt(req.params.id);
+
+    if (!Number.isInteger(courtId)) {
+      logger.error("Court ID is not an integer.");
+      return res.status(400).json({ error: "Court ID is not an integer." });
+    }
+
+    const [targetCourt] = await db
+      .select({
+        id: court.id,
+        name: court.name,
+        address: court.address,
+        collegeName: court.collegeName,
+        collegeColor: court.collegeColor,
+        lat: court.lat,
+        lng: court.lng,
+      })
+      .from(court)
+      .where(eq(court.id, courtId));
+
+    res.json(targetCourt);
+  } catch (error) {
+    handleError(error, res, "GET /courts/:id");
   }
 });
 
