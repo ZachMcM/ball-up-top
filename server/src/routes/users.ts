@@ -3,10 +3,6 @@ import { and, desc, eq, sql } from "drizzle-orm";
 import { Router } from "express";
 import * as z from "zod";
 import { db } from "../db";
-import {
-  getOverallHistory,
-  getRecentSessions,
-} from "../db/queries/userQueries";
 import { activity, leaderboard, rankChange, rating, user } from "../db/schema";
 import { handleError } from "../utils/handleError";
 import {
@@ -19,7 +15,7 @@ import { r2 } from "../utils/r2";
 export const usersRoute = Router();
 
 const PatchPrimaryCollegeSchema = z.object({
-  courtId: z.number(),
+  primaryCourtId: z.number(),
 });
 
 usersRoute.patch("/users/primary-college", authMiddleware, async (req, res) => {
@@ -29,8 +25,7 @@ usersRoute.patch("/users/primary-college", authMiddleware, async (req, res) => {
       return res.status(400).json({ error: validBody.error.message });
     }
 
-    const { courtId: primaryCourtId } = validBody.data;
-
+    const { primaryCourtId } = validBody.data;
 
     await db.transaction(async (tx) => {
       await tx

@@ -1,13 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
-import {
-  NativeSelectScrollView,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { authClient } from '@/lib/auth-client';
 import { patchUserHeight } from '@/lib/endpoints';
@@ -20,38 +13,49 @@ import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-n
 import { toast } from 'sonner-native';
 import * as z from 'zod';
 
-const generateHeightOptions = () => {
-  const options: { label: string; value: string }[] = [];
-  for (let feet = 4; feet <= 8; feet++) {
-    const maxInches = feet === 8 ? 0 : 11;
-    for (let inches = 0; inches <= maxInches; inches++) {
-      const label = `${feet}'${inches}"`;
-      options.push({ label, value: label });
-    }
+const parseHeight = (height: string | undefined): { feet: string; inches: string } => {
+  if (!height) return { feet: '', inches: '' };
+  const match = height.match(/^(\d+)'(\d+)"$/);
+  if (match) {
+    return { feet: match[1], inches: match[2] };
   }
-  return options;
+  return { feet: '', inches: '' };
 };
 
-const HEIGHT_OPTIONS = generateHeightOptions();
-
 const HeightSchema = z.object({
-  height: z.string().min(1, 'Please select your height'),
+  feet: z
+    .string()
+    .min(1, 'Required')
+    .refine((val) => {
+      const num = parseInt(val, 10);
+      return !isNaN(num) && num >= 4 && num <= 8;
+    }, 'Must be 4-8'),
+  inches: z
+    .string()
+    .min(1, 'Required')
+    .refine((val) => {
+      const num = parseInt(val, 10);
+      return !isNaN(num) && num >= 0 && num <= 11;
+    }, 'Must be 0-11'),
 });
 
 export default function HeightPage() {
   const { data: currentUserData, refetch: refetchAuthClientSession } = authClient.useSession();
+  const parsed = parseHeight(currentUserData?.user.height);
 
   const { control, handleSubmit } = useForm<z.infer<typeof HeightSchema>>({
     resolver: zodResolver(HeightSchema),
     defaultValues: {
-      height: !currentUserData?.user.height ? undefined : currentUserData.user.height,
+      feet: parsed.feet,
+      inches: parsed.inches,
     },
   });
 
   const router = useRouter();
 
   const { mutate: saveHeight, isPending } = useMutation({
-    mutationFn: async (height: string) => {
+    mutationFn: async ({ feet, inches }: { feet: string; inches: string }) => {
+      const height = `${feet}'${inches}"`;
       await patchUserHeight(height);
     },
     onSuccess: () => {
@@ -71,34 +75,48 @@ export default function HeightPage() {
       className="flex-1">
       <View className="flex w-full flex-col items-center gap-4 p-8">
         <Text className="text-xl font-bold">What's your height?</Text>
-        <Controller
-          control={control}
-          rules={{ required: true }}
-          render={({ field: { onChange, value }, fieldState: { error } }) => (
-            <View className="flex w-full flex-col gap-2">
-              <Select
-                value={{ value, label: value }}
-                onValueChange={(option) => onChange(option?.value)}>
-                <SelectTrigger className="w-full rounded-2xl">
-                  <SelectValue placeholder="Select your height" />
-                </SelectTrigger>
-                <SelectContent>
-                  <NativeSelectScrollView>
-                    {HEIGHT_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} label={option.label} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </NativeSelectScrollView>
-                </SelectContent>
-              </Select>
-              {error && (
-                <Text className="text-sm font-medium text-destructive">{error.message}</Text>
-              )}
-            </View>
-          )}
-          name="height"
-        />
+        <View className="flex w-full flex-row items-start gap-3">
+          <Controller
+            control={control}
+            name="feet"
+            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+              <View className="flex flex-1 flex-col gap-1">
+                <Text className="text-sm font-medium text-muted-foreground">Feet</Text>
+                <Input
+                  placeholder="6"
+                  value={value}
+                  onChangeText={(text) => onChange(text.replace(/[^0-9]/g, ''))}
+                  onBlur={onBlur}
+                  keyboardType="number-pad"
+                  maxLength={1}
+                />
+                {error && (
+                  <Text className="text-xs font-medium text-destructive">{error.message}</Text>
+                )}
+              </View>
+            )}
+          />
+          <Controller
+            control={control}
+            name="inches"
+            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+              <View className="flex flex-1 flex-col gap-1">
+                <Text className="text-sm font-medium text-muted-foreground">Inches</Text>
+                <Input
+                  placeholder="2"
+                  value={value}
+                  onChangeText={(text) => onChange(text.replace(/[^0-9]/g, ''))}
+                  onBlur={onBlur}
+                  keyboardType="number-pad"
+                  maxLength={2}
+                />
+                {error && (
+                  <Text className="text-xs font-medium text-destructive">{error.message}</Text>
+                )}
+              </View>
+            )}
+          />
+        </View>
         <Text className="text-center text-xs font-medium text-muted-foreground">
           This will help determine your archetype and help others identify you. You can change this
           later.
@@ -114,7 +132,7 @@ export default function HeightPage() {
             disabled={isPending}
             size="lg"
             className="flex-1"
-            onPress={handleSubmit((values) => saveHeight(values.height))}>
+            onPress={handleSubmit((values) => saveHeight(values))}>
             <Text>Continue</Text>
             {isPending && <ActivityIndicator />}
           </Button>

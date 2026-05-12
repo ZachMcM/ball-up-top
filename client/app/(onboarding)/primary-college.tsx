@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
+import { Input } from '@/components/ui/input';
 import {
   NativeSelectScrollView,
   Select,
@@ -15,6 +16,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { ArrowLeftIcon } from 'lucide-react-native';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { toast } from 'sonner-native';
@@ -49,11 +51,11 @@ export default function PrimaryCollegePage() {
   const { mutate: savePrimaryCollege, isPending: isSaving } = useMutation({
     mutationFn: async (primaryCourtId: number) => {
       await patchUserPrimaryCollege(primaryCourtId);
-      return primaryCourtId
+      return primaryCourtId;
     },
 
     onSuccess: (primaryCourtId) => {
-      refetchAuthClientSession()
+      refetchAuthClientSession();
       queryClient.invalidateQueries({
         queryKey: ['home'],
       });
@@ -68,6 +70,8 @@ export default function PrimaryCollegePage() {
     },
   });
 
+  const [searchInput, setSearchInput] = useState('');
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -77,11 +81,20 @@ export default function PrimaryCollegePage() {
         <Controller
           control={control}
           rules={{ required: true }}
-          render={({ field: { onChange, value }, fieldState: { error } }) => {
-            const selected = colleges?.find((c) => c.courtId === value);
+          render={({ field: { onChange, value, onBlur }, fieldState: { error } }) => {
             return (
               <View className="flex w-full flex-col gap-2">
-                <Select
+                <Input
+                  placeholder="Search for your college..."
+                  value={searchInput}
+                  onChangeText={setSearchInput}
+                  // TODO
+                  editable={!collegesPending || !colleges}
+                />
+                {colleges?.map((college) => (
+                  <View></View>
+                ))}
+                {/* <Select
                   value={
                     selected
                       ? { value: String(selected.courtId), label: selected.collegeName }
@@ -111,7 +124,7 @@ export default function PrimaryCollegePage() {
                       })}
                     </NativeSelectScrollView>
                   </SelectContent>
-                </Select>
+                </Select> */}
                 {error && (
                   <Text className="text-sm font-medium text-destructive">{error.message}</Text>
                 )}
