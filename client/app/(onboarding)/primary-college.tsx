@@ -12,13 +12,14 @@ import {
 import { Text } from '@/components/ui/text';
 import { authClient } from '@/lib/auth-client';
 import { getColleges, patchUserPrimaryCollege } from '@/lib/endpoints';
+import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { ArrowLeftIcon } from 'lucide-react-native';
+import { ArrowLeftIcon, CheckCircle } from 'lucide-react-native';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 import { toast } from 'sonner-native';
 import * as z from 'zod';
 
@@ -81,50 +82,42 @@ export default function PrimaryCollegePage() {
         <Controller
           control={control}
           rules={{ required: true }}
-          render={({ field: { onChange, value, onBlur }, fieldState: { error } }) => {
+          render={({ field: { onChange, value }, fieldState: { error } }) => {
             return (
-              <View className="flex w-full flex-col gap-2">
+              <View className="flex w-full flex-col gap-4">
                 <Input
                   placeholder="Search for your college..."
                   value={searchInput}
                   onChangeText={setSearchInput}
-                  // TODO
                   editable={!collegesPending || !colleges}
                 />
-                {colleges?.map((college) => (
-                  <View></View>
-                ))}
-                {/* <Select
-                  value={
-                    selected
-                      ? { value: String(selected.courtId), label: selected.collegeName }
-                      : undefined
-                  }
-                  onValueChange={(option) => onChange(option ? Number(option.value) : undefined)}>
-                  <SelectTrigger className="w-full rounded-2xl">
-                    <SelectValue placeholder="Select your primary college" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <NativeSelectScrollView>
-                      {collegesPending && (
-                        <View className="items-center py-4">
-                          <ActivityIndicator />
-                        </View>
-                      )}
-                      {colleges?.map((c) => {
-                        return (
-                          <SelectItem
-                            key={c.courtId}
-                            label={c.collegeName}
-                            value={String(c.courtId)}
-                            textStyle={{ color: c.collegeColor, fontWeight: '600' }}>
-                            {c.collegeName}
-                          </SelectItem>
-                        );
-                      })}
-                    </NativeSelectScrollView>
-                  </SelectContent>
-                </Select> */}
+                <View className="flex flex-col gap-2">
+                  <Text className='text-sm text-muted-foreground'>Results</Text>
+                  {colleges
+                    ?.filter((c) =>
+                      c.collegeName.toLocaleLowerCase().includes(searchInput.toLocaleLowerCase())
+                    )
+                    .map((c) => (
+                      <Pressable
+                        onPress={() => {
+                          if (c.courtId === value) {
+                            onChange(undefined);
+                          } else {
+                            onChange(c.courtId);
+                          }
+                        }}
+                        key={c.courtId}
+                        className={cn(
+                          'flex flex-row items-center justify-between rounded-2xl border border-border bg-card px-4 py-3',
+                          value === c.courtId && 'border-primary'
+                        )}>
+                        <Text className="font-medium text-sm">{c.collegeName}</Text>
+                        {value === c.courtId && (
+                          <Icon as={CheckCircle} size={14} className="text-primary" />
+                        )}
+                      </Pressable>
+                    ))}
+                </View>
                 {error && (
                   <Text className="text-sm font-medium text-destructive">{error.message}</Text>
                 )}
