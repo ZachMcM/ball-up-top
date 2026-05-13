@@ -1,10 +1,10 @@
 import { Activity } from '@/types/activity';
 import {
   CollegeOption,
-  CourtPlayer,
   CourtResponse,
   CourtSession,
   Leaderboard,
+  UserEntry
 } from '@/types/court';
 import { EncounteredPlayer } from '@/types/encounteredPlayer';
 import { HomeResponse } from '@/types/home';
@@ -234,7 +234,7 @@ export async function getLeaderboard(id: number): Promise<Leaderboard> {
   return leaderboard;
 }
 
-export async function getCourtPlayers(id: number): Promise<CourtPlayer[]> {
+export async function getCourtPlayers(id: number): Promise<UserEntry[]> {
   const courtPlayers = await serverRequest({
     endpoint: `/courts/${id}/players`,
     method: 'GET',

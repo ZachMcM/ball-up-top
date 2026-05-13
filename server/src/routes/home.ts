@@ -1,4 +1,4 @@
-import { and, eq, isNotNull, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { Router } from "express";
 import { db } from "../db";
 import {
@@ -62,9 +62,10 @@ homeRoute.get("/home", authMiddleware, async (_, res) => {
         })
         .from(courtSession)
         .innerJoin(user, eq(courtSession.userId, user.id))
-        .where(isNotNull(courtSession.endTime)),
+        .where(isNull(courtSession.endTime)),
       db
         .select({
+          address: court.address,
           id: court.id,
           name: court.name,
           collegeName: court.collegeName,

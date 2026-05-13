@@ -17,6 +17,7 @@ export type HomeResponse = {
   primaryCourt: {
     id: number,
     name: string;
+    address: string,
     collegeName: string;
     collegeColor: string;
   };

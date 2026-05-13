@@ -3,14 +3,13 @@ import { getDistanceInMiles } from '@/lib/utils';
 import { CourtSession } from '@/types/court';
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'expo-router';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import { toast } from 'sonner-native';
 import { Text } from '../ui/text';
 import { useLocation } from './LocationProvider';
 
-export const MAX_DISTANCE_FOR_CHECK_IN = 0.062; // miles (~100 meters)
+export const MAX_DISTANCE_FOR_CHECK_IN = 0.12; // miles (~100 meters)
 
 type CourtSessionContextValues = {
   activeCourtSession?: CourtSession | null;
@@ -161,81 +160,14 @@ function formatDuration(startTime: Date): string {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
-// export function SessionFooter({
-//   courtName,
-//   playerCount,
-// }: {
-//   courtName: string;
-//   playerCount: number;
-// }) {
-//   const { activeCourtSession, checkOut, isCheckOutPending } = useCourtSession();
-//   const [duration, setDuration] = useState('0:00');
-
-//   useEffect(() => {
-//     if (!activeCourtSession?.startTime) return;
-
-//     const formatDuration = (start: Date) => {
-//       const now = new Date();
-//       const diffMs = now.getTime() - start.getTime();
-//       const totalSeconds = Math.floor(diffMs / 1000);
-//       const hours = Math.floor(totalSeconds / 3600);
-//       const minutes = Math.floor((totalSeconds % 3600) / 60);
-//       const seconds = totalSeconds % 60;
-//       if (hours > 0) {
-//         return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-//       }
-//       return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-//     };
-
-//     const startTime = new Date(activeCourtSession.startTime);
-//     setDuration(formatDuration(startTime));
-
-//     const interval = setInterval(() => {
-//       setDuration(formatDuration(startTime));
-//     }, 1000);
-
-//     return () => clearInterval(interval);
-//   }, [activeCourtSession?.startTime]);
-
-//   return (
-//     <View className="border-t border-border bg-card px-4 py-3">
-//       <View className="flex flex-row items-center justify-between">
-//         <View className="flex flex-row items-center gap-3">
-//           <View
-//             className="size-2 rounded-full bg-green-400"
-//             style={{
-//               shadowColor: '#7CD992',
-//               shadowOffset: { width: 0, height: 0 },
-//               shadowOpacity: 0.6,
-//               shadowRadius: 4,
-//             }}
-//           />
-//           <View className="flex flex-col">
-//             <Text className="font-mono text-sm font-semibold tabular-nums">{duration} elapsed</Text>
-//             <Text className="text-xs text-muted-foreground">
-//               You + {playerCount - 1} live at {courtName}
-//             </Text>
-//           </View>
-//         </View>
-//         <Pressable onPress={checkOut} disabled={isCheckOutPending}>
-//           <Text className="text-sm font-bold">End ›</Text>
-//         </Pressable>
-//       </View>
-//     </View>
-//   );
-// }
-
 export function SessionFooter() {
   const { activeCourtSession, checkOut, isCheckOutPending } = useCourtSession();
-  const { location } = useLocation();
-  const router = useRouter();
   const [duration, setDuration] = useState('0:00');
 
   const { data: court } = useQuery({
-    queryFn: async () =>
-      getCourt(activeCourtSession?.courtId!),
+    queryFn: async () => getCourt(activeCourtSession?.courtId!),
     queryKey: ['court', activeCourtSession?.courtId],
-    enabled: !!activeCourtSession?.courtId && !!location,
+    enabled: !!activeCourtSession?.courtId,
   });
 
   useEffect(() => {
@@ -255,38 +187,51 @@ export function SessionFooter() {
     return null;
   }
 
-  // const handlePress = () => {
-  //   if (court) {
-  //     router.push({
-  //       pathname: '/court/[courtId]',
-  //       params: { courtId: court.id },
-  //     });
-  //   }
-  // };
+  const startTime = new Date(activeCourtSession.startTime);
+  const formattedStartTime = startTime.toLocaleTimeString([], {
+    hour: 'numeric',
+    minute: '2-digit',
+  });
 
   return (
-    <View className="border-t border-border bg-card px-4 py-3">
+    <View className="border-t border-border px-4 pb-8 pt-3">
       <View className="flex flex-row items-center justify-between">
-        {/* <Pressable onPress={handlePress} className="flex flex-row items-center gap-3">
+        <View className="flex flex-row items-center gap-3">
           <View
-            className="size-2 rounded-full bg-green-400"
+            className="size-2.5 rounded-full bg-green-400"
             style={{
-              shadowColor: '#7CD992',
+              shadowColor: '#4ade80',
               shadowOffset: { width: 0, height: 0 },
-              shadowOpacity: 0.6,
-              shadowRadius: 4,
+              shadowOpacity: 0.8,
+              shadowRadius: 6,
             }}
           />
           <View className="flex flex-col">
-            <Text className="font-mono text-sm font-semibold tabular-nums">{duration} elapsed</Text>
-            <Text className="text-xs text-muted-foreground">
-              Playing at {court?.name ?? 'Loading...'}
-            </Text>
+            <View className="flex flex-row items-baseline gap-2">
+              <Text
+                className="text-xl tabular-nums text-foreground"
+                style={{ fontFamily: 'BebasNeue_400Regular' }}>
+                {duration}
+              </Text>
+              <Text className="text-xs text-muted-foreground">elapsed</Text>
+            </View>
+            <View className="flex flex-row items-center gap-1.5">
+              <Text className="text-xs text-muted-foreground">
+                {court?.name ?? 'Loading...'}
+              </Text>
+              <Text className="text-xs text-muted-foreground/50">·</Text>
+              <Text className="text-xs text-muted-foreground/70">
+                started {formattedStartTime}
+              </Text>
+            </View>
           </View>
-        </Pressable> */}
-        <Pressable onPress={checkOut} disabled={isCheckOutPending}>
-          <Text className="text-sm font-bold">End ›</Text>
-          {isCheckOutPending && <ActivityIndicator />}
+        </View>
+        <Pressable
+          onPress={checkOut}
+          disabled={isCheckOutPending}
+          className="flex flex-row items-center gap-2 rounded-full bg-muted px-4 py-2">
+          <Text className="text-sm font-semibold">End Session</Text>
+          {isCheckOutPending && <ActivityIndicator size="small" />}
         </Pressable>
       </View>
     </View>

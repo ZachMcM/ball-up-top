@@ -21,6 +21,7 @@ export function OVRDisplay({ value, size = 'lg', color, style }: OVRDisplayProps
     <Text
       style={[
         {
+          lineHeight: fontSize * 1.1,
           fontFamily: 'BebasNeue_400Regular',
           fontSize,
           color: color ?? '#fafafa',

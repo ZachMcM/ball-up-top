@@ -206,6 +206,10 @@ courtsRoute.post(
         lng,
       );
 
+      console.log("Target:", targetCourt.lat, targetCourt.lng, "Your:", lat, lng)
+
+      console.log("Distance:", distance, "MAX_DISTANCE_FOR_CHECKIN", MAX_DISTANCE_FOR_CHECK_IN)
+
       if (distance > MAX_DISTANCE_FOR_CHECK_IN) {
         return res.status(400).json({
           error: "You must be at the court to check in.",

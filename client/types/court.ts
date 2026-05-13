@@ -13,7 +13,7 @@ export type CourtSession = {
   hasRated: boolean;
 };
 
-type UserEntry = {
+export type UserEntry = {
   rank: number | null;
   overall: number;
   userId: string;
@@ -28,15 +28,6 @@ export type Leaderboard = {
     oldRank: number | null;
     rankImprovement: number;
   })[];
-};
-
-export type CourtPlayer = {
-  rank: number | null;
-  overall: number;
-  userId: string;
-  name: string;
-  image: string | null;
-  archetype: string;
 };
 
 export type CourtResponse = {
