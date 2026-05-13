@@ -17,27 +17,6 @@ export default function ActivityLayout() {
           headerLeft: () => <BackButton />,
         }}
       />
-      <Stack.Screen
-        name="court/[courtId]/index"
-        options={{
-          headerTitle: 'Court',
-          headerLeft: () => <BackButton />,
-        }}
-      />
-      <Stack.Screen
-        name="court/[courtId]/players"
-        options={{
-          headerTitle: 'Current Players',
-          headerLeft: () => <BackButton />,
-        }}
-      />
-      <Stack.Screen
-        name='court/[courtId]/leaderboard'
-        options={{
-          headerTitle: "Leaderboard",
-          headerLeft: () => <BackButton/>
-        }}
-      />
     </Stack>
   );
 }

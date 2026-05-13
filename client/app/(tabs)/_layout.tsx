@@ -5,7 +5,7 @@ import { THEME } from '@/lib/theme';
 import { BottomTabBar, BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useQuery } from '@tanstack/react-query';
 import { Tabs, usePathname, useRouter } from 'expo-router';
-import { Activity, Home as HomeIcon, SearchIcon, User } from 'lucide-react-native';
+import { Activity, ChartNoAxesColumn, Home as HomeIcon, User } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { useEffect, useRef } from 'react';
 import { View } from 'react-native';
@@ -85,8 +85,8 @@ export default function TabsLayout() {
         name="(leaderboard)"
         options={{
           headerShown: false,
-          title: 'leaderboard',
-          tabBarIcon: ({ color }) => <Icon as={SearchIcon} size={18} color={color} />,
+          title: 'Leaderboard',
+          tabBarIcon: ({ color }) => <Icon as={ChartNoAxesColumn} size={18} color={color} />,
         }}
       />
       <Tabs.Screen
