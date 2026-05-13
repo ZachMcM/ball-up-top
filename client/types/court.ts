@@ -23,7 +23,8 @@ export type UserEntry = {
 };
 
 export type Leaderboard = {
-  orderedUsers: UserEntry[];
+  court: CourtResponse,
+  users: UserEntry[];
   topMovers: (UserEntry & {
     oldRank: number | null;
     rankImprovement: number;

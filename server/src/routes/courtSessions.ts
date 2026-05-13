@@ -247,11 +247,9 @@ courtSessionsRoute.patch(
           .json({ error: "Unauthorized for this encountered player." });
       }
 
-      // Verify session hasn't been rated yet
+      // If session is already rated, ignore the draft update (no-op)
       if (ep.courtSession.hasRated) {
-        return res
-          .status(400)
-          .json({ error: "Session has already been rated." });
+        return res.json({ success: true });
       }
 
       const {

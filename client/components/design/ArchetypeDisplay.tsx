@@ -5,6 +5,7 @@ import { Text } from '../ui/text';
 type ArchetypeDisplayProps = {
   archetype: string;
   variant?: 'hero' | 'inline';
+  tone?: 'fill' | 'muted';
   size?: 'sm' | 'md' | 'lg';
 } & ViewProps;
 
@@ -29,54 +30,38 @@ type HeroArchetypeProps = {
   size?: 'sm' | 'md' | 'lg';
 } & ViewProps;
 
-function HeroArchetype({ archetype, size = 'md', className, ...props }: HeroArchetypeProps) {
-  const isTwoWay = archetype.startsWith('2-Way');
-  const mainName = isTwoWay ? archetype.replace('2-Way ', '') : archetype;
-
+function HeroArchetype({ archetype, size = 'md' }: HeroArchetypeProps) {
   const sizeStyles = {
-    sm: { fontSize: 20, prefixSize: 10 },
-    md: { fontSize: 28, prefixSize: 12 },
-    lg: { fontSize: 36, prefixSize: 14 },
+    sm: { fontSize: 20 },
+    md: { fontSize: 28 },
+    lg: { fontSize: 36 },
   };
 
-  const { fontSize, prefixSize } = sizeStyles[size];
+  const { fontSize } = sizeStyles[size];
 
   return (
-    <View className={cn('flex flex-col', className)} {...props}>
-      {isTwoWay && (
-        <View className="flex flex-row items-center gap-1.5 mb-0.5">
-          <View className="h-px flex-1 max-w-4 bg-muted-foreground/30" />
-          <Text
-            className="text-muted-foreground uppercase tracking-widest font-semibold"
-            style={{ fontSize: prefixSize }}>
-            2-Way
-          </Text>
-          <View className="h-px flex-1 max-w-4 bg-muted-foreground/30" />
-        </View>
-      )}
-      <Text
-        className="text-foreground tracking-tight"
-        style={{
-          fontFamily: 'BebasNeue_400Regular',
-          fontSize,
-          lineHeight: fontSize * 1.1,
-        }}>
-        {mainName}
-      </Text>
-    </View>
+    <Text
+      className="tracking-tighter text-foreground"
+      style={{
+        fontFamily: 'BebasNeue_400Regular',
+        fontSize,
+        lineHeight: fontSize * 1.1,
+      }}>
+      {archetype}
+    </Text>
   );
 }
 
 type InlineArchetypeProps = {
   archetype: string;
   size?: 'sm' | 'md' | 'lg';
-  tone?: 'fill' | 'ghost' | 'muted';
+  tone?: 'fill' | 'muted';
 } & ViewProps;
 
 function InlineArchetype({
   archetype,
   size = 'md',
-  tone = 'ghost',
+  tone = 'muted',
   className,
   ...props
 }: InlineArchetypeProps) {
@@ -94,20 +79,18 @@ function InlineArchetype({
 
   const toneClasses = {
     fill: 'bg-foreground',
-    ghost: 'bg-foreground/5',
-    muted: 'bg-muted',
+    muted: 'bg-muted/70 border border-border',
   };
 
   const textToneClasses = {
     fill: 'text-background',
-    ghost: 'text-muted-foreground',
     muted: 'text-muted-foreground',
   };
 
   return (
     <View
       className={cn(
-        'rounded-full flex items-center self-start',
+        'flex items-center self-start rounded-full',
         sizeClasses[size],
         toneClasses[tone],
         className
@@ -115,7 +98,7 @@ function InlineArchetype({
       {...props}>
       <Text
         className={cn(
-          'font-semibold uppercase tracking-wider',
+          'font-bold uppercase tracking-wider',
           textSizeClasses[size],
           textToneClasses[tone]
         )}>

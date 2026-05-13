@@ -18,7 +18,7 @@ export function SegmentedControl({
   return (
     <View
       className={cn(
-        'flex w-full flex-row items-center justify-between rounded-full bg-muted/30 p-1',
+        'flex flex-row items-center justify-between rounded-full bg-muted/30 p-1',
         className
       )}
       {...props}>

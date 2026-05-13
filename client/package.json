@@ -11,9 +11,11 @@
   },
   "dependencies": {
     "@better-auth/expo": "^1.4.3",
+    "@expo-google-fonts/anton": "^0.4.2",
     "@expo-google-fonts/barlow-condensed": "^0.4.1",
     "@expo-google-fonts/bebas-neue": "^0.4.1",
     "@expo-google-fonts/dm-sans": "^0.4.2",
+    "@expo-google-fonts/inter": "^0.4.2",
     "@gorhom/bottom-sheet": "^5.2.8",
     "@hookform/resolvers": "^5.2.2",
     "@react-native-community/netinfo": "^11.4.1",

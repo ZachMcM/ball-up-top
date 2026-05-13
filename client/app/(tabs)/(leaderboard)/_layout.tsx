@@ -1,7 +1,7 @@
 import BackButton from '@/components/BackButton';
 import { Stack } from 'expo-router';
 
-export default function DiscoverLayout() {
+export default function LeaderboardLayout() {
   return (
     <Stack>
       <Stack.Screen

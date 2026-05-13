@@ -235,7 +235,7 @@ export default function RatePage() {
     },
     onSuccess: () => {
       if (isLastStep) {
-        queryClient.invalidateQueries({ queryKey: ['courtSession', 'unrated'] });
+        queryClient.setQueryData(['courtSession', 'unrated'], null);
         toast.success('Ratings submitted successfully!', { position: 'bottom-center' });
         router.dismiss();
       } else {
@@ -259,7 +259,6 @@ export default function RatePage() {
     },
     onSuccess: () => {
       queryClient.setQueryData(['courtSession', 'unrated'], null);
-      queryClient.invalidateQueries({ queryKey: ['courtSession', 'unrated'] });
       toast.success('Ratings submitted successfully!', { position: 'bottom-center' });
       router.dismiss();
     },

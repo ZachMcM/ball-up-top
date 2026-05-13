@@ -3,9 +3,11 @@ import { getDistanceInMiles } from '@/lib/utils';
 import { CourtSession } from '@/types/court';
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ChevronRight } from 'lucide-react-native';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import { toast } from 'sonner-native';
+import { Icon } from '../ui/icon';
 import { Text } from '../ui/text';
 import { useLocation } from './LocationProvider';
 
@@ -188,13 +190,9 @@ export function SessionFooter() {
   }
 
   const startTime = new Date(activeCourtSession.startTime);
-  const formattedStartTime = startTime.toLocaleTimeString([], {
-    hour: 'numeric',
-    minute: '2-digit',
-  });
 
   return (
-    <View className="border-t border-border px-4 pb-8 pt-3">
+    <View className="border-t border-border bg-card px-4 py-3">
       <View className="flex flex-row items-center justify-between">
         <View className="flex flex-row items-center gap-3">
           <View
@@ -213,25 +211,23 @@ export function SessionFooter() {
                 style={{ fontFamily: 'BebasNeue_400Regular' }}>
                 {duration}
               </Text>
-              <Text className="text-xs text-muted-foreground">elapsed</Text>
+              <Text className="text-xs text-muted-foreground">Elapsed</Text>
             </View>
-            <View className="flex flex-row items-center gap-1.5">
-              <Text className="text-xs text-muted-foreground">
-                {court?.name ?? 'Loading...'}
-              </Text>
-              <Text className="text-xs text-muted-foreground/50">·</Text>
-              <Text className="text-xs text-muted-foreground/70">
-                started {formattedStartTime}
-              </Text>
-            </View>
+            <Text className="text-xs text-muted-foreground">
+              Live at {court?.name ?? 'Loading...'}
+            </Text>
           </View>
         </View>
         <Pressable
           onPress={checkOut}
-          disabled={isCheckOutPending}
-          className="flex flex-row items-center gap-2 rounded-full bg-muted px-4 py-2">
-          <Text className="text-sm font-semibold">End Session</Text>
-          {isCheckOutPending && <ActivityIndicator size="small" />}
+          className="flex flex-row items-center gap-2"
+          disabled={isCheckOutPending}>
+          <Text className="text-sm font-semibold">End</Text>
+          {isCheckOutPending ? (
+            <ActivityIndicator size="small" className='text-muted-foreground' />
+          ) : (
+            <Icon as={ChevronRight} size={16} />
+          )}
         </Pressable>
       </View>
     </View>

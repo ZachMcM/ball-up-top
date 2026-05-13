@@ -1,4 +1,3 @@
-import { ArchetypePill } from '@/components/design/ArchetypePill';
 import { DeltaIndicator } from '@/components/design/DeltaIndicator';
 import { OVRDisplay } from '@/components/design/OVRDisplay';
 import { SegmentedControl } from '@/components/design/SegmentedControl';

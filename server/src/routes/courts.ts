@@ -77,7 +77,19 @@ courtsRoute.get("/courts/:id/leaderboard", authMiddleware, async (req, res) => {
       return res.status(400).json({ error: "Court ID is not an integer." });
     }
 
-    const [orderedCourtLeaderboard, topMovers] = await Promise.all([
+    const [[courtData], leaderboardUsers, topMovers] = await Promise.all([
+      db
+        .select({
+          id: court.id,
+          name: court.name,
+          address: court.address,
+          collegeName: court.collegeName,
+          collegeColor: court.collegeColor,
+          lat: court.lat,
+          lng: court.lng,
+        })
+        .from(court)
+        .where(eq(court.id, courtId)),
       db
         .select({
           rank: leaderboard.rank,
@@ -89,9 +101,7 @@ courtsRoute.get("/courts/:id/leaderboard", authMiddleware, async (req, res) => {
         })
         .from(leaderboard)
         .innerJoin(user, eq(leaderboard.userId, user.id))
-        .where(
-          and(eq(leaderboard.courtId, courtId), isNotNull(leaderboard.rank)),
-        )
+        .where(eq(leaderboard.courtId, courtId))
         .orderBy(asc(leaderboard.rank)),
       db
         .selectDistinctOn([rankChange.userId], {
@@ -120,7 +130,7 @@ courtsRoute.get("/courts/:id/leaderboard", authMiddleware, async (req, res) => {
         ),
     ]);
 
-    res.json({ orderedUsers: orderedCourtLeaderboard, topMovers });
+    res.json({ court: courtData, users: leaderboardUsers, topMovers });
   } catch (error) {
     handleError(error, res, "GET /courts/:id/leaderboard");
   }
@@ -206,9 +216,21 @@ courtsRoute.post(
         lng,
       );
 
-      console.log("Target:", targetCourt.lat, targetCourt.lng, "Your:", lat, lng)
+      console.log(
+        "Target:",
+        targetCourt.lat,
+        targetCourt.lng,
+        "Your:",
+        lat,
+        lng,
+      );
 
-      console.log("Distance:", distance, "MAX_DISTANCE_FOR_CHECKIN", MAX_DISTANCE_FOR_CHECK_IN)
+      console.log(
+        "Distance:",
+        distance,
+        "MAX_DISTANCE_FOR_CHECKIN",
+        MAX_DISTANCE_FOR_CHECK_IN,
+      );
 
       if (distance > MAX_DISTANCE_FOR_CHECK_IN) {
         return res.status(400).json({

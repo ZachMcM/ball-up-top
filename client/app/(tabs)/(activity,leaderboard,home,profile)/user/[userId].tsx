@@ -1,4 +1,3 @@
-import { ArchetypePill } from '@/components/design/ArchetypePill';
 import { DeltaIndicator } from '@/components/design/DeltaIndicator';
 import { OVRDisplay } from '@/components/design/OVRDisplay';
 import { StatBar } from '@/components/design/StatBar';
@@ -81,7 +80,6 @@ export default function ProfilePage() {
                 <View className="flex flex-row items-start gap-4">
                   <OVRDisplay value={user.overall} size="xl" />
                   <View className="flex flex-1 flex-col gap-3 pt-4">
-                    <ArchetypePill archetype={user.archetype} tone="fill" size="md" />
                     <View className="flex flex-row items-center gap-2">
                       <Text className="text-2xl font-extrabold">#{user.rank ?? '—'}</Text>
                       <Text className="text-sm text-muted-foreground">on campus</Text>

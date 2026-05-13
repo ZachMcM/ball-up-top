@@ -6,6 +6,7 @@ import { PushNotificationProvider } from '@/components/providers/PushNotificatio
 import '@/global.css';
 import { authClient } from '@/lib/auth-client';
 import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
+import { Inter_400Regular } from '@expo-google-fonts/inter';
 import { useFonts } from 'expo-font';
 
 import { NAV_THEME, THEME } from '@/lib/theme';
@@ -24,7 +25,7 @@ import { Toaster } from 'sonner-native';
 
 export {
   // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
+  ErrorBoundary
 } from 'expo-router';
 
 const queryClient = new QueryClient();
@@ -33,8 +34,9 @@ export default function RootLayout() {
   const { colorScheme, setColorScheme } = useColorScheme();
   setColorScheme('dark');
 
-  const [fontsLoaded] = useFonts({
+  useFonts({
     BebasNeue_400Regular,
+    Inter_400Regular,
   });
 
   function onAppStateChange(status: AppStateStatus) {
