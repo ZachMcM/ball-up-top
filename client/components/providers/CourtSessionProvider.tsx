@@ -3,7 +3,7 @@ import { getDistanceInMiles } from '@/lib/utils';
 import { CourtSession } from '@/types/court';
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { OctagonPauseIcon } from 'lucide-react-native';
+import { PauseCircleIcon } from 'lucide-react-native';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import { toast } from 'sonner-native';
@@ -224,7 +224,7 @@ export function SessionFooter() {
           {isCheckOutPending ? (
             <ActivityIndicator size="small" className='text-muted-foreground' />
           ) : (
-            <Icon as={OctagonPauseIcon} size={16} />
+            <Icon as={PauseCircleIcon} size={18} />
           )}
         </Pressable>
       </View>
