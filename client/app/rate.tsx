@@ -130,7 +130,7 @@ function RatingInput({
             <Icon size={20} as={MinusIcon} />
           </Button>
           <View className="flex size-12 flex-row items-center justify-center">
-            <Text className="text-2xl font-bold">{value}</Text>
+            <Text className="font-bebas text-3xl leading-none">{value}</Text>
           </View>
           <Button
             onPressIn={startIncrement}
@@ -327,7 +327,7 @@ export default function RatePage() {
                   </Text>
                 </View>
                 <View className="flex flex-col items-center">
-                  <Text className="text-2xl font-bold">{currentPlayer.rateeOverallAtTime}</Text>
+                  <Text className="font-bebas text-3xl leading-none">{currentPlayer.rateeOverallAtTime}</Text>
                   <Text className="font-medium text-muted-foreground">Overall</Text>
                 </View>
               </View>

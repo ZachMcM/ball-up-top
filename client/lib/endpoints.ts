@@ -266,17 +266,20 @@ export async function deleteCourtNotification(courtId: number): Promise<void> {
 export async function patchUserProfile(data: {
   name: string;
   height: string;
-  image: ImagePickerAsset;
-}): Promise<{ success: boolean; image: string }> {
+  image?: ImagePickerAsset;
+}): Promise<{ success: boolean; image?: string }> {
   const formData = new FormData();
 
   formData.append('name', data.name);
   formData.append('height', data.height);
-  formData.append('image', {
-    uri: data.image.uri,
-    type: data.image.mimeType || 'image/jpeg',
-    name: data.image.fileName || 'image.jpg',
-  } as any);
+
+  if (data.image) {
+    formData.append('image', {
+      uri: data.image.uri,
+      type: data.image.mimeType || 'image/jpeg',
+      name: data.image.fileName || 'image.jpg',
+    } as any);
+  }
 
   return await serverRequest({
     endpoint: '/users/profile',

@@ -42,9 +42,8 @@ module.exports = {
           foreground: 'hsl(var(--card-foreground))',
         },
       },
-      // TODO
       fontFamily: {
-        heading: [],
+        bebas: ['BebasNeue_400Regular'],
       },
       borderRadius: {
         lg: 'var(--radius)',

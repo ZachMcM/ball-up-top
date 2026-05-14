@@ -1,5 +1,7 @@
 export type User = {
+  id: string;
   name: string;
+  image: string | null;
   archetype: string;
   height: string | null;
   overall: number;

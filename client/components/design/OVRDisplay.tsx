@@ -1,37 +1,27 @@
 import { cn } from '@/lib/utils';
-import { TextStyle } from 'react-native';
 import { Text } from '../ui/text';
 
 type OVRDisplayProps = {
   className?: string;
   value: number;
   size?: 'sm' | 'md' | 'lg' | 'xl';
-  color?: string;
-  style?: TextStyle;
 };
 
-const SIZES = {
-  sm: 26,
-  md: 32,
-  lg: 132,
-  xl: 148,
+const SIZE_CLASSES = {
+  sm: 'text-[26px] leading-[29px]',
+  md: 'text-[32px] leading-[35px]',
+  lg: 'text-[132px] leading-[145px]',
+  xl: 'text-[148px] leading-[150px]',
 };
 
-export function OVRDisplay({ value, size = 'lg', style, className }: OVRDisplayProps) {
-  const fontSize = SIZES[size];
-
+export function OVRDisplay({ value, size = 'lg', className }: OVRDisplayProps) {
   return (
     <Text
-      className={cn('tracking-tighter', className)}
-      style={[
-        {
-          lineHeight: fontSize * 1.1,
-          fontFamily: 'BebasNeue_400Regular',
-          fontSize,
-          fontVariant: ['tabular-nums'],
-        },
-        style,
-      ]}>
+      className={cn(
+        'font-bebas tabular-nums tracking-tighter',
+        SIZE_CLASSES[size],
+        className
+      )}>
       {value}
     </Text>
   );

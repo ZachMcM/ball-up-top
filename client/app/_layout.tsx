@@ -182,6 +182,13 @@ export function RootNavigator() {
         }}
         name="rate"
       />
+      <Stack.Screen
+        options={{
+          presentation: 'modal',
+          headerShown: false,
+        }}
+        name="edit-profile"
+      />
     </Stack>
   );
 }

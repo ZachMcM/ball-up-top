@@ -21,7 +21,7 @@ export default function UserItem({ user, className, children, ...props }: { user
         {...props}>
         <View className="flex flex-row items-center gap-4">
           {children}
-          <Avatar className="size-12" alt={`${user.name}'s image`} source={{ uri: user.image }} />
+          <Avatar className="size-12" alt={`${user.name}'s image`} source={{ uri: user.image ?? undefined }} />
           <View className="flex flex-col">
             <Text className="font-semibold">{user.name}</Text>
             <Text className="text-sm font-medium text-muted-foreground">

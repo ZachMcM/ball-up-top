@@ -168,7 +168,9 @@ usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
 
     const [targetUser] = await db
       .select({
+        id: user.id,
         name: user.name,
+        image: user.image,
         archetype: user.archetype,
         height: user.height,
         overall: user.overall,
@@ -318,10 +320,6 @@ usersRoute.patch(
     try {
       const file = req.file;
 
-      if (!file) {
-        return res.status(400).json({ error: "No image file provided" });
-      }
-
       const validBody = PatchProfileSchema.safeParse(req.body);
       if (!validBody.success) {
         return res.status(400).json({ error: validBody.error.message });
@@ -329,41 +327,45 @@ usersRoute.patch(
 
       const { name, height } = validBody.data;
 
-      const allowedMimeTypes = [
-        "image/jpeg",
-        "image/jpg",
-        "image/png",
-        "image/webp",
-        "image/gif",
-      ];
-      if (!allowedMimeTypes.includes(file.mimetype)) {
-        return res.status(400).json({
-          error:
-            "Invalid file type. Only JPEG, PNG, WebP, and GIF images are allowed",
-        });
+      let imageUrl: string | undefined;
+
+      if (file) {
+        const allowedMimeTypes = [
+          "image/jpeg",
+          "image/jpg",
+          "image/png",
+          "image/webp",
+          "image/gif",
+        ];
+        if (!allowedMimeTypes.includes(file.mimetype)) {
+          return res.status(400).json({
+            error:
+              "Invalid file type. Only JPEG, PNG, WebP, and GIF images are allowed",
+          });
+        }
+
+        const fileName = `users/${
+          res.locals.userId
+        }-${Date.now()}.${file.originalname.split(".").pop()}`;
+
+        await r2.send(
+          new PutObjectCommand({
+            Bucket: process.env.R2_BUCKET_NAME!,
+            Key: fileName,
+            Body: file.buffer,
+            ContentType: file.mimetype,
+          }),
+        );
+
+        imageUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
       }
-
-      const fileName = `users/${
-        res.locals.userId
-      }-${Date.now()}.${file.originalname.split(".").pop()}`;
-
-      await r2.send(
-        new PutObjectCommand({
-          Bucket: process.env.R2_BUCKET_NAME!,
-          Key: fileName,
-          Body: file.buffer,
-          ContentType: file.mimetype,
-        }),
-      );
-
-      const imageUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
 
       await db
         .update(user)
         .set({
           name,
           height,
-          image: imageUrl,
+          ...(imageUrl && { image: imageUrl }),
         })
         .where(eq(user.id, res.locals.userId!));
 
@@ -376,7 +378,7 @@ usersRoute.patch(
         invalidateQueries(["leaderboard", entry.courtId]);
       }
 
-      invalidateQueries(["home"])
+      invalidateQueries(["home"]);
 
       return res.json({ success: true, image: imageUrl });
     } catch (error) {

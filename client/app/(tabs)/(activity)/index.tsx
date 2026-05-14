@@ -203,21 +203,17 @@ function ActivityArchetypeCard({ to, from, when }: { to: string; from: string; w
         <Text className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-background/55">
           Archetype Changed · {when}
         </Text>
-        <Text
-          style={{
-            fontFamily: 'BebasNeue_400Regular',
-          }}
-          className="text-4xl tracking-tight text-primary-foreground">
+        <Text className="font-bebas text-4xl leading-[44px] tracking-tight text-primary-foreground">
           {to}
         </Text>
 
-        <View className="flex-row items-center gap-2">
+        <View className="flex-row items-center gap-1.5 flex-wrap">
           <View className="rounded-full border border-background/25 px-3 py-1">
             <Text className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-background/55">
               {displayFrom}
             </Text>
           </View>
-          <Text className="text-[13px] text-background/45">→</Text>
+          <Icon as={MoveRightIcon} size={16} className='text-muted-foreground'/>
           <View className="rounded-full bg-background px-3 py-1">
             <Text className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-foreground">
               {displayTo}
@@ -261,29 +257,17 @@ function ActivityOVRCard({ from, to, when }: { from: number; to: number; when: s
       <View className="flex flex-col">
         <View className="flex flex-row items-center justify-between">
           <View className="flex flex-row items-center gap-2">
-            <Text
-              style={{
-                fontFamily: 'BebasNeue_400Regular',
-              }}
-              className="text-7xl tracking-tighter">
+            <Text className="font-bebas text-7xl leading-[77px] tracking-tighter">
               {to}
             </Text>
             <DeltaIndicator value={delta} size="xl" />
           </View>
           <View className="flex flex-row items-center gap-2">
-            <Text
-              style={{
-                fontFamily: 'BebasNeue_400Regular',
-              }}
-              className="text-2xl line-through">
+            <Text className="font-bebas text-2xl leading-[26px] line-through">
               {from}
             </Text>
             <Icon as={MoveRightIcon} />
-            <Text
-              style={{
-                fontFamily: 'BebasNeue_400Regular',
-              }}
-              className="text-3xl">
+            <Text className="font-bebas text-3xl leading-[33px]">
               {to}
             </Text>
           </View>
@@ -331,30 +315,18 @@ function ActivityRankCard({
       <View className="flex flex-col">
         <View className="flex flex-row items-center justify-between">
           <View className="flex flex-row items-center gap-2">
-            <Text
-              style={{
-                fontFamily: 'BebasNeue_400Regular',
-              }}
-              className="text-7xl tracking-tighter">
+            <Text className="font-bebas text-7xl leading-[77px] tracking-tighter">
               #{to}
             </Text>
             {to && from && <DeltaIndicator value={delta} size="xl" />}
           </View>
           {to && from && (
             <View className="flex flex-row items-center gap-2">
-              <Text
-                style={{
-                  fontFamily: 'BebasNeue_400Regular',
-                }}
-                className="text-2xl line-through">
+              <Text className="font-bebas text-2xl leading-[26px] line-through">
                 #{from}
               </Text>
               <Icon as={MoveRightIcon} />
-              <Text
-                style={{
-                  fontFamily: 'BebasNeue_400Regular',
-                }}
-                className="text-3xl">
+              <Text className="font-bebas text-3xl leading-[33px]">
                 #{to}
               </Text>
             </View>

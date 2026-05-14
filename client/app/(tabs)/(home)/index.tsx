@@ -16,12 +16,7 @@ import { cn, openDirections } from '@/lib/utils';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import {
-  ChevronRight,
-  LogInIcon,
-  LogOutIcon,
-  Navigation
-} from 'lucide-react-native';
+import { ChevronRight, Navigation } from 'lucide-react-native';
 import React, { useCallback, useRef } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 
@@ -74,32 +69,30 @@ export default function HomePage() {
               contentContainerClassName="flex w-full flex-col gap-8 py-6"
               keyboardShouldPersistTaps="handled">
               <View className="flex flex-col px-4">
-                <View className="flex flex-row items-end justify-between">
-                  <View className="flex flex-col">
+                <View className="flex flex-row items-end gap-4 justify-between">
+                  <View className="flex flex-col flex-1">
                     <View className="flex flex-row items-end gap-2">
-                      <View className="flex flex-col">
+                      <View className="flex flex-col gap-4">
                         <Text className="text-xs font-semibold tracking-wider text-muted-foreground">
                           YOUR OVERALL
                         </Text>
                         <OVRDisplay value={home.userData.overall} size="xl" />
                       </View>
                       {home.userData.overallDelta !== null && home.userData.overallDelta !== 0 && (
-                        <View className="flex flex-row items-center mb-10">
-                          <DeltaIndicator size='xl' value={home.userData.overallDelta} />
+                        <View className="mb-10 flex flex-row items-center">
+                          <DeltaIndicator size="xl" value={home.userData.overallDelta} />
                         </View>
                       )}
                     </View>
                     <ArchetypeDisplay
                       archetype={home.userData.archetype}
                       variant="hero"
-                      size="md"
+                      size="lg"
                     />
                   </View>
                   <View className="flex flex-col items-end gap-1">
                     <View className="flex flex-row items-baseline gap-1">
-                      <Text
-                        style={{ fontFamily: 'BebasNeue_400Regular', lineHeight: 54 }}
-                        className="text-5xl tabular-nums">
+                      <Text className="font-bebas text-5xl tabular-nums leading-[54px]">
                         #{home.userData.rank ?? '—'}
                       </Text>
                     </View>
@@ -209,7 +202,7 @@ export default function HomePage() {
                     )}
                   </View>
                 ) : (
-                  <View className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-8">
+                  <View className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-8 mx-4">
                     <Text className="text-sm text-muted-foreground">No one's playing</Text>
                     <Text className="mt-1 text-xs text-muted-foreground">
                       Be the first one out there
@@ -218,18 +211,16 @@ export default function HomePage() {
                 )}
 
                 {/* Check In/Out Button */}
-                <View className="flex flex-col gap-3">
+                <View className="mx-4 flex flex-col gap-3">
                   {isCheckedIn ? (
                     <Button
                       disabled={isCheckOutPending}
                       onPress={checkOut}
                       size="lg"
-                      className="mx-4 h-14 rounded-2xl">
+                      className="h-12 rounded-2xl">
                       <Text className="font-bold">Check Out</Text>
-                      {isCheckOutPending ? (
+                      {isCheckOutPending && (
                         <ActivityIndicator size="small" className="ml-2 text-muted-foreground" />
-                      ) : (
-                        <Icon as={LogInIcon} className="text-primary-foreground" size={18} />
                       )}
                     </Button>
                   ) : (
@@ -238,12 +229,10 @@ export default function HomePage() {
                         disabled={isCheckInPending || !!activeCourtSession || !!unratedCourtSession}
                         onPress={() => checkIn(home.primaryCourt.id)}
                         size="lg"
-                        className="h-14 rounded-2xl">
+                        className="h-12 rounded-2xl">
                         <Text className="font-bold text-primary-foreground">Check In to Play</Text>
-                        {isCheckInPending ? (
+                        {isCheckInPending && (
                           <ActivityIndicator size="small" className="ml-2 text-muted-foreground" />
-                        ) : (
-                          <Icon as={LogOutIcon} className="text-primary-foreground" size={18} />
                         )}
                       </Button>
                       {unratedCourtSession && (

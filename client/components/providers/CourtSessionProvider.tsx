@@ -204,9 +204,7 @@ export function SessionFooter() {
           />
           <View className="flex flex-col">
             <View className="flex flex-row items-baseline gap-2">
-              <Text
-                className="text-xl tabular-nums text-foreground"
-                style={{ fontFamily: 'BebasNeue_400Regular' }}>
+              <Text className="font-bebas text-xl leading-[22px] tabular-nums text-foreground">
                 {duration}
               </Text>
               <Text className="text-xs text-muted-foreground">Elapsed</Text>

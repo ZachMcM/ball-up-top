@@ -153,11 +153,8 @@ export default function LeaderboardPage() {
                     )}>
                     <View className="flex flex-row items-center gap-1">
                       <Text
-                        style={{
-                          fontFamily: 'BebasNeue_400Regular',
-                        }}
                         className={cn(
-                          'w-8 text-3xl tabular-nums',
+                          'w-8 font-bebas text-3xl leading-[33px] tabular-nums',
                           user.rank && user.rank <= 3 ? 'text-foreground' : 'text-muted-foreground'
                         )}>
                         #{user.rank}
@@ -198,9 +195,7 @@ export default function LeaderboardPage() {
           {/* Sticky pinned current user row (Leaderboard tab only) */}
           {currentUserEntry && (
             <View className="absolute bottom-2 left-3 right-3 flex flex-row items-center gap-3 rounded-2xl bg-foreground px-4 py-3">
-              <Text
-                style={{ fontFamily: 'BebasNeue_400Regular' }}
-                className="text-3xl font-extrabold text-background">
+              <Text className="font-bebas text-3xl leading-[33px] font-extrabold text-background">
                 #{currentUserEntry.rank ?? '—'}
               </Text>
               <View className="flex-1">

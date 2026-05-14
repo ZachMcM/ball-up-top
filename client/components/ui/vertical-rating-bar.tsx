@@ -24,14 +24,14 @@ export function VerticalRatingBar({ value, label, className, color }: VerticalRa
 
   return (
     <View className={cn('flex flex-1 flex-col items-center gap-2', className)}>
-      <Text className="text-sm font-bold">{value}</Text>
+      <Text className="text-2xl font-bold font-bebas">{value}</Text>
       <View className="flex w-9 flex-col gap-0.5">
         {segments.map(({ segmentNumber, isFilled }) => (
           <View
             key={segmentNumber}
             className={cn(
               'h-1.5 w-full rounded-sm',
-              !isFilled ? 'bg-muted-foreground/40' : (color ?? 'bg-primary')
+              !isFilled ? 'bg-muted' : (color ?? 'bg-primary')
             )}
           />
         ))}

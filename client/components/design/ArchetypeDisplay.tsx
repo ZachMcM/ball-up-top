@@ -6,7 +6,7 @@ type ArchetypeDisplayProps = {
   archetype: string;
   variant?: 'hero' | 'inline';
   tone?: 'fill' | 'muted';
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
 } & ViewProps;
 
 export function ArchetypeDisplay({
@@ -27,26 +27,23 @@ export function ArchetypeDisplay({
 
 type HeroArchetypeProps = {
   archetype: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
 } & ViewProps;
 
+const HERO_SIZE_CLASSES = {
+  sm: 'text-[20px] leading-[22px]',
+  md: 'text-[28px] leading-[31px]',
+  lg: 'text-[36px] leading-[40px]',
+  xl: 'text-[44px] leading-[48px]',
+};
+
 function HeroArchetype({ archetype, size = 'md' }: HeroArchetypeProps) {
-  const sizeStyles = {
-    sm: { fontSize: 20 },
-    md: { fontSize: 28 },
-    lg: { fontSize: 36 },
-  };
-
-  const { fontSize } = sizeStyles[size];
-
   return (
     <Text
-      className="tracking-tighter text-foreground"
-      style={{
-        fontFamily: 'BebasNeue_400Regular',
-        fontSize,
-        lineHeight: fontSize * 1.1,
-      }}>
+      className={cn(
+        'font-bebas tracking-tighter text-foreground',
+        HERO_SIZE_CLASSES[size]
+      )}>
       {archetype}
     </Text>
   );

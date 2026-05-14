@@ -54,9 +54,7 @@ export function DeltaIndicator({
         className={cn(colorClass)}
         size={sizeClasses[size].icon}
       />
-      <Text style={{
-        fontFamily: "BebasNeue_400Regular"
-      }} className={cn('font-bold tabular-nums', colorClass, sizeClasses[size].text)}>
+      <Text className={cn('font-bebas font-bold tabular-nums', colorClass, sizeClasses[size].text)}>
         {absValue}
       </Text>
     </View>
