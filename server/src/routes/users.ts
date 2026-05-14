@@ -3,7 +3,12 @@ import { and, desc, eq, sql } from "drizzle-orm";
 import { Router } from "express";
 import * as z from "zod";
 import { db } from "../db";
-import { activity, leaderboard, rankChange, rating, user } from "../db/schema";
+import {
+  activity,
+  court,
+  leaderboard,
+  user
+} from "../db/schema";
 import { handleError } from "../utils/handleError";
 import {
   invalidateQueries,
@@ -172,25 +177,10 @@ usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
         defenseRating: user.defenseRating,
         shootingRating: user.shootingRating,
         rank: leaderboard.rank,
-        overallDelta: sql<number | null>`(
-        SELECT ${rating.rateeNewOverall} - COALESCE(${rating.rateeOldOverall}, ${rating.rateeNewOverall})
-        FROM ${rating}                                                                                                        
-        WHERE ${rating.rateeId} = ${user.id}
-        ORDER BY ${rating.createdAt} DESC                                                                                     
-        LIMIT 1                                                                                                               
-      )`,
-        rankDelta: sql<
-          number | null
-        >`(                                                                                         
-        SELECT ${rankChange.newRank} - COALESCE(${rankChange.oldRank}, ${rankChange.newRank})
-        FROM ${rankChange}
-        WHERE ${rankChange.userId} = ${user.id}
-          AND ${rankChange.courtId} = ${user.primaryCourtId}                                                                  
-        ORDER BY ${rankChange.createdAt} DESC
-        LIMIT 1                                                                                                               
-      )`,
+        primaryCollegeName: court.collegeName,
       })
       .from(user)
+      .innerJoin(court, eq(user.primaryCourtId, court.id))
       .innerJoin(
         leaderboard,
         and(
@@ -314,3 +304,83 @@ usersRoute.patch("/users/activity/read", authMiddleware, async (req, res) => {
     handleError(error, res, "PATCH /users/activity/read");
   }
 });
+
+const PatchProfileSchema = z.object({
+  name: z.string().min(1),
+  height: z.string().min(1),
+});
+
+usersRoute.patch(
+  "/users/profile",
+  authMiddleware,
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      const file = req.file;
+
+      if (!file) {
+        return res.status(400).json({ error: "No image file provided" });
+      }
+
+      const validBody = PatchProfileSchema.safeParse(req.body);
+      if (!validBody.success) {
+        return res.status(400).json({ error: validBody.error.message });
+      }
+
+      const { name, height } = validBody.data;
+
+      const allowedMimeTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/webp",
+        "image/gif",
+      ];
+      if (!allowedMimeTypes.includes(file.mimetype)) {
+        return res.status(400).json({
+          error:
+            "Invalid file type. Only JPEG, PNG, WebP, and GIF images are allowed",
+        });
+      }
+
+      const fileName = `users/${
+        res.locals.userId
+      }-${Date.now()}.${file.originalname.split(".").pop()}`;
+
+      await r2.send(
+        new PutObjectCommand({
+          Bucket: process.env.R2_BUCKET_NAME!,
+          Key: fileName,
+          Body: file.buffer,
+          ContentType: file.mimetype,
+        }),
+      );
+
+      const imageUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
+
+      await db
+        .update(user)
+        .set({
+          name,
+          height,
+          image: imageUrl,
+        })
+        .where(eq(user.id, res.locals.userId!));
+
+      const userLeaderboards = await db
+        .select({ courtId: leaderboard.courtId })
+        .from(leaderboard)
+        .where(eq(leaderboard.userId, res.locals.userId!));
+
+      for (const entry of userLeaderboards) {
+        invalidateQueries(["leaderboard", entry.courtId]);
+      }
+
+      invalidateQueries(["home"])
+
+      return res.json({ success: true, image: imageUrl });
+    } catch (error) {
+      handleError(error, res, "PATCH /users/profile");
+    }
+  },
+);

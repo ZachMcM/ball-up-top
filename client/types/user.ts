@@ -8,6 +8,5 @@ export type User = {
   defenseRating: number;
   shootingRating: number;
   rank: number | null;
-  overallDelta: number | null;
-  rankDelta: number | null;
+  primaryCollegeName: string;
 };

@@ -20,9 +20,7 @@ import {
   ChevronRight,
   LogInIcon,
   LogOutIcon,
-  MoveDownIcon,
-  MoveUpIcon,
-  Navigation,
+  Navigation
 } from 'lucide-react-native';
 import React, { useCallback, useRef } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
