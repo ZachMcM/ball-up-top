@@ -64,7 +64,7 @@ export default function ProfilePage() {
             {/* Hero Block: OVR + Meta */}
             <View className="flex flex-row items-start gap-6">
               <OVRDisplay value={user.overall} size="xl" />
-              <View className="flex flex-col justify-center">
+              <View className="flex flex-col gap-2 justify-center">
                 <ArchetypeDisplay
                   archetype={user.archetype}
                   variant="hero"
@@ -91,10 +91,9 @@ export default function ProfilePage() {
               </Text>
             </Button>
 
-            {/* Skill Breakdown */}
             <View className="flex flex-col gap-3">
               <Text className="text-sm font-semibold text-muted-foreground">
-                Skill Breakdown
+                Ratings
               </Text>
               <View className="flex flex-row items-end justify-between gap-2.5">
                 <VerticalRatingBar label="Finishing" value={user.finishingRating} />

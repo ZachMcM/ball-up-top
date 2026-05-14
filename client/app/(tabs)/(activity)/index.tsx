@@ -249,15 +249,15 @@ function ActivityOVRCard({ from, to, when }: { from: number; to: number; when: s
   const { data: currentUserdata } = authClient.useSession();
 
   return (
-    <View className="flex flex-col gap-4 overflow-hidden rounded-2xl border border-border bg-card p-5">
+    <View className="flex flex-col gap-2.5 overflow-hidden rounded-2xl border border-border bg-card p-5">
       <View className="absolute -bottom-10 -right-10 h-40 w-40 rounded-full border-[40px] border-muted/50" />
       <Text className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-muted-foreground">
         Overall {isPositive ? 'Up' : 'Down'} · {when}
       </Text>
-      <View className="flex flex-col">
+      <View className="flex flex-col gap-1.5">
         <View className="flex flex-row items-center justify-between">
           <View className="flex flex-row items-center gap-2">
-            <Text className="font-bebas text-7xl leading-[77px] tracking-tighter">
+            <Text className="font-bebas text-5xl leading-[52px] tracking-tighter">
               {to}
             </Text>
             <DeltaIndicator value={delta} size="xl" />
@@ -312,10 +312,10 @@ function ActivityRankCard({
       <Text className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-muted-foreground">
         Rank {isPositive ? 'Up' : 'Down'} · {when}
       </Text>
-      <View className="flex flex-col">
+      <View className="flex flex-col gap-1.5">
         <View className="flex flex-row items-center justify-between">
           <View className="flex flex-row items-center gap-2">
-            <Text className="font-bebas text-7xl leading-[77px] tracking-tighter">
+            <Text className="font-bebas text-5xl leading-[52px] tracking-tighter">
               #{to}
             </Text>
             {to && from && <DeltaIndicator value={delta} size="xl" />}

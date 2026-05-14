@@ -43,7 +43,7 @@ export function DeltaIndicator({
     },
     xl: {
       text: "text-3xl",
-      icon: 24
+      icon: 20
     }
   };
 

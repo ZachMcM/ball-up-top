@@ -1,9 +1,7 @@
 import { THEME } from '@/lib/theme';
 import { useColorScheme } from 'nativewind';
-import { useMemo, useRef } from 'react';
-import { BarChart, LineChart, LineChartPropsType } from 'react-native-gifted-charts';
-import { NativewindScrollView } from './NativewindScrollView';
-import { Text } from './ui/text';
+import { useMemo } from 'react';
+import { BarChart, LineChartPropsType } from 'react-native-gifted-charts';
 
 // Normalize UTC hours from server to local timezone
 const normalizeToLocalTimezone = (points: { hour: number; avgSessions: number }[]) => {
