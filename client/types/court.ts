@@ -16,7 +16,7 @@ export type CourtSession = {
 export type UserEntry = {
   rank: number | null;
   overall: number;
-  userId: string;
+  id: string;
   name: string;
   image: string | null;
   archetype: string;

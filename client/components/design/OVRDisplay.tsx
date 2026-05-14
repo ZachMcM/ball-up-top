@@ -11,8 +11,8 @@ type OVRDisplayProps = {
 };
 
 const SIZES = {
-  sm: 24,
-  md: 36,
+  sm: 26,
+  md: 32,
   lg: 132,
   xl: 148,
 };

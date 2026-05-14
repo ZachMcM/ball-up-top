@@ -3,7 +3,7 @@ import { getDistanceInMiles } from '@/lib/utils';
 import { CourtSession } from '@/types/court';
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ChevronRight } from 'lucide-react-native';
+import { OctagonPauseIcon } from 'lucide-react-native';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import { toast } from 'sonner-native';
@@ -189,8 +189,6 @@ export function SessionFooter() {
     return null;
   }
 
-  const startTime = new Date(activeCourtSession.startTime);
-
   return (
     <View className="border-t border-border bg-card px-4 py-3">
       <View className="flex flex-row items-center justify-between">
@@ -220,13 +218,13 @@ export function SessionFooter() {
         </View>
         <Pressable
           onPress={checkOut}
-          className="flex flex-row items-center gap-2"
+          className="flex flex-row items-center gap-1.5"
           disabled={isCheckOutPending}>
           <Text className="text-sm font-semibold">End</Text>
           {isCheckOutPending ? (
             <ActivityIndicator size="small" className='text-muted-foreground' />
           ) : (
-            <Icon as={ChevronRight} size={16} />
+            <Icon as={OctagonPauseIcon} size={16} />
           )}
         </Pressable>
       </View>

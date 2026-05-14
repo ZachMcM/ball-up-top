@@ -36,7 +36,7 @@ export default function LeaderboardPage() {
   });
 
   const currentUserEntry = useMemo(() => {
-    return leaderboard?.users.find((u) => u.userId === currentUserId);
+    return leaderboard?.users.find((u) => u.id === currentUserId);
   }, [leaderboard, currentUserId]);
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -47,13 +47,6 @@ export default function LeaderboardPage() {
 
   const router = useRouter();
   const tabContext = useTabContext();
-
-  const handleUserPress = (userId: string) => {
-    router.push({
-      pathname: `/(tabs)/(${tabContext})/user/[userId]` as const,
-      params: { userId },
-    });
-  };
 
   function getPositionContext(
     orderedUsers: { rank: number | null; overall: number; name: string }[],
@@ -102,11 +95,11 @@ export default function LeaderboardPage() {
                     contentContainerStyle={{ gap: 10 }}>
                     {leaderboard.topMovers.map((mover) => (
                       <Pressable
-                        key={mover.userId}
+                        key={mover.id}
                         onPress={() =>
                           router.push({
                             pathname: `/(tabs)/(${tabContext})/user/[userId]` as const,
-                            params: { userId: mover.userId },
+                            params: { userId: mover.id },
                           })
                         }>
                         <Card className="w-36 p-3">
@@ -143,78 +136,68 @@ export default function LeaderboardPage() {
               </View>
               <NativewindFlatList
                 data={filteredPlayers}
-                renderItem={({ item: user, index }) => {
-                  const isCurrentUser = user.userId === currentUserId;
-                  return (
-                    <Pressable
-                      key={user.userId}
-                      onPress={() =>
-                        router.push({
-                          pathname: `/(tabs)/(${tabContext})/user/[userId]` as const,
-                          params: { userId: user.userId },
-                        })
-                      }
-                      className={cn(
-                        'flex flex-row items-center justify-between border-b border-border px-4 py-3',
-                        index == 0 && 'border-t',
-                        isCurrentUser && 'border-l-2 border-l-foreground bg-card'
-                      )}>
-                      <View className="flex flex-row items-center gap-1">
-                        <Text
-                          style={{
-                            fontFamily: 'BebasNeue_400Regular',
-                          }}
-                          className={cn(
-                            'w-8 text-3xl tabular-nums',
-                            user.rank && user.rank <= 3
-                              ? 'text-foreground'
-                              : 'text-muted-foreground'
-                          )}>
-                          #{user.rank}
-                        </Text>
-                        <View className="flex flex-row items-center gap-3">
-                          <Avatar
-                            className={cn(
-                              'size-9',
-                              isCurrentUser &&
-                                'ring-2 ring-foreground ring-offset-2 ring-offset-background'
+                renderItem={({ item: user, index }) => (
+                  <Pressable
+                    key={user.id}
+                    onPress={() =>
+                      router.push({
+                        pathname: `/(tabs)/(${tabContext})/user/[userId]` as const,
+                        params: { userId: user.id },
+                      })
+                    }
+                    className={cn(
+                      'flex flex-row items-center justify-between border-b border-border px-4 py-3',
+                      index == 0 && 'border-t',
+                      user.id === currentUserData?.user.id &&
+                        'border-l-2 border-l-foreground bg-card'
+                    )}>
+                    <View className="flex flex-row items-center gap-1">
+                      <Text
+                        style={{
+                          fontFamily: 'BebasNeue_400Regular',
+                        }}
+                        className={cn(
+                          'w-8 text-3xl tabular-nums',
+                          user.rank && user.rank <= 3 ? 'text-foreground' : 'text-muted-foreground'
+                        )}>
+                        #{user.rank}
+                      </Text>
+                      <View className="flex flex-row items-center gap-3">
+                        <Avatar
+                          className="size-10"
+                          alt={user.name}
+                          source={{ uri: user.image ?? undefined }}
+                        />
+                        <View className="flex flex-col gap-1">
+                          <Text className="font-semibold">
+                            {user.name}
+                            {user.id === currentUserData?.user.id && (
+                              <Text className="text-muted-foreground"> (You)</Text>
                             )}
-                            alt={user.name}
-                            source={{ uri: user.image ?? undefined }}
+                          </Text>
+                          <ArchetypeDisplay
+                            tone="muted"
+                            size="md"
+                            variant="inline"
+                            archetype={user.archetype}
                           />
-                          <View className="flex flex-col gap-1">
-                            <Text className="font-semibold">
-                              {user.name}
-                              {isCurrentUser && (
-                                <Text className="text-muted-foreground"> (You)</Text>
-                              )}
-                            </Text>
-                            <ArchetypeDisplay
-                              tone="muted"
-                              size="md"
-                              variant="inline"
-                              archetype={user.archetype}
-                            />
-                          </View>
                         </View>
                       </View>
-                      <View className="flex flex-col items-center">
-                        <OVRDisplay value={user.overall} size="sm" />
-                        <Text className="text-[10px] font-medium tracking-tight text-muted-foreground">
-                          OVR
-                        </Text>
-                      </View>
-                    </Pressable>
-                  );
-                }}
+                    </View>
+                    <View className="flex flex-col items-center">
+                      <OVRDisplay value={user.overall} size="sm" />
+                      <Text className="text-[10px] font-medium tracking-tight text-muted-foreground">
+                        OVR
+                      </Text>
+                    </View>
+                  </Pressable>
+                )}
               />
             </>
           )}
           {/* Sticky pinned current user row (Leaderboard tab only) */}
           {currentUserEntry && (
-            <Pressable
-              onPress={() => handleUserPress(currentUserEntry.userId)}
-              className="absolute bottom-2 left-3 right-3 flex flex-row items-center gap-3 rounded-2xl bg-foreground px-4 py-3">
+            <View className="absolute bottom-2 left-3 right-3 flex flex-row items-center gap-3 rounded-2xl bg-foreground px-4 py-3">
               <Text
                 style={{ fontFamily: 'BebasNeue_400Regular' }}
                 className="text-3xl font-extrabold text-background">
@@ -238,7 +221,7 @@ export default function LeaderboardPage() {
                   OVR
                 </Text>
               </View>
-            </Pressable>
+            </View>
           )}
         </View>
       </KeyboardAvoidingView>

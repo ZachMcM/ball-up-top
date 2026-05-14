@@ -1,5 +1,7 @@
 import { cn } from '@/lib/utils';
+import { MoveDown, MoveUp } from 'lucide-react-native';
 import { View, ViewProps } from 'react-native';
+import { Icon } from '../ui/icon';
 import { Text } from '../ui/text';
 
 type DeltaIndicatorProps = {
@@ -30,15 +32,28 @@ export function DeltaIndicator({
   const colorClass = isPositive ? 'text-green-400' : 'text-red-400';
 
   const sizeClasses = {
-    sm: 'text-[11px]',
-    md: 'text-xs',
-    lg: 'text-sm',
+    sm: {
+      text: 'text-[11px]',
+      icon: 10,
+    },
+    md: {
+      text: 'text-xs',
+      icon: 12,
+    },
+    lg: {
+      text: 'text-sm',
+      icon: 14,
+    },
   };
 
   return (
-    <View className={cn('flex flex-row items-center', className)} {...props}>
-      <Text className={cn('font-bold tabular-nums', colorClass, sizeClasses[size])}>
-        {arrow}
+    <View className={cn('gap-0.25 flex flex-row items-center', className)} {...props}>
+      <Icon
+        as={isPositive ? MoveUp : MoveDown}
+        className={cn(colorClass)}
+        size={sizeClasses[size].icon}
+      />
+      <Text className={cn('font-bold tabular-nums', colorClass, sizeClasses[size].text)}>
         {absValue}
       </Text>
     </View>

@@ -40,34 +40,6 @@ courtsRoute.get("/colleges", authMiddleware, async (_, res) => {
   }
 });
 
-courtsRoute.get("/courts/:id/players", authMiddleware, async (req, res) => {
-  try {
-    const courtId = parseInt(req.params.id);
-
-    if (!Number.isInteger(courtId)) {
-      logger.error("Court ID is not an integer.");
-      return res.status(400).json({ error: "Court ID is not an integer." });
-    }
-
-    const courtPlayers = await db
-      .select({
-        rank: leaderboard.rank,
-        overall: user.overall,
-        userId: user.id,
-        name: user.name,
-        image: user.image,
-        archetype: user.archetype,
-      })
-      .from(leaderboard)
-      .innerJoin(user, eq(leaderboard.userId, user.id))
-      .where(eq(leaderboard.courtId, courtId));
-
-    res.json(courtPlayers);
-  } catch (error) {
-    handleError(error, res, "GET /courts/:id/players");
-  }
-});
-
 courtsRoute.get("/courts/:id/leaderboard", authMiddleware, async (req, res) => {
   try {
     const courtId = parseInt(req.params.id);
@@ -94,7 +66,7 @@ courtsRoute.get("/courts/:id/leaderboard", authMiddleware, async (req, res) => {
         .select({
           rank: leaderboard.rank,
           overall: user.overall,
-          userId: user.id,
+          id: user.id,
           name: user.name,
           image: user.image,
           archetype: user.archetype,

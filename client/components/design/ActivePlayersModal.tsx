@@ -1,17 +1,18 @@
 import { useTabContext } from '@/hooks/useTabContext';
 import { authClient } from '@/lib/auth-client';
 import { THEME } from '@/lib/theme';
+import { cn } from '@/lib/utils';
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import { RefObject, useCallback, useMemo, useState } from 'react';
-import { FlatList, Pressable, View } from 'react-native';
+import { Pressable, View } from 'react-native';
+import { NativewindFlatList } from '../NativewindFlatList';
 import { Avatar } from '../ui/avatar';
 import { Input } from '../ui/input';
 import { Text } from '../ui/text';
 import { ArchetypeDisplay } from './ArchetypeDisplay';
 import { OVRDisplay } from './OVRDisplay';
-import { NativewindFlatList } from '../NativewindFlatList';
 
 type ActivePlayer = {
   id: string;
@@ -71,8 +72,8 @@ export function ActivePlayersModal({
       backdropComponent={renderBackdrop}
       backgroundStyle={{ backgroundColor: THEME[colorScheme!].background }}
       handleIndicatorStyle={{ backgroundColor: THEME[colorScheme!].accent }}>
-      <BottomSheetView className="flex flex-1 flex-col gap-4 px-4">
-        <View className="flex flex-col gap-0.5">
+      <BottomSheetView className="flex flex-1 flex-col gap-6">
+        <View className="flex flex-col gap-0.5 px-4">
           <Text className="text-lg font-bold">
             {courtName ? `Active at ${courtName}` : 'Active Players'}
           </Text>
@@ -80,18 +81,24 @@ export function ActivePlayersModal({
             {players.length} players live
           </Text>
         </View>
-        <Input
-          className="h-9 rounded-full"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholder="Search players..."
-        />
+        <View className="px-4">
+          <Input
+            className="h-9 rounded-full"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder="Search players..."
+          />
+        </View>
         <NativewindFlatList
           data={filteredPlayers}
-          renderItem={({ item: user }) => (
+          renderItem={({ item: user, index }) => (
             <Pressable
               onPress={() => handlePlayerPress(user.id)}
-              className="flex w-full flex-row items-center justify-between gap-3 border-b border-border py-3">
+              className={cn(
+                'flex flex-row items-center justify-between border-b border-border px-4 py-3',
+                index == 0 && 'border-t',
+                user.id === currentUserData?.user.id && 'border-l-2 border-l-foreground bg-card'
+              )}>
               <View className="flex flex-row items-center gap-3">
                 <Avatar
                   className="size-10"
@@ -108,7 +115,7 @@ export function ActivePlayersModal({
                   <ArchetypeDisplay size="md" archetype={user.archetype} />
                 </View>
               </View>
-              <View className="flex flex-col gap-1 items-center">
+              <View className="flex flex-col items-center">
                 <OVRDisplay size="sm" value={user.overall} />
                 <Text className="text-[10px] font-medium tracking-tight text-muted-foreground">
                   OVR
