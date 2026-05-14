@@ -34,16 +34,16 @@ export function DeltaIndicator({
       icon: 10,
     },
     md: {
-      text: 'text-xs',
+      text: 'text-sm',
       icon: 12,
     },
     lg: {
-      text: 'text-sm',
-      icon: 14,
+      text: 'text-base',
+      icon: 18,
     },
     xl: {
-      text: "text-xl",
-      icon: 22
+      text: "text-3xl",
+      icon: 24
     }
   };
 
@@ -54,7 +54,9 @@ export function DeltaIndicator({
         className={cn(colorClass)}
         size={sizeClasses[size].icon}
       />
-      <Text className={cn('font-bold tabular-nums', colorClass, sizeClasses[size].text)}>
+      <Text style={{
+        fontFamily: "BebasNeue_400Regular"
+      }} className={cn('font-bold tabular-nums', colorClass, sizeClasses[size].text)}>
         {absValue}
       </Text>
     </View>
