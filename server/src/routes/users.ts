@@ -7,8 +7,10 @@ import {
   activity,
   court,
   leaderboard,
+  rating,
   user
 } from "../db/schema";
+import { redis } from "../utils/redis";
 import { handleError } from "../utils/handleError";
 import {
   invalidateQueries,
@@ -121,6 +123,39 @@ usersRoute.patch("/users/height", authMiddleware, async (req, res) => {
     handleError(error, res, "PATCH /users/height");
   }
 });
+
+usersRoute.get(
+  "/users/has-submitted-ratings",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const userId = res.locals.userId!;
+      const cacheKey = `has_submitted_ratings:${userId}`;
+
+      const cached = await redis.get(cacheKey);
+      if (cached === "true") {
+        return res.json({ hasSubmittedRatings: true });
+      }
+
+      const existingRating = await db.query.rating.findFirst({
+        where: eq(rating.raterId, userId),
+        columns: { id: true },
+      });
+
+      const hasSubmittedRatings = !!existingRating;
+
+      if (hasSubmittedRatings) {
+        await redis.set(cacheKey, "true");
+      } else {
+        await redis.set(cacheKey, "false", { EX: 60 });
+      }
+
+      res.json({ hasSubmittedRatings });
+    } catch (error) {
+      handleError(error, res, "GET /users/has-submitted-ratings");
+    }
+  },
+);
 
 usersRoute.get("/users/activity", authMiddleware, async (_, res) => {
   try {

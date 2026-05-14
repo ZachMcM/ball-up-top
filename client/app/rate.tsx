@@ -17,7 +17,12 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Progress } from '@/components/ui/progress';
 import { Text } from '@/components/ui/text';
-import { getEncounteredPlayers, patchEncounteredPlayer, postSessionRatings } from '@/lib/endpoints';
+import {
+  getEncounteredPlayers,
+  getUserHasSubmittedRatings,
+  patchEncounteredPlayer,
+  postSessionRatings,
+} from '@/lib/endpoints';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import {
@@ -170,12 +175,23 @@ export default function RatePage() {
     shootingRating: MIN_RATING,
     playmakingRating: MIN_RATING,
   });
+  const [explainerAcknowledged, setExplainerAcknowledged] = useState(false);
 
   const [debouncedRatings] = useDebounce(localRatings, 500);
   const hasSubmittedRef = useRef(false);
 
   const router = useRouter();
   const queryClient = useQueryClient();
+
+  const { data: hasSubmittedRatingsData, isPending: isHasSubmittedRatingsPending } = useQuery({
+    queryKey: ['has-submitted-ratings'],
+    queryFn: getUserHasSubmittedRatings,
+  });
+
+  const showExplainer =
+    !isHasSubmittedRatingsPending &&
+    !hasSubmittedRatingsData?.hasSubmittedRatings &&
+    !explainerAcknowledged;
 
   const {
     data: encounteredPlayers,
@@ -297,8 +313,34 @@ export default function RatePage() {
         contentInsetAdjustmentBehavior="automatic"
         contentContainerClassName="flex w-full flex-col gap-6 px-4 py-6"
         keyboardShouldPersistTaps="handled">
-        {arePlayersPending ? (
+        {isHasSubmittedRatingsPending || arePlayersPending ? (
           <ActivityIndicator />
+        ) : showExplainer ? (
+          <View className="flex flex-1 flex-col items-center justify-center gap-6 py-12">
+            <Text className="text-center text-2xl font-bold">How Ratings Work</Text>
+
+            <View className="flex flex-col gap-4">
+              <Text className="text-center text-base text-muted-foreground">
+                Rate each player across four skills: Defense, Finishing, Shooting, and Playmaking.
+              </Text>
+
+              <Text className="text-center text-base text-muted-foreground">
+                Use the presets or adjust manually. Be honest about what you saw on the court.
+              </Text>
+
+              <Text className="text-center text-base text-muted-foreground">
+                Your specific scores stay anonymous. Players see their averages, not who said what.
+              </Text>
+
+              <Text className="text-center text-sm font-medium">
+                Fair ratings make everyone's OVR accurate — including yours.
+              </Text>
+            </View>
+
+            <Button className="w-full" size="lg" onPress={() => setExplainerAcknowledged(true)}>
+              <Text>Got it</Text>
+            </Button>
+          </View>
         ) : (
           encounteredPlayers &&
           currentPlayer && (

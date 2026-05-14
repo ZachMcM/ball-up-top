@@ -32,7 +32,7 @@ const queryClient = new QueryClient();
 
 export default function RootLayout() {
   const { colorScheme, setColorScheme } = useColorScheme();
-  setColorScheme('dark');
+  setColorScheme("system")
 
   useFonts({
     BebasNeue_400Regular,

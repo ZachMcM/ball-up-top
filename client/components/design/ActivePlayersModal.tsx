@@ -91,12 +91,11 @@ export function ActivePlayersModal({
         </View>
         <NativewindFlatList
           data={filteredPlayers}
-          renderItem={({ item: user, index }) => (
+          renderItem={({ item: user }) => (
             <Pressable
               onPress={() => handlePlayerPress(user.id)}
               className={cn(
                 'flex flex-row items-center justify-between border-b border-border px-4 py-3',
-                index == 0 && 'border-t',
                 user.id === currentUserData?.user.id && 'border-l-2 border-l-foreground bg-card'
               )}>
               <View className="flex flex-row items-center gap-3">

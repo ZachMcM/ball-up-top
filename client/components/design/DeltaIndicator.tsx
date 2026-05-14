@@ -6,12 +6,12 @@ import { Text } from '../ui/text';
 
 type DeltaIndicatorProps = {
   value: number | null;
-  size?: 'sm' | 'md' | 'lg' | "xl";
+  size?: 'sm' | 'lg';
 } & ViewProps;
 
 export function DeltaIndicator({
   value,
-  size = 'md',
+  size = 'sm',
   className,
   ...props
 }: DeltaIndicatorProps) {
@@ -30,18 +30,10 @@ export function DeltaIndicator({
 
   const sizeClasses = {
     sm: {
-      text: 'text-[11px]',
-      icon: 10,
-    },
-    md: {
-      text: 'text-sm',
-      icon: 12,
+      text: 'text-xl',
+      icon: 16,
     },
     lg: {
-      text: 'text-base',
-      icon: 18,
-    },
-    xl: {
       text: "text-3xl",
       icon: 20
     }

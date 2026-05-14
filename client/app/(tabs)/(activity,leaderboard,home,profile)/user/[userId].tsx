@@ -7,10 +7,11 @@ import { Text } from '@/components/ui/text';
 import { VerticalRatingBar } from '@/components/ui/vertical-rating-bar';
 import { authClient } from '@/lib/auth-client';
 import { getUser } from '@/lib/endpoints';
-import { Share } from 'lucide-react-native';
+import { ShareIcon } from 'lucide-react-native';
 import { useQuery } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, Pressable, Share, View } from 'react-native';
+import { Icon } from '@/components/ui/icon';
 
 export default function ProfilePage() {
   const searchParams = useLocalSearchParams();
@@ -21,17 +22,28 @@ export default function ProfilePage() {
     queryKey: ['user', userId],
   });
 
-  const { data: currentUserData } = authClient.useSession();
-
-  const handleShareProfile = () => {
-    // TODO: Implement react-native-skia share image generation
+  const handleShareProfile = async () => {
+    // TODO fix in dev version
+    try {
+      await Share.share({
+        title: `Ball Up Top`,
+        url: `ball-up-top-client://user/${userId}`,
+        message: `Check out ${user?.name}'s Ball Up Top profile!`,
+      });
+    } catch (error) {
+      // TODO
+    }
   };
 
   return (
     <>
       <Stack.Screen
         options={{
-          headerTitle: user?.name ?? 'Profile',
+          headerRight: () => (
+            <Pressable onPress={handleShareProfile}>
+              <Icon size={24} as={ShareIcon} />
+            </Pressable>
+          ),
         }}
       />
       {isPending ? (
@@ -42,58 +54,38 @@ export default function ProfilePage() {
         user && (
           <NativewindScrollView
             contentInsetAdjustmentBehavior="automatic"
-            contentContainerClassName="flex w-full flex-col px-4 py-6 gap-6">
-            {/* Identity Block */}
-            <View className="flex flex-row items-center gap-3">
-              <Avatar
-                className="size-14"
-                alt={`${user.name}'s profile`}
-                source={{ uri: user.image ?? undefined }}
-              />
-              <View className='flex flex-col'>
-                <Text className="text-lg font-extrabold tracking-tight">
-                  {user.name}
-                </Text>
-                <Text className="text-sm font-semibold text-muted-foreground">
-                  {user.primaryCollegeName}
-                </Text>
-              </View>
-            </View>
-
-            {/* Hero Block: OVR + Meta */}
-            <View className="flex flex-row items-start gap-6">
-              <OVRDisplay value={user.overall} size="xl" />
-              <View className="flex flex-col gap-2 justify-center">
-                <ArchetypeDisplay
-                  archetype={user.archetype}
-                  variant="hero"
-                  size="md"
+            contentContainerClassName="flex w-full flex-col px-4 py-6 gap-2">
+            <View className="flex flex-col gap-8">
+              <View className="flex flex-row items-center gap-3">
+                <Avatar
+                  className="size-14"
+                  alt={`${user.name}'s profile`}
+                  source={{ uri: user.image ?? undefined }}
                 />
-                {user.rank && (
-                  <View className="mt-1 flex flex-row items-baseline gap-1.5">
-                    <Text className="font-bebas text-3xl tracking-tight">
-                      #{user.rank}
-                    </Text>
-                    <Text className="text-sm font-semibold text-muted-foreground">
-                      at {user.primaryCollegeName}
-                    </Text>
-                  </View>
-                )}
+                <View className="flex flex-col">
+                  <Text className="text-lg font-extrabold tracking-tight">{user.name}</Text>
+                  <Text className="text-sm font-semibold text-muted-foreground">
+                    {user.primaryCollegeName}
+                  </Text>
+                </View>
+              </View>
+              <View className="flex flex-row items-start gap-6">
+                <OVRDisplay value={user.overall} size="xl" />
+                <View className="flex flex-col justify-center gap-2">
+                  <ArchetypeDisplay archetype={user.archetype} variant="hero" size="md" />
+                  {user.rank && (
+                    <View className="mt-1 flex flex-row items-baseline gap-1.5">
+                      <Text className="font-bebas text-3xl tracking-tight">#{user.rank}</Text>
+                      <Text className="text-sm font-semibold text-muted-foreground">
+                        at {user.primaryCollegeName}
+                      </Text>
+                    </View>
+                  )}
+                </View>
               </View>
             </View>
-
-            {/* Share CTA */}
-            <Button onPress={handleShareProfile} className="h-12 -mt-8 rounded-xl">
-              <Share size={16} className="text-primary-foreground" />
-              <Text className="text-[15px] font-bold text-primary-foreground">
-                Share Your Profile
-              </Text>
-            </Button>
-
             <View className="flex flex-col gap-4">
-              <Text className="text-sm font-semibold text-muted-foreground">
-                Ratings Breakdown
-              </Text>
+              <Text className="text-sm font-semibold text-muted-foreground">Ratings Breakdown</Text>
               <View className="flex flex-row items-end justify-between gap-2.5">
                 <VerticalRatingBar label="Finishing" value={user.finishingRating} />
                 <VerticalRatingBar label="Playmaking" value={user.playmakingRating} />

@@ -1,11 +1,5 @@
 import { Activity } from '@/types/activity';
-import {
-  CollegeOption,
-  CourtResponse,
-  CourtSession,
-  Leaderboard,
-  UserEntry
-} from '@/types/court';
+import { CollegeOption, CourtResponse, CourtSession, Leaderboard, UserEntry } from '@/types/court';
 import { EncounteredPlayer } from '@/types/encounteredPlayer';
 import { HomeResponse } from '@/types/home';
 import { User } from '@/types/user';
@@ -260,6 +254,13 @@ export async function deleteCourtNotification(courtId: number): Promise<void> {
   await serverRequest({
     endpoint: `/courts/${courtId}/notifications`,
     method: 'DELETE',
+  });
+}
+
+export async function getUserHasSubmittedRatings(): Promise<{ hasSubmittedRatings: boolean }> {
+  return await serverRequest({
+    endpoint: `/users/has-submitted-ratings`,
+    method: 'GET',
   });
 }
 

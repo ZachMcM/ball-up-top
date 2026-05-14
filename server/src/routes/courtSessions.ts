@@ -23,6 +23,7 @@ import { handleError } from "../utils/handleError";
 import { authMiddleware } from "../utils/middleware";
 
 import * as z from "zod";
+import { redis } from "../utils/redis";
 import {
   MAX_OVR,
   MAX_SHIFT,
@@ -578,6 +579,8 @@ courtSessionsRoute.post(
       );
 
       res.json({ success: true });
+
+      await redis.set(`has_submitted_ratings:${res.locals.userId}`, "true");
 
       // Invalidate queries for rated users
       for (const rateeId of rateeIds) {

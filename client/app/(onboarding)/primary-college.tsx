@@ -78,6 +78,7 @@ export default function PrimaryCollegePage() {
             return (
               <View className="flex w-full flex-col gap-4">
                 <Input
+                  className='rounded-full'
                   placeholder="Search for your college..."
                   value={searchInput}
                   onChangeText={setSearchInput}

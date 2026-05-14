@@ -69,8 +69,8 @@ export default function HomePage() {
               contentContainerClassName="flex w-full flex-col gap-8 py-6"
               keyboardShouldPersistTaps="handled">
               <View className="flex flex-col px-4">
-                <View className="flex flex-row items-end gap-4 justify-between">
-                  <View className="flex flex-col flex-1">
+                <View className="flex flex-row items-end justify-between gap-4">
+                  <View className="flex flex-1 flex-col">
                     <View className="flex flex-row items-end gap-2">
                       <View className="flex flex-col gap-4">
                         <Text className="text-xs font-semibold tracking-wider text-muted-foreground">
@@ -80,7 +80,7 @@ export default function HomePage() {
                       </View>
                       {home.userData.overallDelta !== null && home.userData.overallDelta !== 0 && (
                         <View className="mb-10 flex flex-row items-center">
-                          <DeltaIndicator size="xl" value={home.userData.overallDelta} />
+                          <DeltaIndicator size="lg" value={home.userData.overallDelta} />
                         </View>
                       )}
                     </View>
@@ -202,7 +202,7 @@ export default function HomePage() {
                     )}
                   </View>
                 ) : (
-                  <View className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-8 mx-4">
+                  <View className="mx-4 flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-8">
                     <Text className="text-sm text-muted-foreground">No one's playing</Text>
                     <Text className="mt-1 text-xs text-muted-foreground">
                       Be the first one out there
@@ -213,12 +213,8 @@ export default function HomePage() {
                 {/* Check In/Out Button */}
                 <View className="mx-4 flex flex-col gap-3">
                   {isCheckedIn ? (
-                    <Button
-                      disabled={isCheckOutPending}
-                      onPress={checkOut}
-                      size="lg"
-                      className="h-12 rounded-2xl">
-                      <Text className="font-bold">Check Out</Text>
+                    <Button disabled={isCheckOutPending} onPress={checkOut} size="lg">
+                      <Text>Check Out Of Court</Text>
                       {isCheckOutPending && (
                         <ActivityIndicator size="small" className="ml-2 text-muted-foreground" />
                       )}
@@ -228,9 +224,8 @@ export default function HomePage() {
                       <Button
                         disabled={isCheckInPending || !!activeCourtSession || !!unratedCourtSession}
                         onPress={() => checkIn(home.primaryCourt.id)}
-                        size="lg"
-                        className="h-12 rounded-2xl">
-                        <Text className="font-bold text-primary-foreground">Check In to Play</Text>
+                        size="lg">
+                        <Text>Check In To Court</Text>
                         {isCheckInPending && (
                           <ActivityIndicator size="small" className="ml-2 text-muted-foreground" />
                         )}

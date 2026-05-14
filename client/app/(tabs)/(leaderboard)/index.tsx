@@ -114,7 +114,7 @@ export default function LeaderboardPage() {
                             </Text>
                           </View>
                           <View className="mt-2 flex flex-row items-baseline gap-1.5">
-                            <DeltaIndicator value={mover.rankImprovement} size="lg" />
+                            <DeltaIndicator value={mover.rankImprovement} size="sm" />
                             <Text className="text-xs text-muted-foreground">spots</Text>
                           </View>
                           <Text className="mt-1 text-xs text-muted-foreground/70">
@@ -136,7 +136,7 @@ export default function LeaderboardPage() {
               </View>
               <NativewindFlatList
                 data={filteredPlayers}
-                renderItem={({ item: user, index }) => (
+                renderItem={({ item: user }) => (
                   <Pressable
                     key={user.id}
                     onPress={() =>
@@ -147,18 +147,21 @@ export default function LeaderboardPage() {
                     }
                     className={cn(
                       'flex flex-row items-center justify-between border-b border-border px-4 py-3',
-                      index == 0 && 'border-t',
                       user.id === currentUserData?.user.id &&
                         'border-l-2 border-l-foreground bg-card'
                     )}>
                     <View className="flex flex-row items-center gap-1">
-                      <Text
-                        className={cn(
-                          'w-8 font-bebas text-3xl leading-[33px] tabular-nums',
-                          user.rank && user.rank <= 3 ? 'text-foreground' : 'text-muted-foreground'
-                        )}>
-                        #{user.rank}
-                      </Text>
+                      {user.rank && (
+                        <Text
+                          className={cn(
+                            'font-bebas w-8 text-3xl tabular-nums leading-[33px]',
+                            user.rank && user.rank <= 3
+                              ? 'text-foreground'
+                              : 'text-muted-foreground'
+                          )}>
+                          #{user.rank}
+                        </Text>
+                      )}
                       <View className="flex flex-row items-center gap-3">
                         <Avatar
                           className="size-10"
@@ -195,13 +198,11 @@ export default function LeaderboardPage() {
           {/* Sticky pinned current user row (Leaderboard tab only) */}
           {currentUserEntry && (
             <View className="absolute bottom-2 left-3 right-3 flex flex-row items-center gap-3 rounded-2xl bg-foreground px-4 py-3">
-              <Text className="font-bebas text-3xl leading-[33px] font-extrabold text-background">
+              <Text className="font-bebas text-3xl font-extrabold leading-[33px] text-background">
                 #{currentUserEntry.rank ?? '—'}
               </Text>
               <View className="flex-1">
-                <Text className="font-bold text-primary-foreground">
-                  Your Ranking
-                </Text>
+                <Text className="font-bold text-primary-foreground">Your Ranking</Text>
                 <Text className="text-xs text-background/70">
                   {getPositionContext(leaderboard?.users ?? [], currentUserEntry)}
                 </Text>

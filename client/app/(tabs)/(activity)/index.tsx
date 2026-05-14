@@ -260,7 +260,7 @@ function ActivityOVRCard({ from, to, when }: { from: number; to: number; when: s
             <Text className="font-bebas text-5xl leading-[52px] tracking-tighter">
               {to}
             </Text>
-            <DeltaIndicator value={delta} size="xl" />
+            <DeltaIndicator value={delta} size="sm" />
           </View>
           <View className="flex flex-row items-center gap-2">
             <Text className="font-bebas text-2xl leading-[26px] line-through">
@@ -318,7 +318,7 @@ function ActivityRankCard({
             <Text className="font-bebas text-5xl leading-[52px] tracking-tighter">
               #{to}
             </Text>
-            {to && from && <DeltaIndicator value={delta} size="xl" />}
+            {to && from && <DeltaIndicator value={delta} size="sm" />}
           </View>
           {to && from && (
             <View className="flex flex-row items-center gap-2">
