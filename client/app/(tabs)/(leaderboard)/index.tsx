@@ -114,7 +114,7 @@ export default function LeaderboardPage() {
                             </Text>
                           </View>
                           <View className="mt-2 flex flex-row items-baseline gap-1.5">
-                            <DeltaIndicator value={mover.rankImprovement} type="rank" size="lg" />
+                            <DeltaIndicator value={mover.rankImprovement} size="lg" />
                             <Text className="text-xs text-muted-foreground">spots</Text>
                           </View>
                           <Text className="mt-1 text-xs text-muted-foreground/70">
@@ -204,8 +204,8 @@ export default function LeaderboardPage() {
                 #{currentUserEntry.rank ?? '—'}
               </Text>
               <View className="flex-1">
-                <Text className="font-extrabold text-background">
-                  You · {currentUserEntry.archetype}
+                <Text className="font-bold text-primary-foreground">
+                  Your Ranking
                 </Text>
                 <Text className="text-xs text-background/70">
                   {getPositionContext(leaderboard?.users ?? [], currentUserEntry)}

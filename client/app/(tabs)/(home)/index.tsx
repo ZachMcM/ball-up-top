@@ -16,7 +16,14 @@ import { cn, openDirections } from '@/lib/utils';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { ChevronRight, LogInIcon, LogOutIcon, Navigation } from 'lucide-react-native';
+import {
+  ChevronRight,
+  LogInIcon,
+  LogOutIcon,
+  MoveDownIcon,
+  MoveUpIcon,
+  Navigation,
+} from 'lucide-react-native';
 import React, { useCallback, useRef } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 
@@ -79,8 +86,8 @@ export default function HomePage() {
                         <OVRDisplay value={home.userData.overall} size="xl" />
                       </View>
                       {home.userData.overallDelta !== null && home.userData.overallDelta !== 0 && (
-                        <View className="pb-10">
-                          <DeltaIndicator value={home.userData.overallDelta} type="ovr" size="lg" />
+                        <View className="flex flex-row items-center mb-10">
+                          <DeltaIndicator size='xl' value={home.userData.overallDelta} />
                         </View>
                       )}
                     </View>
@@ -102,7 +109,7 @@ export default function HomePage() {
                       <Text className="text-[13px] text-muted-foreground">
                         At {home.primaryCourt.collegeName}
                       </Text>
-                      <DeltaIndicator value={home.userData.rankDelta} type="rank" size="sm" />
+                      <DeltaIndicator value={home.userData.rankDelta} size="sm" />
                     </View>
                   </View>
                 </View>
@@ -234,9 +241,7 @@ export default function HomePage() {
                         onPress={() => checkIn(home.primaryCourt.id)}
                         size="lg"
                         className="h-14 rounded-2xl">
-                        <Text className="font-bold text-primary-foreground">
-                          Check In to Play
-                        </Text>
+                        <Text className="font-bold text-primary-foreground">Check In to Play</Text>
                         {isCheckInPending ? (
                           <ActivityIndicator size="small" className="ml-2 text-muted-foreground" />
                         ) : (

@@ -6,13 +6,11 @@ import { Text } from '../ui/text';
 
 type DeltaIndicatorProps = {
   value: number | null;
-  type?: 'rank' | 'ovr';
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | "xl";
 } & ViewProps;
 
 export function DeltaIndicator({
   value,
-  type = 'rank',
   size = 'md',
   className,
   ...props
@@ -26,10 +24,9 @@ export function DeltaIndicator({
   }
 
   const isPositive = value > 0;
-  const arrow = isPositive ? '↑' : '↓';
   const absValue = Math.abs(value);
 
-  const colorClass = isPositive ? 'text-green-400' : 'text-red-400';
+  const colorClass = isPositive ? 'text-emerald-500' : 'text-destructive';
 
   const sizeClasses = {
     sm: {
@@ -44,6 +41,10 @@ export function DeltaIndicator({
       text: 'text-sm',
       icon: 14,
     },
+    xl: {
+      text: "text-xl",
+      icon: 22
+    }
   };
 
   return (
