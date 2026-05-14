@@ -73,8 +73,8 @@ export default function HomePage() {
                   <View className="flex flex-1 flex-col">
                     <View className="flex flex-row items-end gap-2">
                       <View className="flex flex-col gap-4">
-                        <Text className="text-xs font-semibold tracking-wider text-muted-foreground">
-                          YOUR OVERALL
+                        <Text className="text-xs font-semibold text-muted-foreground">
+                          Your Overall
                         </Text>
                         <OVRDisplay value={home.userData.overall} size="xl" />
                       </View>

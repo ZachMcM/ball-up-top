@@ -71,7 +71,7 @@ export default function ProfilePage() {
               </View>
               <View className="flex flex-row items-start gap-6">
                 <OVRDisplay value={user.overall} size="xl" />
-                <View className="flex flex-col justify-center gap-2">
+                <View className="flex flex-col justify-center gap-2 flex-1">
                   <ArchetypeDisplay archetype={user.archetype} variant="hero" size="md" />
                   {user.rank && (
                     <View className="mt-1 flex flex-row items-baseline gap-1.5">

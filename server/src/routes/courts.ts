@@ -77,9 +77,10 @@ courtsRoute.get("/courts/:id/leaderboard", authMiddleware, async (req, res) => {
         .orderBy(asc(leaderboard.rank)),
       db
         .selectDistinctOn([rankChange.userId], {
+          overall: user.overall,
           oldRank: rankChange.oldRank,
           rank: rankChange.newRank,
-          userId: rankChange.userId,
+          id: rankChange.userId,
           name: user.name,
           image: user.image,
           archetype: user.archetype,
