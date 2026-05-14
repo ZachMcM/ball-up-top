@@ -7,10 +7,10 @@ import {
   activity,
   court,
   leaderboard,
+  rankChange,
   rating,
-  user
+  user,
 } from "../db/schema";
-import { redis } from "../utils/redis";
 import { handleError } from "../utils/handleError";
 import {
   invalidateQueries,
@@ -18,6 +18,7 @@ import {
 } from "../utils/invalidateQueries";
 import { authMiddleware, upload } from "../utils/middleware";
 import { r2 } from "../utils/r2";
+import { redis } from "../utils/redis";
 
 export const usersRoute = Router();
 
@@ -215,6 +216,16 @@ usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
         shootingRating: user.shootingRating,
         rank: leaderboard.rank,
         primaryCollegeName: court.collegeName,
+        rankDelta: sql<
+          number | null
+        >`(                                                                                         
+                SELECT ${rankChange.newRank} - COALESCE(${rankChange.oldRank}, ${rankChange.newRank})
+                FROM ${rankChange}
+                WHERE ${rankChange.userId} = ${user.id}
+                  AND ${rankChange.courtId} = ${user.primaryCourtId}                                                                  
+                ORDER BY ${rankChange.createdAt} DESC
+                LIMIT 1                                                                                                               
+              )`,
       })
       .from(user)
       .innerJoin(court, eq(user.primaryCourtId, court.id))

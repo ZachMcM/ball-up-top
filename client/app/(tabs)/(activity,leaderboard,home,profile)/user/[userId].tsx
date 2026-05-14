@@ -1,17 +1,16 @@
 import { NativewindScrollView } from '@/components/NativewindScrollView';
+import { DeltaIndicator } from '@/components/design';
 import { ArchetypeDisplay } from '@/components/design/ArchetypeDisplay';
 import { OVRDisplay } from '@/components/design/OVRDisplay';
 import { Avatar } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { VerticalRatingBar } from '@/components/ui/vertical-rating-bar';
-import { authClient } from '@/lib/auth-client';
 import { getUser } from '@/lib/endpoints';
-import { ShareIcon } from 'lucide-react-native';
 import { useQuery } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams } from 'expo-router';
+import { ShareIcon } from 'lucide-react-native';
 import { ActivityIndicator, Pressable, Share, View } from 'react-native';
-import { Icon } from '@/components/ui/icon';
 
 export default function ProfilePage() {
   const searchParams = useLocalSearchParams();
@@ -63,22 +62,27 @@ export default function ProfilePage() {
                   source={{ uri: user.image ?? undefined }}
                 />
                 <View className="flex flex-col">
-                  <Text className="text-lg font-extrabold tracking-tight">{user.name}</Text>
+                  <Text className="text-lg font-bold tracking-tight">{user.name}</Text>
                   <Text className="text-sm font-semibold text-muted-foreground">
                     {user.primaryCollegeName}
                   </Text>
                 </View>
               </View>
-              <View className="flex flex-row items-start gap-6">
-                <OVRDisplay value={user.overall} size="xl" />
-                <View className="flex flex-col justify-center gap-2 flex-1">
+              <View className="flex flex-row items-start justify-between gap-6">
+                <OVRDisplay value={user.overall} size="lg" />
+                <View className="flex flex-1 flex-col justify-center gap-2">
                   <ArchetypeDisplay archetype={user.archetype} variant="hero" size="md" />
                   {user.rank && (
-                    <View className="mt-1 flex flex-row items-baseline gap-1.5">
-                      <Text className="font-bebas text-3xl tracking-tight">#{user.rank}</Text>
-                      <Text className="text-sm font-semibold text-muted-foreground">
-                        at {user.primaryCollegeName}
+                    <View className="flex flex-row items-center gap-2">
+                      <Text className="font-bebas text-4xl tabular-nums leading-[54px]">
+                        #{user.rank ?? '—'}
                       </Text>
+                      <View className="flex flex-row items-center gap-1">
+                        <Text className="text-[13px] text-muted-foreground font-semibold">
+                          At {user.primaryCollegeName}
+                        </Text>
+                        <DeltaIndicator value={user.rankDelta} size="sm" />
+                      </View>
                     </View>
                   )}
                 </View>

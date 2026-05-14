@@ -64,7 +64,7 @@ export default function LeaderboardPage() {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       className="flex-1">
-      <View className="flex flex-1 flex-col gap-6 py-6">
+      <View className="flex flex-1 flex-col gap-6 pt-6 pb-24">
         {isPending ? (
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="small" />
@@ -75,45 +75,10 @@ export default function LeaderboardPage() {
           </View>
         ) : (
           <>
-            <View className='px-4'>
-              <Text className='text-muted-foreground text-xs font-medium'>College Rankings</Text>
-              <Text className='text-3xl font-bold'>{leaderboard.court.collegeName}</Text>
+            <View className="px-4">
+              <Text className="text-xs font-medium text-muted-foreground">College Rankings</Text>
+              <Text className="text-3xl font-bold">{leaderboard.court.collegeName}</Text>
             </View>
-            {/* {leaderboard.topMovers && leaderboard.topMovers.length > 0 && (
-              <View className="flex flex-col gap-2 px-4">
-                <Text className="text-sm font-semibold text-muted-foreground">Top Movers</Text>
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{ gap: 10 }}>
-                  {leaderboard.topMovers.map((mover) => (
-                    <Pressable
-                      key={mover.id}
-                      className="rounded-2xl border border-border bg-card p-3 flex flex-col gap-2 w-40"
-                      onPress={() =>
-                        router.push({
-                          pathname: `/(tabs)/(${tabContext})/user/[userId]` as const,
-                          params: { userId: mover.id },
-                        })
-                      }>
-                      <View className="flex flex-row items-center gap-2">
-                        <Avatar
-                          className="size-7"
-                          alt={mover.name}
-                          source={{ uri: mover.image ?? undefined }}
-                        />
-                        <Text className="font-semibold">{mover.name.split(' ')[0]} {mover.name.split(' ')[2][0]}.</Text>
-                      </View>
-                      <View className='flex flex-row items-center gap-2'>
-                        <DeltaIndicator value={mover.rankImprovement} size='sm' />
-                        <Text className='text-muted-foreground text-sm font-medium'>Spots</Text>
-                      </View>
-                      <Text className='text-muted-foreground font-medium text-sm'>Now #{mover.rank} · {mover.overall} OVR</Text>
-                    </Pressable>
-                  ))}
-                </ScrollView>
-              </View>
-            )} */}
             <View className="px-4">
               <Input
                 className="h-9 rounded-full"
@@ -123,6 +88,47 @@ export default function LeaderboardPage() {
               />
             </View>
             <NativewindFlatList
+              ListHeaderComponent={
+                leaderboard.topMovers && leaderboard.topMovers.length > 0 ? (
+                  <View className="flex flex-col gap-2 px-4 mb-6">
+                    <Text className="text-sm font-semibold text-muted-foreground">Top Movers</Text>
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={{ gap: 10 }}>
+                      {leaderboard.topMovers.map((mover) => (
+                        <Pressable
+                          key={mover.id}
+                          className="flex w-40 flex-col gap-2 rounded-2xl border border-border bg-card p-3"
+                          onPress={() =>
+                            router.push({
+                              pathname: `/(tabs)/(${tabContext})/user/[userId]` as const,
+                              params: { userId: mover.id },
+                            })
+                          }>
+                          <View className="flex flex-row items-center gap-2">
+                            <Avatar
+                              className="size-7"
+                              alt={mover.name}
+                              source={{ uri: mover.image ?? undefined }}
+                            />
+                            <Text className="font-semibold">
+                              {mover.name.split(' ')[0]} {mover.name.split(' ')[1][0]}.
+                            </Text>
+                          </View>
+                          <View className="flex flex-row items-center gap-2">
+                            <DeltaIndicator value={mover.rankImprovement} size="sm" />
+                            <Text className="text-sm font-medium text-muted-foreground">Spots</Text>
+                          </View>
+                          <Text className="text-sm font-medium text-muted-foreground">
+                            Now #{mover.rank} · {mover.overall} OVR
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </ScrollView>
+                  </View>
+                ) : null
+              }
               data={filteredPlayers}
               renderItem={({ item: user, index }) => (
                 <Pressable
@@ -135,7 +141,7 @@ export default function LeaderboardPage() {
                   }
                   className={cn(
                     'flex flex-row items-center justify-between border-b border-border px-4 py-3',
-                    index == 0 && "border-t",
+                    index == 0 && 'border-t',
                     user.id === currentUserData?.user.id && 'border-l-2 border-l-foreground bg-card'
                   )}>
                   <View className="flex flex-row items-center gap-1">

@@ -25,13 +25,6 @@ homeRoute.get("/home", authMiddleware, async (_, res) => {
           archetype: user.archetype,
           overall: user.overall,
           rank: leaderboard.rank,
-          overallDelta: sql<number | null>`(
-        SELECT ${rating.rateeNewOverall} - COALESCE(${rating.rateeOldOverall}, ${rating.rateeNewOverall})
-        FROM ${rating}                                                                                                        
-        WHERE ${rating.rateeId} = ${user.id}
-        ORDER BY ${rating.createdAt} DESC                                                                                     
-        LIMIT 1                                                                                                               
-      )`,
           rankDelta: sql<
             number | null
           >`(                                                                                         

@@ -71,18 +71,11 @@ export default function HomePage() {
               <View className="flex flex-col px-4">
                 <View className="flex flex-row items-end justify-between gap-4">
                   <View className="flex flex-1 flex-col">
-                    <View className="flex flex-row items-end gap-2">
-                      <View className="flex flex-col gap-4">
-                        <Text className="text-xs font-semibold text-muted-foreground">
-                          Your Overall
-                        </Text>
-                        <OVRDisplay value={home.userData.overall} size="xl" />
-                      </View>
-                      {home.userData.overallDelta !== null && home.userData.overallDelta !== 0 && (
-                        <View className="mb-10 flex flex-row items-center">
-                          <DeltaIndicator size="lg" value={home.userData.overallDelta} />
-                        </View>
-                      )}
+                    <View className="flex flex-col gap-4">
+                      <Text className="text-xs font-semibold text-muted-foreground">
+                        Your Overall
+                      </Text>
+                      <OVRDisplay value={home.userData.overall} size="xl" />
                     </View>
                     <ArchetypeDisplay
                       archetype={home.userData.archetype}
@@ -97,7 +90,7 @@ export default function HomePage() {
                       </Text>
                     </View>
                     <View className="flex flex-row items-center gap-1.5">
-                      <Text className="text-[13px] text-muted-foreground">
+                      <Text className="text-[13px] text-muted-foreground font-semibold">
                         At {home.primaryCourt.collegeName}
                       </Text>
                       <DeltaIndicator value={home.userData.rankDelta} size="sm" />

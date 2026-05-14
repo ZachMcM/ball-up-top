@@ -13,7 +13,6 @@ import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { authClient } from '@/lib/auth-client';
 import { getActivity, patchActivityRead } from '@/lib/endpoints';
-import { cn } from '@/lib/utils';
 import { Activity } from '@/types/activity';
 import { useFocusEffect } from '@react-navigation/native';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -22,9 +21,7 @@ import { useRouter } from 'expo-router';
 import {
   BanIcon,
   ChevronRight,
-  MoveDownIcon,
-  MoveRightIcon,
-  MoveUpIcon,
+  MoveRightIcon
 } from 'lucide-react-native';
 import { useCallback, useMemo } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';

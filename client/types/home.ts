@@ -4,7 +4,6 @@ export type HomeResponse = {
     archetype: string;
     overall: number;
     rank: number | null;
-    overallDelta: number | null;
     rankDelta: number | null;
   };
   activePlayers: {
