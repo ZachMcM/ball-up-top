@@ -306,7 +306,6 @@ export const activity = pgTable("activity", {
 
   ratingId: integer("rating_id").references(() => rating.id),
   rankChangeId: integer("rank_change_id"),
-  courtSessionId: integer("court_session_id").references(() => courtSession.id),
   courtId: integer("court_id").references(() => court.id),
 
   read: boolean("read").notNull().default(false),

@@ -1,10 +1,8 @@
-
 export type Activity = {
   id: number;
   createdAt: Date;
   userId: string;
   courtId: number | null;
-  courtSessionId: number | null;
   type: 'overall_change' | 'rank_change' | 'archetype_change';
   ratingId: number | null;
   read: boolean;
@@ -13,16 +11,12 @@ export type Activity = {
     name: string;
     collegeName: string;
     collegeColor: string;
-  };
-  rating:
-    | ({ rateeOldOverall: number; rateeNewOverall: number } & {
-        rater: {
-          name: string;
-          image: string;
-          overall: number;
-          archetype: string;
-        };
-      })
-    | null;
+  } | null;
+  rating: {
+    rateeOldOverall: number;
+    rateeNewOverall: number;
+    rateeOldArchetype: string;
+    rateeNewArchetype: string;
+  } | null;
   rankChange: { oldRank: number; newRank: number } | null;
 };

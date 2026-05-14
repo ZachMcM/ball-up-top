@@ -105,10 +105,6 @@ export const activityRelations = relations(activity, ({ one }) => ({
     fields: [activity.rankChangeId],
     references: [rankChange.id],
   }),
-  courtSession: one(courtSession, {
-    fields: [activity.courtSessionId],
-    references: [courtSession.id],
-  }),
   court: one(court, {
     fields: [activity.courtId],
     references: [court.id],

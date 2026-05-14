@@ -138,16 +138,8 @@ usersRoute.get("/users/activity", authMiddleware, async (_, res) => {
           columns: {
             rateeOldOverall: true,
             rateeNewOverall: true,
-          },
-          with: {
-            rater: {
-              columns: {
-                name: true,
-                image: true,
-                overall: true,
-                archetype: true,
-              },
-            },
+            rateeOldArchetype: true,
+            rateeNewArchetype: true,
           },
         },
         rankChange: {

@@ -93,13 +93,13 @@ export default function HomePage() {
                   <View className="flex flex-col items-end gap-1">
                     <View className="flex flex-row items-baseline gap-1">
                       <Text
-                        style={{ fontFamily: 'BebasNeue_400Regular' }}
+                        style={{ fontFamily: 'BebasNeue_400Regular', lineHeight: 54 }}
                         className="text-5xl tabular-nums">
                         #{home.userData.rank ?? '—'}
                       </Text>
                     </View>
                     <View className="flex flex-row items-center gap-1.5">
-                      <Text className="text-xs text-muted-foreground">
+                      <Text className="text-[13px] text-muted-foreground">
                         At {home.primaryCourt.collegeName}
                       </Text>
                       <DeltaIndicator value={home.userData.rankDelta} type="rank" size="sm" />
@@ -220,11 +220,11 @@ export default function HomePage() {
                       onPress={checkOut}
                       size="lg"
                       className="mx-4 h-14 rounded-2xl">
-                      <Text className="text-base font-bold">Check Out</Text>
+                      <Text className="font-bold">Check Out</Text>
                       {isCheckOutPending ? (
                         <ActivityIndicator size="small" className="ml-2 text-muted-foreground" />
                       ) : (
-                        <Icon as={LogInIcon} className="text-primary-foreground" size={22} />
+                        <Icon as={LogInIcon} className="text-primary-foreground" size={18} />
                       )}
                     </Button>
                   ) : (
@@ -234,13 +234,13 @@ export default function HomePage() {
                         onPress={() => checkIn(home.primaryCourt.id)}
                         size="lg"
                         className="h-14 rounded-2xl">
-                        <Text className="text-base font-bold text-primary-foreground">
+                        <Text className="font-bold text-primary-foreground">
                           Check In to Play
                         </Text>
                         {isCheckInPending ? (
                           <ActivityIndicator size="small" className="ml-2 text-muted-foreground" />
                         ) : (
-                          <Icon as={LogOutIcon} className="text-primary-foreground" size={22} />
+                          <Icon as={LogOutIcon} className="text-primary-foreground" size={18} />
                         )}
                       </Button>
                       {unratedCourtSession && (

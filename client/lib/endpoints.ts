@@ -234,15 +234,6 @@ export async function getLeaderboard(id: number): Promise<Leaderboard> {
   return leaderboard;
 }
 
-export async function getCourtPlayers(id: number): Promise<UserEntry[]> {
-  const courtPlayers = await serverRequest({
-    endpoint: `/courts/${id}/players`,
-    method: 'GET',
-  });
-
-  return courtPlayers;
-}
-
 export async function patchExpoPushToken(expoPushToken: string): Promise<void> {
   await serverRequest({
     endpoint: '/users/expoPushToken',

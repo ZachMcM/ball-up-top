@@ -190,7 +190,7 @@ export function SessionFooter() {
   }
 
   return (
-    <View className="border-t border-border bg-card px-4 py-3">
+    <View className="border-t border-border bg-card/70 px-4 py-3">
       <View className="flex flex-row items-center justify-between">
         <View className="flex flex-row items-center gap-3">
           <View
