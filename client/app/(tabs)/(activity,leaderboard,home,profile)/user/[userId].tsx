@@ -22,7 +22,6 @@ export default function ProfilePage() {
   });
 
   const { data: currentUserData } = authClient.useSession();
-  const isOwnProfile = currentUserData?.user.id === userId;
 
   const handleShareProfile = () => {
     // TODO: Implement react-native-skia share image generation
@@ -47,16 +46,16 @@ export default function ProfilePage() {
             {/* Identity Block */}
             <View className="flex flex-row items-center gap-3">
               <Avatar
-                className="size-12"
+                className="size-14"
                 alt={`${user.name}'s profile`}
                 source={{ uri: user.image ?? undefined }}
               />
-              <View>
-                <Text className="text-[17px] font-extrabold tracking-tight">
+              <View className='flex flex-col'>
+                <Text className="text-lg font-extrabold tracking-tight">
                   {user.name}
                 </Text>
-                <Text className="mt-0.5 text-xs font-semibold text-muted-foreground underline decoration-border underline-offset-2">
-                  At {user.primaryCollegeName}
+                <Text className="text-sm font-semibold text-muted-foreground">
+                  {user.primaryCollegeName}
                 </Text>
               </View>
             </View>
@@ -91,9 +90,9 @@ export default function ProfilePage() {
               </Text>
             </Button>
 
-            <View className="flex flex-col gap-3">
+            <View className="flex flex-col gap-4">
               <Text className="text-sm font-semibold text-muted-foreground">
-                Ratings
+                Ratings Breakdown
               </Text>
               <View className="flex flex-row items-end justify-between gap-2.5">
                 <VerticalRatingBar label="Finishing" value={user.finishingRating} />
