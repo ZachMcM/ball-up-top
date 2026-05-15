@@ -1,4 +1,4 @@
-import { DeltaIndicator } from '@/components/design';
+import { NativewindScrollView } from '@/components/NativewindScrollView';
 import { NativewindSectionList } from '@/components/NativewindSectionList';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,6 +13,7 @@ import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { authClient } from '@/lib/auth-client';
 import { getActivity, patchActivityRead } from '@/lib/endpoints';
+import { cn } from '@/lib/utils';
 import { Activity } from '@/types/activity';
 import { useFocusEffect } from '@react-navigation/native';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -20,20 +21,33 @@ import { format, formatDistanceToNow, isAfter, isToday, isYesterday, subDays } f
 import { useRouter } from 'expo-router';
 import {
   BanIcon,
-  ChevronRight,
-  MoveRightIcon
+  Binary,
+  ChartLine,
+  ChartPie,
+  ChevronRightIcon,
+  MoveRightIcon,
 } from 'lucide-react-native';
-import { useCallback, useMemo } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
+import { type ReactNode, useCallback, useMemo, useState } from 'react';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 
 type ActivitySection = {
   title: 'Today' | 'Yesterday' | 'Last 7 Days' | 'Last 30 Days';
   data: Activity[];
 };
 
+type FilterType = 'all' | 'overall_change' | 'rank_change' | 'archetype_change';
+
+const FILTERS: { key: FilterType; label: string }[] = [
+  { key: 'all', label: 'All' },
+  { key: 'overall_change', label: 'Ratings' },
+  { key: 'rank_change', label: 'Rank' },
+  { key: 'archetype_change', label: 'Archetype' },
+];
+
 export default function ActivityPage() {
   const queryClient = useQueryClient();
   const router = useRouter();
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
 
   const { data: activityList, isPending: activityPending } = useQuery({
     queryKey: ['activity'],
@@ -66,8 +80,14 @@ export default function ActivityPage() {
     }, [activityList, markAsRead])
   );
 
-  const activitySections = useMemo(() => {
+  const filteredActivity = useMemo(() => {
     if (!activityList) return [];
+    if (activeFilter === 'all') return activityList;
+    return activityList.filter((a) => a.type === activeFilter);
+  }, [activityList, activeFilter]);
+
+  const activitySections = useMemo(() => {
+    if (!filteredActivity.length) return [];
 
     const today: Activity[] = [];
     const yesterday: Activity[] = [];
@@ -78,7 +98,7 @@ export default function ActivityPage() {
     const sevenDaysAgo = subDays(now, 7);
     const thirtyDaysAgo = subDays(now, 30);
 
-    activityList.forEach((activity) => {
+    filteredActivity.forEach((activity) => {
       const activityDate = new Date(activity.createdAt);
 
       if (isToday(activityDate)) {
@@ -99,13 +119,34 @@ export default function ActivityPage() {
     if (last30Days.length > 0) sections.push({ title: 'Last 30 Days', data: last30Days });
 
     return sections;
-  }, [activityList]);
+  }, [filteredActivity]);
+
+  const hasActivityButFilteredEmpty =
+    activityList && activityList.length > 0 && filteredActivity.length === 0;
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      className="flex-1">
-      <View className="flex w-full flex-1 flex-col">
+    <View className="flex flex-1 flex-col gap-6 px-4 pt-6">
+      <View className="flex flex-row items-center gap-2">
+        {FILTERS.map((filter) => (
+          <Pressable
+            key={filter.key}
+            onPress={() => setActiveFilter(filter.key)}
+            className={cn(
+              'rounded-full px-4 py-1.5',
+              activeFilter === filter.key ? 'bg-foreground' : 'border border-border bg-background'
+            )}>
+            <Text
+              className={cn(
+                'text-sm font-medium',
+                activeFilter === filter.key ? 'text-background' : 'text-muted-foreground'
+              )}>
+              {filter.label}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
+      <View className="flex-1">
         {activityPending ? (
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator />
@@ -129,216 +170,162 @@ export default function ActivityPage() {
               </EmptyContent>
             </Empty>
           </View>
+        ) : hasActivityButFilteredEmpty ? (
+          <Text className="text-center text-muted-foreground">
+            No {FILTERS.find((f) => f.key === activeFilter)?.label.toLowerCase()} activity yet
+          </Text>
         ) : (
           <NativewindSectionList
-            contentContainerClassName="pb-8 px-4"
             sections={activitySections}
+            contentContainerClassName="gap-5"
             showsVerticalScrollIndicator={false}
             stickySectionHeadersEnabled={false}
             renderSectionHeader={({ section }) => (
-              <Text className="py-3 text-lg font-bold">{section.title}</Text>
+              <Text className="text-sm font-semibold text-muted-foreground">{section.title}</Text>
             )}
-            renderItem={({ item }) => <ActivityCard activity={item} />}
+            renderItem={({ item }) => <ActivityRow activity={item} />}
             keyExtractor={(item) => item.id.toString()}
-            ItemSeparatorComponent={() => <View className="h-3" />}
           />
         )}
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
 function getRelativeTime(date: Date): string {
   if (isToday(date)) {
-    return formatDistanceToNow(date, { addSuffix: false }) + ' ago';
+    const distance = formatDistanceToNow(date, { addSuffix: false });
+    if (distance.includes('less than')) return 'now';
+    return distance
+      .replace(' minutes', 'm')
+      .replace(' minute', 'm')
+      .replace(' hours', 'h')
+      .replace(' hour', 'h');
   }
   return format(date, 'h:mm a');
 }
 
-function ActivityCard({ activity }: { activity: Activity }) {
-  if (activity.type === 'archetype_change' && activity.rating) {
-    return (
-      <ActivityArchetypeCard
-        to={activity.rating.rateeNewArchetype}
-        from={activity.rating.rateeOldArchetype}
-        when={getRelativeTime(new Date(activity.createdAt))}
-      />
-    );
-  }
-
-  if (activity.type === 'overall_change' && activity.rating) {
-    return (
-      <ActivityOVRCard
-        from={activity.rating.rateeOldOverall}
-        to={activity.rating.rateeNewOverall}
-        when={getRelativeTime(new Date(activity.createdAt))}
-      />
-    );
-  }
-
-  if (activity.type === 'rank_change' && activity.rankChange) {
-    return (
-      <ActivityRankCard
-        from={activity.rankChange.oldRank}
-        to={activity.rankChange.newRank}
-        when={getRelativeTime(new Date(activity.createdAt))}
-      />
-    );
-  }
-
-  return null;
-}
-
-function ActivityArchetypeCard({ to, from, when }: { to: string; from: string; when: string }) {
-  const displayTo = to.toUpperCase();
-  const displayFrom = from.toUpperCase();
-
-  return (
-    <View className="relative overflow-hidden rounded-2xl bg-foreground p-5">
-      <View className="absolute -right-10 -top-10 h-40 w-40 rounded-full border-[40px] border-background/5" />
-      <View className="flex flex-col gap-2">
-        <Text className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-background/55">
-          Archetype Changed · {when}
-        </Text>
-        <Text className="font-bebas text-4xl leading-[44px] tracking-tight text-primary-foreground">
-          {to}
-        </Text>
-
-        <View className="flex-row items-center gap-1.5 flex-wrap">
-          <View className="rounded-full border border-background/25 px-3 py-1">
-            <Text className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-background/55">
-              {displayFrom}
-            </Text>
-          </View>
-          <Icon as={MoveRightIcon} size={16} className='text-muted-foreground'/>
-          <View className="rounded-full bg-background px-3 py-1">
-            <Text className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-foreground">
-              {displayTo}
-            </Text>
-          </View>
-        </View>
-
-        {/* <View className="mt-4 flex-row gap-2">
-        <Pressable className="rounded-full bg-background px-4 py-2">
-          <View className="flex-row items-center gap-2">
-            <Icon size={14} as={ShareIcon} className="text-foreground" />
-            <Text className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-foreground">
-              Share
-            </Text>
-          </View>
-        </Pressable>
-        <Pressable className="rounded-full border border-background/25 px-4 py-2">
-          <Text className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-background/70">
-            View Profile
-          </Text>
-        </Pressable>
-      </View> */}
-      </View>
-    </View>
-  );
-}
-
-function ActivityOVRCard({ from, to, when }: { from: number; to: number; when: string }) {
-  const delta = to - from;
-  const isPositive = delta > 0;
-
+function ActivityRow({ activity }: { activity: Activity }) {
   const router = useRouter();
   const { data: currentUserdata } = authClient.useSession();
 
+  const handlePress = () => {
+    if (activity.type === 'overall_change' || activity.type === 'archetype_change') {
+      router.push({
+        pathname: '/(tabs)/(activity)/user/[userId]',
+        params: { userId: currentUserdata?.user.id! },
+      });
+    } else if (activity.type === 'rank_change') {
+      router.push('/(tabs)/(leaderboard)');
+    }
+  };
+
+  const { icon, descriptionComponent } = getActivityDisplay(activity);
+
   return (
-    <View className="flex flex-col gap-2.5 overflow-hidden rounded-2xl border border-border bg-card p-5">
-      <View className="absolute -bottom-10 -right-10 h-40 w-40 rounded-full border-[40px] border-muted/50" />
-      <Text className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-muted-foreground">
-        Overall {isPositive ? 'Up' : 'Down'} · {when}
-      </Text>
-      <View className="flex flex-col gap-1.5">
-        <View className="flex flex-row items-center justify-between">
-          <View className="flex flex-row items-center gap-2">
-            <Text className="font-bebas text-5xl leading-[52px] tracking-tighter">
-              {to}
-            </Text>
-            <DeltaIndicator value={delta} size="sm" />
-          </View>
-          <View className="flex flex-row items-center gap-2">
-            <Text className="font-bebas text-2xl leading-[26px] line-through">
-              {from}
-            </Text>
-            <Icon as={MoveRightIcon} />
-            <Text className="font-bebas text-3xl leading-[33px]">
-              {to}
-            </Text>
-          </View>
-        </View>
-        <View className="-mt-2 flex flex-row items-center justify-between">
-          <Text className="text-xs font-semibold text-muted-foreground">New OVR</Text>
-          <Pressable
-            onPress={() =>
-              router.push({
-                pathname: '/(tabs)/(profile)/user/[userId]',
-                params: { userId: currentUserdata?.user.id! },
-              })
-            }
-            className="flex flex-row items-center gap-0.5 self-end">
-            <Text className="text-xs font-medium text-muted-foreground">View Profile</Text>
-            <Icon as={ChevronRight} className="text-muted-foreground" size={16} />
-          </Pressable>
+    <Pressable
+      onPress={handlePress}
+      className={cn(
+        'w-full flex-row items-center gap-3 active:bg-muted/50',
+        !activity.read && 'bg-accent/30'
+      )}>
+      {!activity.read && <View className="absolute left-1.5 h-1.5 w-1.5 rounded-full bg-primary" />}
+
+      <View className="h-10 w-10 items-center justify-center rounded-2xl border border-border bg-card/70">
+        <Icon as={icon} size={20} />
+      </View>
+
+      <View className="w-full flex-1 flex-row items-center justify-between">
+        <View className="flex-1">{descriptionComponent}</View>
+        <View className="flex-row items-center gap-1 pl-2">
+          <Text className="text-xs font-medium text-muted-foreground">
+            {getRelativeTime(new Date(activity.createdAt))}
+          </Text>
+          <Icon as={ChevronRightIcon} size={16} className="text-muted-foreground" />
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 }
 
-function ActivityRankCard({
-  from,
-  to,
-  when,
-}: {
-  from: number;
-  to: number;
-  when: string;
-  scope?: string;
-}) {
-  const delta = from - to;
-  const isPositive = delta > 0;
-
-  const router = useRouter();
-
-  return (
-    <View className="flex flex-col gap-4 overflow-hidden rounded-2xl border border-border bg-card p-5">
-      <View className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full border-[40px] border-muted/50" />
-      <Text className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-muted-foreground">
-        Rank {isPositive ? 'Up' : 'Down'} · {when}
-      </Text>
-      <View className="flex flex-col gap-1.5">
-        <View className="flex flex-row items-center justify-between">
-          <View className="flex flex-row items-center gap-2">
-            <Text className="font-bebas text-5xl leading-[52px] tracking-tighter">
-              #{to}
+function getActivityDisplay(activity: Activity): {
+  icon: typeof Binary;
+  descriptionComponent: ReactNode;
+} {
+  if (activity.type === 'overall_change' && activity.rating) {
+    const delta = activity.rating.rateeNewOverall - activity.rating.rateeOldOverall;
+    const isPositive = delta > 0;
+    const colorClass = isPositive ? 'text-emerald-500' : 'text-destructive';
+    return {
+      icon: Binary,
+      descriptionComponent: (
+        <Text className="leading-[22px]">
+          <Text className="text-sm text-muted-foreground">Your </Text>
+          <Text className="text-sm font-semibold text-muted-foreground">OVR</Text>
+          <Text className="text-sm text-muted-foreground">
+            {' '}
+            went {isPositive ? 'up' : 'down'} to{' '}
+          </Text>
+          <Text className="font-bebas text-xl tabular-nums text-foreground">
+            {activity.rating.rateeNewOverall}
+            <Text className={cn(colorClass)}>
+              {'   '}({isPositive ? '+' : ''}
+              {delta})
             </Text>
-            {to && from && <DeltaIndicator value={delta} size="sm" />}
-          </View>
-          {to && from && (
-            <View className="flex flex-row items-center gap-2">
-              <Text className="font-bebas text-2xl leading-[26px] line-through">
-                #{from}
-              </Text>
-              <Icon as={MoveRightIcon} />
-              <Text className="font-bebas text-3xl leading-[33px]">
-                #{to}
-              </Text>
-            </View>
-          )}
-        </View>
-        <View className="-mt-2 flex flex-row items-center justify-between">
-          <Text className="text-xs font-semibold text-muted-foreground">New Rank</Text>
-          <Pressable
-            onPress={() => router.push('/(tabs)/(leaderboard)')}
-            className="flex flex-row items-center gap-0.5 self-end">
-            <Text className="text-xs font-medium text-muted-foreground">View Leaderboard</Text>
-            <Icon as={ChevronRight} className="text-muted-foreground" size={16} />
-          </Pressable>
-        </View>
-      </View>
-    </View>
-  );
+          </Text>
+        </Text>
+      ),
+    };
+  }
+
+  if (activity.type === 'rank_change' && activity.rankChange) {
+    const delta = activity.rankChange.oldRank - activity.rankChange.newRank;
+    const isPositive = delta > 0;
+    const colorClass = isPositive ? 'text-emerald-500' : 'text-destructive';
+    return {
+      icon: ChartLine,
+      descriptionComponent: (
+        <Text className="leading-[22px]">
+          <Text className="text-sm text-muted-foreground">Your </Text>
+          <Text className="text-sm font-semibold text-muted-foreground">Rank</Text>
+          <Text className="text-sm text-muted-foreground">
+            {' '}
+            went {isPositive ? 'up' : 'down'} to{' '}
+          </Text>
+          <Text className="font-bebas text-xl tabular-nums text-foreground">
+            #{activity.rankChange.newRank}
+            <Text className={cn(colorClass)}>
+              {'   '}({isPositive ? '+' : ''}
+              {delta})
+            </Text>
+          </Text>
+        </Text>
+      ),
+    };
+  }
+
+  if (activity.type === 'archetype_change' && activity.rating) {
+    return {
+      icon: ChartPie,
+      descriptionComponent: (
+        <Text className="leading-[22px]">
+          <Text className="text-sm text-muted-foreground">Your </Text>
+          <Text className="text-sm font-semibold text-muted-foreground">Archetype </Text>
+          <Text className="text-sm text-muted-foreground">changed from </Text>
+          <Text className="font-bebas text-xl text-muted-foreground">
+            {activity.rating.rateeOldArchetype}{' '}
+          </Text>
+          <Text className="text-sm text-muted-foreground">to </Text>
+          <Text className="font-bebas text-xl text-foreground">
+            {activity.rating.rateeNewArchetype}
+          </Text>
+        </Text>
+      ),
+    };
+  }
+
+  return {
+    icon: Binary,
+    descriptionComponent: <Text className="text-sm text-muted-foreground">Activity</Text>,
+  };
 }

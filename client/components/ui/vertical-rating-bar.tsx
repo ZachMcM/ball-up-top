@@ -2,7 +2,7 @@ import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
 import { View } from 'react-native';
 
-const TOTAL_SEGMENTS = 25;
+const TOTAL_SEGMENTS = 22;
 
 interface VerticalRatingBarProps {
   value: number;

@@ -90,7 +90,7 @@ export default function LeaderboardPage() {
             <NativewindFlatList
               ListHeaderComponent={
                 leaderboard.topMovers && leaderboard.topMovers.length > 0 ? (
-                  <View className="flex flex-col gap-2 px-4 mb-6">
+                  <View className="flex flex-col gap-4 px-4 mb-6">
                     <Text className="text-sm font-semibold text-muted-foreground">Top Movers</Text>
                     <ScrollView
                       horizontal
