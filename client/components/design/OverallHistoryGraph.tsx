@@ -33,6 +33,7 @@ export function OverallHistoryGraph({ points }: { points: OverallHistoryPoint[] 
   return (
     <LineChart
       curved
+      scrollToEnd
       isAnimated
       areaChart
       hideYAxisText
