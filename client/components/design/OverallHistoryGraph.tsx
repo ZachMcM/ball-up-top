@@ -28,14 +28,21 @@ export function OverallHistoryGraph({ points }: { points: OverallHistoryPoint[] 
     return <Text className="text-center text-xs font-medium">No ratings data yet.</Text>;
   }
 
+  const areaStartOpacity = colorScheme === 'dark' ? 0.2 : 0.15;
+
   return (
     <LineChart
+      curved
       isAnimated
       areaChart
       hideYAxisText
-      height={64}
+      height={72}
       thickness={1.5}
       color={THEME[colorScheme!].primary}
+      startFillColor={THEME[colorScheme!].primary}
+      endFillColor={THEME[colorScheme!].primary}
+      startOpacity={areaStartOpacity}
+      endOpacity={0}
       dataPointsColor={THEME[colorScheme!].primary}
       dataPointsRadius={3}
       hideRules

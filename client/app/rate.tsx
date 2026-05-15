@@ -25,7 +25,6 @@ import {
   postSessionRatings,
 } from '@/lib/endpoints';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'expo-router';
 import {
   ArrowLeft,
   ArrowRight,
@@ -181,7 +180,6 @@ export default function RatePage() {
   const [debouncedRatings] = useDebounce(localRatings, 500);
   const hasSubmittedRef = useRef(false);
 
-  const router = useRouter();
   const queryClient = useQueryClient();
 
   const { data: hasSubmittedRatingsData, isPending: isHasSubmittedRatingsPending } = useQuery({
@@ -254,7 +252,6 @@ export default function RatePage() {
       if (isLastStep) {
         queryClient.setQueryData(['courtSession', 'unrated'], null);
         toast.success('Ratings submitted successfully!', { position: 'bottom-center' });
-        router.dismiss();
       } else {
         refetch();
         setStep((prev) => prev + 1);
@@ -277,7 +274,6 @@ export default function RatePage() {
     onSuccess: () => {
       queryClient.setQueryData(['courtSession', 'unrated'], null);
       toast.success('Ratings submitted successfully!', { position: 'bottom-center' });
-      router.dismiss();
     },
     onError: (error) => {
       toast.error(error.message, { position: 'bottom-center' });
@@ -351,9 +347,7 @@ export default function RatePage() {
                   <Text className="text-lg font-semibold">
                     Player {step + 1} of {totalSteps}
                   </Text>
-                  <Badge variant="secondary">
-                    <Text className="text-sm">{(((step + 1) / totalSteps) * 100).toFixed(0)}%</Text>
-                  </Badge>
+                  <Text className="text-sm font-medium">{(((step + 1) / totalSteps) * 100).toFixed(0)}%</Text>
                 </View>
                 <Progress className="h-1" value={((step + 1) / totalSteps) * 100} />
               </View>
@@ -363,8 +357,8 @@ export default function RatePage() {
                   className="size-16"
                   alt={`${currentPlayer.rateeName}'s image`}
                 />
-                <View className="flex flex-1 flex-col">
-                  <Text className="text-lg font-bold">{currentPlayer.rateeName}</Text>
+                <View className="flex flex-1 flex-col gap-1.5">
+                  <Text className="text-xl font-bold">{currentPlayer.rateeName}</Text>
                   <ArchetypeDisplay
                     tone="muted"
                     size="md"

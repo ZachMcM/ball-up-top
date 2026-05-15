@@ -51,8 +51,6 @@ export default function HomePage() {
   const tabContext = useTabContext();
   const router = useRouter();
 
-  const isCheckedIn = activeCourtSession && activeCourtSession.courtId === home?.primaryCourt?.id;
-
   return (
     <>
       <KeyboardAvoidingView
@@ -205,7 +203,7 @@ export default function HomePage() {
 
                 {/* Check In/Out Button */}
                 <View className="mx-4 flex flex-col gap-3">
-                  {isCheckedIn ? (
+                  {activeCourtSession ? (
                     <Button disabled={isCheckOutPending} onPress={checkOut} size="lg">
                       <Text>Check Out Of Court</Text>
                       {isCheckOutPending && (

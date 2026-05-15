@@ -1,5 +1,5 @@
 import BackButton from '@/components/BackButton';
-import { CourtSessionProvider } from '@/components/providers/CourtSessionProvider';
+import { CourtSessionProvider, useCourtSession } from '@/components/providers/CourtSessionProvider';
 import { InvalidationProvider } from '@/components/providers/InvalidationProvider';
 import { LocationProvider, useLocation } from '@/components/providers/LocationProvider';
 import { PushNotificationProvider } from '@/components/providers/PushNotificationProvider';
@@ -86,18 +86,35 @@ export default function RootLayout() {
 export function RootNavigator() {
   const { data: currentUserData, isPending: isSessionPending } = authClient.useSession();
   const { locationPermissionStatus } = useLocation();
+  const { unratedCourtSession, areUnratedCourtSessionPending } = useCourtSession();
   const isOnboardingComplete = currentUserData?.user.onboardingStep === 'complete';
 
-  // Show loading screen while checking session OR (when user exists, completed onboarding, AND location permission hasn't been checked yet)
   const isLoading =
     isSessionPending ||
-    (currentUserData !== null && isOnboardingComplete && locationPermissionStatus === null);
+    (currentUserData !== null && isOnboardingComplete && locationPermissionStatus === null) ||
+    (currentUserData !== null && isOnboardingComplete && locationPermissionStatus === 'granted' && areUnratedCourtSessionPending);
 
   const onboardingStep = currentUserData?.user.onboardingStep!;
   const showOnboarding = !isLoading && currentUserData !== null && !isOnboardingComplete;
 
   return (
     <Stack>
+      <Stack.Protected
+        guard={
+          !isLoading &&
+          currentUserData !== null &&
+          isOnboardingComplete &&
+          locationPermissionStatus === 'granted' &&
+          !!unratedCourtSession
+        }>
+        <Stack.Screen
+          name="rate"
+          options={{
+            title: 'Rate Players',
+            headerBackVisible: false,
+          }}
+        />
+      </Stack.Protected>
       <Stack.Protected
         guard={
           !isLoading &&
@@ -175,13 +192,6 @@ export function RootNavigator() {
           name="loading"
         />
       </Stack.Protected>
-      <Stack.Screen
-        options={{
-          presentation: 'modal',
-          title: 'Rate Players',
-        }}
-        name="rate"
-      />
       <Stack.Screen
         options={{
           presentation: 'modal',

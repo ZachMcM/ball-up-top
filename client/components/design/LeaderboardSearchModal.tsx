@@ -56,10 +56,8 @@ export function LeaderboardSearchModal({ bottomSheetRef, users }: LeaderboardSea
       backdropComponent={renderBackdrop}
       backgroundStyle={{
         backgroundColor: THEME[colorScheme!].background,
-        borderWidth: 1,
-        borderTopColor: THEME[colorScheme!].border,
       }}
-      handleIndicatorStyle={{ backgroundColor: THEME[colorScheme!].accent }}
+      handleIndicatorStyle={{ backgroundColor: THEME[colorScheme!].muted }}
       onDismiss={() => setSearchQuery('')}>
       <BottomSheetView className="flex flex-1 flex-col gap-6">
         <View className="flex flex-col gap-0.5 px-4">
