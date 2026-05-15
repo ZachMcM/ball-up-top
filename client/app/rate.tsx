@@ -1,3 +1,4 @@
+import { ArchetypeDisplay } from '@/components/design/ArchetypeDisplay';
 import { NativewindScrollView } from '@/components/NativewindScrollView';
 import { useCourtSession } from '@/components/providers/CourtSessionProvider';
 import {
@@ -364,12 +365,17 @@ export default function RatePage() {
                 />
                 <View className="flex flex-1 flex-col">
                   <Text className="text-lg font-bold">{currentPlayer.rateeName}</Text>
-                  <Text className="text-sm text-muted-foreground">
-                    {currentPlayer.rateeArchetype}
-                  </Text>
+                  <ArchetypeDisplay
+                    tone="muted"
+                    size="md"
+                    variant="inline"
+                    archetype={currentPlayer.rateeArchetype}
+                  />
                 </View>
                 <View className="flex flex-col items-center">
-                  <Text className="font-bebas text-3xl leading-none">{currentPlayer.rateeOverallAtTime}</Text>
+                  <Text className="font-bebas text-3xl leading-none">
+                    {currentPlayer.rateeOverallAtTime}
+                  </Text>
                   <Text className="font-medium text-muted-foreground">Overall</Text>
                 </View>
               </View>

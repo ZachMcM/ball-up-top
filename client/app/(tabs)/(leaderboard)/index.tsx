@@ -1,21 +1,22 @@
 import { ArchetypeDisplay } from '@/components/design/ArchetypeDisplay';
 import { DeltaIndicator } from '@/components/design/DeltaIndicator';
+import { LeaderboardSearchModal } from '@/components/design/LeaderboardSearchModal';
 import { OVRDisplay } from '@/components/design/OVRDisplay';
 import { NativewindFlatList } from '@/components/NativewindFlatList';
 import { Avatar } from '@/components/ui/avatar';
-import { Input } from '@/components/ui/input';
+import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { useTabContext } from '@/hooks/useTabContext';
 import { authClient } from '@/lib/auth-client';
 import { getLeaderboard } from '@/lib/endpoints';
 import { cn } from '@/lib/utils';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { SearchIcon } from 'lucide-react-native';
+import { useMemo, useRef } from 'react';
 import {
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
   Pressable,
   ScrollView,
   View,
@@ -38,11 +39,11 @@ export default function LeaderboardPage() {
     return leaderboard?.users.find((u) => u.id === currentUserId);
   }, [leaderboard, currentUserId]);
 
-  const [searchQuery, setSearchQuery] = useState('');
+  const rankedUsers = useMemo(() => {
+    return leaderboard?.users.filter((u) => u.rank !== null) ?? [];
+  }, [leaderboard?.users]);
 
-  const filteredPlayers = useMemo(() => {
-    return leaderboard?.users.filter((u) => u.name.includes(searchQuery));
-  }, [leaderboard?.users, searchQuery]);
+  const searchSheetRef = useRef<BottomSheetModal | null>(null);
 
   const router = useRouter();
   const tabContext = useTabContext();
@@ -61,10 +62,7 @@ export default function LeaderboardPage() {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      className="flex-1">
-      <View className="flex flex-1 flex-col gap-6 pt-6 pb-24">
+    <View className="flex flex-1 flex-col gap-4 pt-6 pb-24">
         {isPending ? (
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="small" />
@@ -75,17 +73,17 @@ export default function LeaderboardPage() {
           </View>
         ) : (
           <>
-            <View className="px-4">
-              <Text className="text-xs font-medium text-muted-foreground">College Rankings</Text>
-              <Text className="text-3xl font-bold">{leaderboard.court.collegeName}</Text>
-            </View>
-            <View className="px-4">
-              <Input
-                className="h-9 rounded-full"
-                placeholder="Search players..."
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-              />
+            <View className="flex flex-row items-start justify-between px-4">
+              <View>
+                <Text className="text-xs font-medium text-muted-foreground">College Rankings</Text>
+                <Text className="text-3xl font-bold">{leaderboard.court.collegeName}</Text>
+              </View>
+              <Pressable
+                onPress={() => searchSheetRef.current?.present()}
+                hitSlop={8}
+                className="mt-1">
+                <Icon as={SearchIcon} size={20} className="text-muted-foreground" />
+              </Pressable>
             </View>
             <NativewindFlatList
               ListHeaderComponent={
@@ -129,7 +127,7 @@ export default function LeaderboardPage() {
                   </View>
                 ) : null
               }
-              data={filteredPlayers}
+              data={rankedUsers}
               renderItem={({ item: user, index }) => (
                 <Pressable
                   key={user.id}
@@ -142,7 +140,7 @@ export default function LeaderboardPage() {
                   className={cn(
                     'flex flex-row items-center justify-between border-b border-border px-4 py-3',
                     index == 0 && 'border-t',
-                    user.id === currentUserData?.user.id && 'border-l-2 border-l-foreground bg-card'
+                    user.id === currentUserData?.user.id && 'bg-muted-foreground/10 dark:bg-card'
                   )}>
                   <View className="flex flex-row items-center gap-1">
                     {user.rank && (
@@ -187,7 +185,6 @@ export default function LeaderboardPage() {
             />
           </>
         )}
-        {/* Sticky pinned current user row (Leaderboard tab only) */}
         {currentUserEntry && (
           <View className="absolute bottom-2 left-3 right-3 flex flex-row items-center gap-3 rounded-2xl bg-foreground px-4 py-3">
             <Text className="font-bebas text-3xl font-extrabold leading-[33px] text-background">
@@ -209,7 +206,12 @@ export default function LeaderboardPage() {
             </View>
           </View>
         )}
-      </View>
-    </KeyboardAvoidingView>
+      {leaderboard && (
+        <LeaderboardSearchModal
+          bottomSheetRef={searchSheetRef}
+          users={leaderboard.users}
+        />
+      )}
+    </View>
   );
 }

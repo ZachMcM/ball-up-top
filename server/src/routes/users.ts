@@ -216,16 +216,23 @@ usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
         shootingRating: user.shootingRating,
         rank: leaderboard.rank,
         primaryCollegeName: court.collegeName,
-        rankDelta: sql<
-          number | null
-        >`(                                                                                         
-                SELECT ${rankChange.newRank} - COALESCE(${rankChange.oldRank}, ${rankChange.newRank})
+        rankDelta: sql<number | null>`(SELECT ${rankChange.newRank} - COALESCE(${rankChange.oldRank}, ${rankChange.newRank})
                 FROM ${rankChange}
                 WHERE ${rankChange.userId} = ${user.id}
                   AND ${rankChange.courtId} = ${user.primaryCourtId}                                                                  
                 ORDER BY ${rankChange.createdAt} DESC
-                LIMIT 1                                                                                                               
-              )`,
+                LIMIT 1 )`,
+        overallHistory: sql<{ overall: number; createdAt: Date }[]>`(
+          SELECT COALESCE(
+            json_agg(
+              json_build_object('overall', ${rating.rateeNewOverall}, 'createdAt', ${rating.createdAt})
+              ORDER BY ${rating.createdAt}
+            ),
+            '[]'::json
+          )
+          FROM ${rating}
+          WHERE ${rating.rateeId} = ${user.id}
+        )`,
       })
       .from(user)
       .innerJoin(court, eq(user.primaryCourtId, court.id))

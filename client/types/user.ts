@@ -12,4 +12,5 @@ export type User = {
   rank: number | null;
   primaryCollegeName: string;
   rankDelta: number | null,
+  overallHistory: { overall: number; createdAt: Date }[];
 };

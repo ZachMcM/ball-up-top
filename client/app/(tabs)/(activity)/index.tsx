@@ -178,9 +178,9 @@ export default function ActivityPage() {
           <NativewindSectionList
             sections={activitySections}
             showsVerticalScrollIndicator={false}
-            stickySectionHeadersEnabled={false}
+            SectionSeparatorComponent={() => <View className="h-4" />}
             renderSectionHeader={({ section }) => (
-              <Text className="px-4 pb-4 font-semibold text-muted-foreground">{section.title}</Text>
+              <Text className="px-4 font-semibold text-muted-foreground">{section.title}</Text>
             )}
             renderItem={({ item }) => <ActivityRow activity={item} />}
             keyExtractor={(item) => item.id.toString()}
@@ -196,6 +196,7 @@ function getRelativeTime(date: Date): string {
     const distance = formatDistanceToNow(date, { addSuffix: false });
     if (distance.includes('less than')) return 'now';
     return distance
+      .replace('about ', '')
       .replace(' minutes', 'm')
       .replace(' minute', 'm')
       .replace(' hours', 'h')
@@ -211,7 +212,7 @@ function ActivityRow({ activity }: { activity: Activity }) {
   const handlePress = () => {
     if (activity.type === 'overall_change' || activity.type === 'archetype_change') {
       router.push({
-        pathname: '/(tabs)/(activity)/user/[userId]',
+        pathname: '/(tabs)/(profile)/user/[userId]',
         params: { userId: currentUserdata?.user.id! },
       });
     } else if (activity.type === 'rank_change') {
@@ -233,18 +234,14 @@ function ActivityRow({ activity }: { activity: Activity }) {
           <Icon as={icon} size={20} />
         </View>
         {!activity.read && (
-          <View className="absolute top-0 -right-0 h-2 w-2 rounded-full bg-primary" />
-        )}  
+          <View className="absolute -right-0 top-0 h-2 w-2 rounded-full bg-primary" />
+        )}
       </View>
-
-      <View className="w-full flex-1 flex-row items-center justify-between">
-        <View className="flex-1">{descriptionComponent}</View>
-        <View className="flex-row items-center gap-1 pl-2">
-          <Text className="text-xs font-medium text-muted-foreground">
-            {getRelativeTime(new Date(activity.createdAt))}
-          </Text>
-          <Icon as={ChevronRightIcon} size={16} className="text-muted-foreground" />
-        </View>
+      <View className="flex flex-1 flex-row items-baseline gap-3">
+        {descriptionComponent}
+        <Text className="text-sm font-medium text-muted-foreground">
+          {getRelativeTime(new Date(activity.createdAt))}
+        </Text>
       </View>
     </Pressable>
   );
@@ -262,15 +259,15 @@ function getActivityDisplay(activity: Activity): {
       icon: Binary,
       descriptionComponent: (
         <Text className="leading-[22px]">
-          <Text className="text-sm text-muted-foreground">Your </Text>
-          <Text className="text-sm font-semibold text-muted-foreground">OVR</Text>
-          <Text className="text-sm text-muted-foreground">
+          <Text className="text-muted-foreground">Your </Text>
+          <Text className="font-semibold text-muted-foreground">OVR</Text>
+          <Text className="text-muted-foreground">
             {' '}
-            went {isPositive ? 'up' : 'down'} to{' '}
+            went {isPositive ? 'up' : 'down'} to{'  '}
           </Text>
-          <Text className="font-bebas text-xl tabular-nums text-foreground">
+          <Text className="font-bebas text-2xl tabular-nums text-foreground">
             {activity.rating.rateeNewOverall}
-            <Text className={cn(colorClass)}>
+            <Text className={cn('text-lg', colorClass)}>
               {'   '}({isPositive ? '+' : ''}
               {delta})
             </Text>
@@ -288,15 +285,15 @@ function getActivityDisplay(activity: Activity): {
       icon: ChartLine,
       descriptionComponent: (
         <Text className="leading-[22px]">
-          <Text className="text-sm text-muted-foreground">Your </Text>
-          <Text className="text-sm font-semibold text-muted-foreground">Rank</Text>
-          <Text className="text-sm text-muted-foreground">
+          <Text className="text-muted-foreground">Your </Text>
+          <Text className="font-semibold text-muted-foreground">Rank</Text>
+          <Text className="text-muted-foreground">
             {' '}
-            went {isPositive ? 'up' : 'down'} to{' '}
+            went {isPositive ? 'up' : 'down'} to{'  '}
           </Text>
-          <Text className="font-bebas text-xl tabular-nums text-foreground">
+          <Text className="font-bebas text-2xl tabular-nums text-foreground">
             #{activity.rankChange.newRank}
-            <Text className={cn(colorClass)}>
+            <Text className={cn('text-lg', colorClass)}>
               {'   '}({isPositive ? '+' : ''}
               {delta})
             </Text>
@@ -310,18 +307,15 @@ function getActivityDisplay(activity: Activity): {
     return {
       icon: ChartPie,
       descriptionComponent: (
-        <Text className="leading-[22px]">
-          <Text className="text-sm text-muted-foreground">Your </Text>
-          <Text className="text-sm font-semibold text-muted-foreground">Archetype </Text>
-          <Text className="text-sm text-muted-foreground">changed from </Text>
-          <Text className="font-bebas text-xl text-muted-foreground">
-            {activity.rating.rateeOldArchetype}{' '}
+        <View className="flex flex-row items-center gap-2">
+          <Text className="font-bebas text-xl leading-[22px] text-muted-foreground">
+            {activity.rating.rateeOldArchetype}
           </Text>
-          <Text className="text-sm text-muted-foreground">to </Text>
-          <Text className="font-bebas text-xl text-foreground">
+          <Icon as={MoveRightIcon} className="text-muted-foreground" size={20} />
+          <Text className="font-bebas text-xl leading-[22px] text-foreground">
             {activity.rating.rateeNewArchetype}
           </Text>
-        </Text>
+        </View>
       ),
     };
   }

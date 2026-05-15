@@ -2,6 +2,7 @@ import { NativewindScrollView } from '@/components/NativewindScrollView';
 import { DeltaIndicator } from '@/components/design';
 import { ArchetypeDisplay } from '@/components/design/ArchetypeDisplay';
 import { OVRDisplay } from '@/components/design/OVRDisplay';
+import { OverallHistoryGraph } from '@/components/design/OverallHistoryGraph';
 import { Avatar } from '@/components/ui/avatar';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
@@ -53,7 +54,7 @@ export default function ProfilePage() {
         user && (
           <NativewindScrollView
             contentInsetAdjustmentBehavior="automatic"
-            contentContainerClassName="flex w-full flex-col px-4 py-6 gap-2">
+            contentContainerClassName="flex w-full flex-col px-4 py-6">
             <View className="flex flex-col gap-8">
               <View className="flex flex-row items-center gap-3">
                 <Avatar
@@ -78,7 +79,7 @@ export default function ProfilePage() {
                         #{user.rank ?? '—'}
                       </Text>
                       <View className="flex flex-row items-center gap-1">
-                        <Text className="text-[13px] text-muted-foreground font-semibold">
+                        <Text className="text-[13px] font-semibold text-muted-foreground">
                           At {user.primaryCollegeName}
                         </Text>
                         <DeltaIndicator value={user.rankDelta} size="sm" />
@@ -88,13 +89,25 @@ export default function ProfilePage() {
                 </View>
               </View>
             </View>
-            <View className="flex flex-col gap-4">
-              <Text className="text-sm font-semibold text-muted-foreground">Ratings Breakdown</Text>
-              <View className="flex flex-row items-end justify-between gap-2.5">
-                <VerticalRatingBar label="Finishing" value={user.finishingRating} />
-                <VerticalRatingBar label="Playmaking" value={user.playmakingRating} />
-                <VerticalRatingBar label="Defense" value={user.defenseRating} />
-                <VerticalRatingBar label="Shooting" value={user.shootingRating} />
+            <View className="flex flex-col gap-8">
+              <View className="flex flex-col gap-4">
+                <Text className="text-sm font-semibold text-muted-foreground">
+                  Ratings Breakdown
+                </Text>
+                <View className="flex flex-row items-end justify-between gap-2.5">
+                  <VerticalRatingBar label="Finishing" value={user.finishingRating} />
+                  <VerticalRatingBar label="Playmaking" value={user.playmakingRating} />
+                  <VerticalRatingBar label="Defense" value={user.defenseRating} />
+                  <VerticalRatingBar label="Shooting" value={user.shootingRating} />
+                </View>
+              </View>
+              <View className="flex flex-col">
+                <Text className="text-sm font-semibold text-muted-foreground">
+                  Overall History
+                </Text>
+                <OverallHistoryGraph
+                  points={user.overallHistory}
+                />
               </View>
             </View>
           </NativewindScrollView>
