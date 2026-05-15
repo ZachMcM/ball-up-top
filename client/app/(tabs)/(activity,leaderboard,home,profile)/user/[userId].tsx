@@ -41,7 +41,7 @@ export default function ProfilePage() {
         options={{
           headerRight: () => (
             <Pressable onPress={handleShareProfile}>
-              <Icon size={24} as={ShareIcon} />
+              <Icon size={22} as={ShareIcon} />
             </Pressable>
           ),
         }}
@@ -54,7 +54,7 @@ export default function ProfilePage() {
         user && (
           <NativewindScrollView
             contentInsetAdjustmentBehavior="automatic"
-            contentContainerClassName="flex w-full flex-col px-4 py-6">
+            contentContainerClassName="flex w-full flex-col px-4 pt-6 pb-8">
             <View className="flex flex-col gap-8">
               <View className="flex flex-row items-center gap-3">
                 <Avatar
