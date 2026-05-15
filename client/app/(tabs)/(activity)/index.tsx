@@ -125,8 +125,8 @@ export default function ActivityPage() {
     activityList && activityList.length > 0 && filteredActivity.length === 0;
 
   return (
-    <View className="flex flex-1 flex-col gap-6 px-4 pt-6">
-      <View className="flex flex-row items-center gap-2">
+    <View className="flex flex-1 flex-col gap-6 pt-6">
+      <View className="flex flex-row items-center gap-2 px-4">
         {FILTERS.map((filter) => (
           <Pressable
             key={filter.key}
@@ -137,7 +137,7 @@ export default function ActivityPage() {
             )}>
             <Text
               className={cn(
-                'text-sm font-medium',
+                'text-xs font-medium',
                 activeFilter === filter.key ? 'text-background' : 'text-muted-foreground'
               )}>
               {filter.label}
@@ -177,11 +177,10 @@ export default function ActivityPage() {
         ) : (
           <NativewindSectionList
             sections={activitySections}
-            contentContainerClassName="gap-5"
             showsVerticalScrollIndicator={false}
             stickySectionHeadersEnabled={false}
             renderSectionHeader={({ section }) => (
-              <Text className="text-sm font-semibold text-muted-foreground">{section.title}</Text>
+              <Text className="px-4 pb-4 font-semibold text-muted-foreground">{section.title}</Text>
             )}
             renderItem={({ item }) => <ActivityRow activity={item} />}
             keyExtractor={(item) => item.id.toString()}
@@ -226,13 +225,16 @@ function ActivityRow({ activity }: { activity: Activity }) {
     <Pressable
       onPress={handlePress}
       className={cn(
-        'w-full flex-row items-center gap-3 active:bg-muted/50',
+        'w-full flex-row items-center gap-3 px-4 py-3 active:opacity-80',
         !activity.read && 'bg-accent/30'
       )}>
-      {!activity.read && <View className="absolute left-1.5 h-1.5 w-1.5 rounded-full bg-primary" />}
-
-      <View className="h-10 w-10 items-center justify-center rounded-2xl border border-border bg-card/70">
-        <Icon as={icon} size={20} />
+      <View className="relative h-10 w-10">
+        <View className="h-10 w-10 items-center justify-center rounded-2xl border border-border bg-card/70">
+          <Icon as={icon} size={20} />
+        </View>
+        {!activity.read && (
+          <View className="absolute top-0 -right-0 h-2 w-2 rounded-full bg-primary" />
+        )}  
       </View>
 
       <View className="w-full flex-1 flex-row items-center justify-between">
