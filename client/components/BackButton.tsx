@@ -1,8 +1,8 @@
-import { useRouter } from 'expo-router';
 import { useNavigationState } from '@react-navigation/native';
-import { Button } from './ui/button';
+import { useRouter } from 'expo-router';
+import { ChevronLeft } from 'lucide-react-native';
+import { Pressable } from 'react-native';
 import { Icon } from './ui/icon';
-import { ArrowLeft } from 'lucide-react-native';
 
 export default function BackButton() {
   const router = useRouter();
@@ -19,8 +19,8 @@ export default function BackButton() {
   }
 
   return (
-    <Button onPress={() => router.back()} variant="secondary" size="icon" className='size-8'>
-      <Icon size={18} as={ArrowLeft} />
-    </Button>
+    <Pressable className='active:opacity-70' onPress={() => router.back()}>
+      <Icon size={22} as={ChevronLeft} />
+    </Pressable>
   );
 }

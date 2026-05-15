@@ -153,7 +153,7 @@ function CourtRow({
       </View>
       <View className="flex flex-row items-center gap-2">
         {court.activePlayerCount > 0 && <AvatarStack players={court.activePlayers} />}
-        <Icon as={ChevronRight} size={18} className="text-muted-foreground" />
+        <Icon as={ChevronRight} size={20} className="text-muted-foreground" />
       </View>
     </Pressable>
   );

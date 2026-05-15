@@ -36,7 +36,7 @@ export function VerticalRatingBar({ value, label, className, color }: VerticalRa
           />
         ))}
       </View>
-      <Text className="text-xs font-medium text-muted-foreground">{label}</Text>
+      <Text className="text-[13px] font-medium mt-1">{label}</Text>
     </View>
   );
 }

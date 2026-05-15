@@ -71,7 +71,9 @@ export default function CourtActivePlayersPage() {
           headerTitle: data?.court.name ?? 'Court',
           headerRight: () =>
             data && (
-              <Pressable onPress={() => openDirections(data.court.address)}>
+              <Pressable
+                className="active:opacity-70"
+                onPress={() => openDirections(data.court.address)}>
                 <Icon as={MapIcon} size={22} />
               </Pressable>
             ),

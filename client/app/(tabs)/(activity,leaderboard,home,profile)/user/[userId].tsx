@@ -47,7 +47,7 @@ export default function ProfilePage() {
       <Stack.Screen
         options={{
           headerRight: () => (
-            <Pressable onPress={handleShareProfile}>
+            <Pressable className='active:opacity-70' onPress={handleShareProfile}>
               <Icon size={22} as={ShareIcon} />
             </Pressable>
           ),

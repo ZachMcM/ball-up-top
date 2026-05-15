@@ -320,17 +320,17 @@ export default function RatePage() {
           <View className="flex flex-1 flex-col items-center justify-center gap-6 py-12">
             <Text className="text-center text-2xl font-bold">How Ratings Work</Text>
 
-            <View className="flex flex-col gap-4">
+            <View className="flex flex-col gap-4 max-w-xs">
               <Text className="text-center text-base text-muted-foreground">
-                Rate each player across four skills: Defense, Finishing, Shooting, and Playmaking.
+                &bull; Rate each player across four skills: Defense, Finishing, Shooting, and Playmaking.
               </Text>
 
               <Text className="text-center text-base text-muted-foreground">
-                Use the presets or adjust manually. Be honest about what you saw on the court.
+                &bull; Use the presets or adjust manually. Be honest about what you saw on the court.
               </Text>
 
               <Text className="text-center text-base text-muted-foreground">
-                Your specific scores stay anonymous. Players see their averages, not who said what.
+                &bull; Your specific scores stay anonymous. Players see their averages, not who said what.
               </Text>
 
               <Text className="text-center text-sm font-medium">
@@ -338,7 +338,7 @@ export default function RatePage() {
               </Text>
             </View>
 
-            <Button className="w-full" size="lg" onPress={() => setExplainerAcknowledged(true)}>
+            <Button className="w-full max-w-xs" size="lg" onPress={() => setExplainerAcknowledged(true)}>
               <Text>Got it</Text>
             </Button>
           </View>
