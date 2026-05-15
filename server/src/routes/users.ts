@@ -212,7 +212,9 @@ usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
         shootingRating: user.shootingRating,
         rank: leaderboard.rank,
         primaryCollegeName: college.name,
-        rankDelta: sql<number | null>`(SELECT ${rankChange.newRank} - COALESCE(${rankChange.oldRank}, ${rankChange.newRank})
+        rankDelta: sql<
+          number | null
+        >`(SELECT ${rankChange.newRank} - COALESCE(${rankChange.oldRank}, ${rankChange.newRank})
                 FROM ${rankChange}
                 WHERE ${rankChange.userId} = ${user.id}
                   AND ${rankChange.collegeId} = ${user.primaryCollegeId}

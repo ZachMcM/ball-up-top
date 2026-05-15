@@ -41,7 +41,7 @@ export default function ProfilePage() {
       <Stack.Screen
         options={{
           headerRight: () => (
-            <Pressable className='active:opacity-70' onPress={handleShareProfile}>
+            <Pressable className="active:opacity-70" onPress={handleShareProfile}>
               <Icon size={22} as={ShareIcon} />
             </Pressable>
           ),
@@ -49,7 +49,7 @@ export default function ProfilePage() {
       />
       {isPending ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator />
+          <ActivityIndicator size="small" />
         </View>
       ) : (
         user && (
@@ -70,9 +70,9 @@ export default function ProfilePage() {
                   </Text>
                 </View>
               </View>
-              <View className="flex flex-row items-start justify-between gap-6">
+              <View className="flex flex-row flex-1 items-start gap-6">
                 <OVRDisplay value={user.overall} size="lg" />
-                <View className="flex flex-1 flex-col justify-center gap-2">
+                <View className="flex flex-1 flex-col justify-center gap-2 flex-wrap">
                   <ArchetypeDisplay archetype={user.archetype} variant="hero" size="lg" />
                   {user.rank ? (
                     <View className="flex flex-row items-center gap-2">

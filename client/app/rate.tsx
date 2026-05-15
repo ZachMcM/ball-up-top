@@ -315,7 +315,7 @@ export default function RatePage() {
         contentContainerClassName="flex w-full flex-col gap-6 px-4 py-6"
         keyboardShouldPersistTaps="handled">
         {isHasSubmittedRatingsPending || arePlayersPending ? (
-          <ActivityIndicator />
+          <ActivityIndicator size="small" />
         ) : showExplainer ? (
           <View className="flex flex-1 flex-col items-center justify-center gap-6 py-12">
             <Text className="text-center text-2xl font-bold">How Ratings Work</Text>
@@ -466,7 +466,7 @@ export default function RatePage() {
                       <Button disabled={isSubmitting} className="flex-1">
                         <Text>Submit</Text>
                         {isSubmitting ? (
-                          <ActivityIndicator size="small" />
+                          <ActivityIndicator className='text-primary-foreground' size="small" />
                         ) : (
                           <Icon className="text-primary-foreground" size={18} as={CheckIcon} />
                         )}

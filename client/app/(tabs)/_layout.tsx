@@ -61,7 +61,7 @@ export default function TabsLayout() {
           tabBarBadgeStyle: {
             backgroundColor: THEME[colorScheme!].primary,
             color: THEME[colorScheme!].primaryForeground,
-            fontWeight: 700,
+            fontWeight: "semibold",
             fontSize: 12,
           },
         }}

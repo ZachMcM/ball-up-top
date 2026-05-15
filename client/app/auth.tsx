@@ -145,7 +145,7 @@ export default function AuthPage() {
               </Button>
               <Button className="flex-1" disabled={isPending} onPress={onSubmitOtp} size="lg">
                 <Text>Continue</Text>
-                {isPending && <ActivityIndicator />}
+                {isPending && <ActivityIndicator size="small" className='text-primary-foreground' />}
               </Button>
             </View>
           </Fragment>

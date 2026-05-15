@@ -34,7 +34,7 @@ export default function LocationPermissionPage() {
       ) : (
         <Button className="w-full" onPress={requestPermission} disabled={isRequestingPermission}>
           <Text>Enable Location Access</Text>
-          {isRequestingPermission && <ActivityIndicator />}
+          {isRequestingPermission && <ActivityIndicator className='text-primary-foreground' />}
         </Button>
       )}
       <Text className="max-w-sm text-center text-xs text-muted-foreground">

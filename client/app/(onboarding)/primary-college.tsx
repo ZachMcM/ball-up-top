@@ -135,7 +135,7 @@ export default function PrimaryCollegePage() {
             className="flex-1"
             onPress={handleSubmit((values) => savePrimaryCollege(values.primaryCollegeId))}>
             <Text>Continue</Text>
-            {isSaving && <ActivityIndicator />}
+            {isSaving && <ActivityIndicator size="small" className='text-primary-foreground' />}
           </Button>
         </View>
       </View>

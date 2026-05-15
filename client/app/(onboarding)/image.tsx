@@ -79,7 +79,7 @@ export default function ImagePage() {
             disabled={isPending || !selectedAsset?.uri || !selectedAsset}
             onPress={() => saveImage()}>
             <Text>Continue</Text>
-            {isPending && <ActivityIndicator />}
+            {isPending && <ActivityIndicator size="small" className='text-primary-foreground' />}
           </Button>
         </View>
       </View>

@@ -101,7 +101,7 @@ export default function NamePage() {
         </Text>
         <Button className="w-full" size="lg" disabled={isPending} onPress={handleSubmit(onSubmit)}>
           <Text>Continue</Text>
-          {isPending && <ActivityIndicator />}
+          {isPending && <ActivityIndicator size="small" className='text-primary-foreground' />}
         </Button>
       </View>
     </KeyboardAvoidingView>

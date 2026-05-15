@@ -4,11 +4,9 @@ import { CourtSession } from '@/types/court';
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { usePathname, useRouter } from 'expo-router';
-import {
-  ArrowRight
-} from 'lucide-react-native';
+import { ArrowRight } from 'lucide-react-native';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 import { toast } from 'sonner-native';
 import { Button } from '../ui/button';
 import { Icon } from '../ui/icon';
@@ -175,13 +173,21 @@ function formatDuration(startTime: Date): string {
 }
 
 export function SessionFooter() {
-  const { activeCourtSession, checkOut, isCheckOutPending } = useCourtSession();
+  const { activeCourtSession, checkOut, isCheckOutPending, unratedCourtSession } =
+    useCourtSession();
+  const router = useRouter();
   const [duration, setDuration] = useState('0:00');
 
   const { data: court } = useQuery({
     queryFn: async () => getCourt(activeCourtSession?.courtId!),
     queryKey: ['court', activeCourtSession?.courtId],
     enabled: !!activeCourtSession?.courtId,
+  });
+
+  const { data: unratedCourt } = useQuery({
+    queryFn: async () => getCourt(unratedCourtSession?.courtId!),
+    queryKey: ['court', unratedCourtSession?.courtId],
+    enabled: !!unratedCourtSession?.courtId && !activeCourtSession,
   });
 
   useEffect(() => {
@@ -197,29 +203,17 @@ export function SessionFooter() {
     return () => clearInterval(interval);
   }, [activeCourtSession?.startTime]);
 
-  if (!activeCourtSession) {
-    return null;
-  }
-
-  return (
+  return activeCourtSession ? (
     <View className="border-t border-border bg-card/70 px-4 py-3">
       <View className="flex flex-row items-center justify-between">
         <View className="flex flex-row items-center gap-3">
-          <View
-            className="size-2.5 rounded-full bg-green-400"
-            style={{
-              shadowColor: '#4ade80',
-              shadowOffset: { width: 0, height: 0 },
-              shadowOpacity: 0.8,
-              shadowRadius: 6,
-            }}
-          />
+          <View className="size-2.5 rounded-full bg-green-400" />
           <View className="flex flex-col">
             <View className="flex flex-row items-baseline gap-2">
               <Text className="font-bebas text-xl tabular-nums leading-[22px] text-foreground">
                 {duration}
               </Text>
-              <Text className="text-xs text-muted-foreground font-medium">Elapsed</Text>
+              <Text className="text-xs font-medium text-muted-foreground">Elapsed</Text>
             </View>
             <Text className="text-xs font-medium text-muted-foreground">
               Live at {court?.name ?? 'Loading...'}
@@ -236,5 +230,26 @@ export function SessionFooter() {
         </Button>
       </View>
     </View>
+  ) : (
+    unratedCourtSession && (
+      <Pressable
+        onPress={() => router.push('/rate')}
+        className="border-t border-border bg-card/70 px-4 py-3 active:bg-accent">
+        <View className="flex flex-row items-center justify-between">
+          <View className="flex flex-col">
+            <Text className="text-[15px] font-semibold leading-tight text-foreground">
+              Unrated run
+            </Text>
+            <Text className="text-xs font-medium text-muted-foreground">
+              {unratedCourt?.name ?? 'Loading...'}
+            </Text>
+          </View>
+          <Button onPress={() => router.push('/rate')} size="sm" className="h8">
+            <Text>Rate</Text>
+            <Icon as={ArrowRight} size={16} className="text-primary-foreground" />
+          </Button>
+        </View>
+      </Pressable>
+    )
   );
 }

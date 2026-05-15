@@ -14,12 +14,7 @@ import { cn } from '@/lib/utils';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import {
-  ArrowRight,
-  ChevronDown,
-  ChevronRightIcon,
-  SearchIcon,
-} from 'lucide-react-native';
+import { ArrowRight, ChevronDown, ChevronRightIcon, SearchIcon } from 'lucide-react-native';
 import { useMemo, useRef } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 
@@ -85,6 +80,7 @@ export default function LeaderboardPage() {
             <Text className="text-2xl font-bold">{leaderboard.college.name}</Text>
           </View>
           <NativewindFlatList
+            className="mt-2"
             ListEmptyComponent={
               <Empty>
                 <EmptyNumeral>0</EmptyNumeral>
@@ -99,7 +95,7 @@ export default function LeaderboardPage() {
                   <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ gap: 10 }}>
+                    contentContainerClassName="gap-[10px]">
                     {leaderboard.topMovers.map((mover) => (
                       <Pressable
                         key={mover.id}
@@ -199,17 +195,13 @@ export default function LeaderboardPage() {
             </Text>
           )}
           <View className="flex-1">
-            <Text className="font-bold text-primary-foreground">Your Ranking</Text>
+            <Text className="font-bold text-background">Your Ranking</Text>
             <Text className="text-xs text-background/70">
               {getPositionContext(leaderboard?.users ?? [], currentUserEntry)}
             </Text>
           </View>
           <View className="flex flex-col items-center">
-            <OVRDisplay
-              value={currentUserEntry.overall}
-              size="sm"
-              className="text-primary-foreground"
-            />
+            <OVRDisplay value={currentUserEntry.overall} size="sm" className="text-background" />
             <Text className="text-[10px] font-medium tracking-tight text-background/70">OVR</Text>
           </View>
         </View>

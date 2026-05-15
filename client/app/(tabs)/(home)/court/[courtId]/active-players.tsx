@@ -113,15 +113,7 @@ export default function CourtActivePlayersPage() {
                         alt={player.name}
                         source={{ uri: player.image ?? undefined }}
                       />
-                      <View
-                        className="absolute bottom-0.5 right-0.5 size-2 rounded-full bg-green-400"
-                        style={{
-                          shadowColor: '#4ade80',
-                          shadowOffset: { width: 0, height: 0 },
-                          shadowOpacity: 0.8,
-                          shadowRadius: 4,
-                        }}
-                      />
+                      <View className="absolute bottom-0.5 right-0.5 size-2 rounded-full bg-green-400" />
                     </View>
                     <View className="flex flex-col gap-1">
                       <Text className="font-semibold">
@@ -156,7 +148,10 @@ export default function CourtActivePlayersPage() {
                 <Button disabled={isCheckOutPending} onPress={checkOut} size="lg">
                   <Text>Check Out Of Court</Text>
                   {isCheckOutPending && (
-                    <ActivityIndicator size="small" className="ml-2 text-muted-foreground" />
+                    <ActivityIndicator
+                      size="small"
+                      className="className='text-primary-foreground'"
+                    />
                   )}
                 </Button>
               ) : (
@@ -164,7 +159,10 @@ export default function CourtActivePlayersPage() {
                   <Button disabled={checkInDisabled} onPress={() => checkIn(courtId)} size="lg">
                     <Text>Check In To Court</Text>
                     {isCheckInPending && (
-                      <ActivityIndicator size="small" className="ml-2 text-muted-foreground" />
+                      <ActivityIndicator
+                        size="small"
+                        className="className='text-primary-foreground'"
+                      />
                     )}
                   </Button>
                   {unratedCourtSession ? (

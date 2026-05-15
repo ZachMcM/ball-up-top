@@ -135,7 +135,7 @@ export default function ActivityPage() {
       <View className="flex-1">
         {activityPending ? (
           <View className="flex-1 items-center justify-center">
-            <ActivityIndicator />
+            <ActivityIndicator size="small" />
           </View>
         ) : hasActivityButFilteredEmpty ? (
           <Text className="text-center text-muted-foreground">

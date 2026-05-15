@@ -134,7 +134,7 @@ export default function HeightPage() {
             className="flex-1"
             onPress={handleSubmit((values) => saveHeight(values))}>
             <Text>Continue</Text>
-            {isPending && <ActivityIndicator />}
+            {isPending && <ActivityIndicator size="small" className='text-primary-foreground' />}
           </Button>
         </View>
       </View>
