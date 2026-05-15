@@ -54,37 +54,38 @@ courtsRoute.get(
         return res.status(400).json({ error: "Court ID is not an integer." });
       }
 
-      const [targetCourt] = await db
-        .select({
-          id: court.id,
-          name: court.name,
-          address: court.address,
-          lat: court.lat,
-          lng: court.lng,
-        })
-        .from(court)
-        .where(eq(court.id, courtId));
+      const [[targetCourt], activePlayers] = await Promise.all([
+        db
+          .select({
+            id: court.id,
+            name: court.name,
+            address: court.address,
+            lat: court.lat,
+            lng: court.lng,
+          })
+          .from(court)
+          .where(eq(court.id, courtId)),
+        db
+          .select({
+            id: user.id,
+            name: user.name,
+            overall: user.overall,
+            archetype: user.archetype,
+            image: user.image,
+          })
+          .from(courtSession)
+          .innerJoin(user, eq(courtSession.userId, user.id))
+          .where(
+            and(
+              eq(courtSession.courtId, courtId),
+              isNull(courtSession.endTime),
+            ),
+          ),
+      ]);
 
       if (!targetCourt) {
         return res.status(404).json({ error: "No court was found." });
       }
-
-      const activePlayers = await db
-        .select({
-          id: user.id,
-          name: user.name,
-          overall: user.overall,
-          archetype: user.archetype,
-          image: user.image,
-        })
-        .from(courtSession)
-        .innerJoin(user, eq(courtSession.userId, user.id))
-        .where(
-          and(
-            eq(courtSession.courtId, courtId),
-            isNull(courtSession.endTime),
-          ),
-        );
 
       res.json({ court: targetCourt, activePlayers });
     } catch (error) {

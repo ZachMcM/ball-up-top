@@ -4,7 +4,13 @@ import { NativewindFlatList } from '@/components/NativewindFlatList';
 import { useCourtSession } from '@/components/providers/CourtSessionProvider';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
@@ -14,7 +20,7 @@ import { getCourtActivePlayers } from '@/lib/endpoints';
 import { cn, openDirections } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { AlertTriangleIcon, Navigation, UserX } from 'lucide-react-native';
+import { AlertTriangleIcon, MapIcon, UserX } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -60,35 +66,36 @@ export default function CourtActivePlayersPage() {
 
   return (
     <>
-      <Stack.Screen options={{ headerTitle: data?.court.name ?? 'Court' }} />
+      <Stack.Screen
+        options={{
+          headerTitle: data?.court.name ?? 'Court',
+          headerRight: () =>
+            data && (
+              <Pressable onPress={() => openDirections(data.court.address)}>
+                <Icon as={MapIcon} size={22} />
+              </Pressable>
+            ),
+        }}
+      />
       <View className="flex-1">
         {isPending ? (
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="small" className="text-muted-foreground" />
           </View>
         ) : data ? (
-          <View className="flex-1">
-            <View className="flex flex-col gap-4 px-4 pt-4">
-              <Pressable
-                onPress={() => openDirections(data.court.address)}
-                className="flex flex-row items-center gap-1.5 self-start">
-                <Icon as={Navigation} size={14} className="text-muted-foreground" />
-                <Text className="text-sm font-medium text-muted-foreground">Get Directions</Text>
-              </Pressable>
+          <View className="flex flex-1 flex-col gap-2 pt-6">
+            <View className="px-4">
               <Input
                 className="h-10 rounded-full"
-                placeholder="Search players..."
+                placeholder={`Search from ${players.length} live players...`}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
               />
-              <Text className="text-xs font-semibold text-muted-foreground">
-                {players.length} {players.length === 1 ? 'player' : 'players'} live
-              </Text>
             </View>
             <NativewindFlatList
               data={filteredPlayers}
               keyExtractor={(item) => item.id}
-              renderItem={({ item: player }) => (
+              renderItem={({ item: player, index }) => (
                 <Pressable
                   onPress={() => {
                     router.push({
@@ -98,8 +105,10 @@ export default function CourtActivePlayersPage() {
                   }}
                   className={cn(
                     'flex flex-row items-center justify-between border-b border-border px-4 py-3',
+                    index === 0 && 'border-t',
                     player.id === currentUserData?.user.id &&
-                      'bg-card'
+                      player.id === currentUserData?.user.id &&
+                      'bg-muted-foreground/10 dark:bg-card'
                   )}>
                   <View className="flex flex-row items-center gap-3">
                     <View className="relative">
@@ -137,7 +146,7 @@ export default function CourtActivePlayersPage() {
                 </Pressable>
               )}
               ListEmptyComponent={
-                <Empty className="border border-dashed border-border m-4">
+                <Empty className="m-4 border border-dashed border-border">
                   <EmptyHeader>
                     <EmptyMedia variant="icon">
                       <Icon size={22} as={UserX} className="text-primary-foreground" />

@@ -6,8 +6,8 @@ import { BottomTabBar, BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useQuery } from '@tanstack/react-query';
 import { Tabs } from 'expo-router';
 import {
-  Activity,
-  ChartBarDecreasingIcon,
+  ActivityIcon,
+  ChartLineIcon,
   Home as HomeIcon,
   User
 } from 'lucide-react-native';
@@ -48,7 +48,7 @@ export default function TabsLayout() {
         options={{
           headerShown: false,
           title: 'Leaderboard',
-          tabBarIcon: ({ color }) => <Icon as={ChartBarDecreasingIcon} size={18} color={color} />,
+          tabBarIcon: ({ color }) => <Icon as={ChartLineIcon} size={18} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -56,7 +56,7 @@ export default function TabsLayout() {
         options={{
           headerShown: false,
           title: 'Activity',
-          tabBarIcon: ({ color }) => <Icon as={Activity} size={18} color={color} />,
+          tabBarIcon: ({ color }) => <Icon as={ActivityIcon} size={18} color={color} />,
           tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
           tabBarBadgeStyle: {
             backgroundColor: THEME[colorScheme!].primary,
