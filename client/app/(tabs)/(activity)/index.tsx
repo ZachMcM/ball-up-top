@@ -1,14 +1,7 @@
 import { NativewindScrollView } from '@/components/NativewindScrollView';
 import { NativewindSectionList } from '@/components/NativewindSectionList';
 import { Button } from '@/components/ui/button';
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from '@/components/ui/empty';
+import { Empty, EmptyDescription, EmptyTitle } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { authClient } from '@/lib/auth-client';
@@ -19,14 +12,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format, formatDistanceToNow, isAfter, isToday, isYesterday, subDays } from 'date-fns';
 import { useRouter } from 'expo-router';
-import {
-  BanIcon,
-  Binary,
-  ChartLine,
-  ChartPie,
-  ChevronRightIcon,
-  MoveRightIcon,
-} from 'lucide-react-native';
+import { Binary, ChartLine, ChartPie, ChevronRightIcon, MoveRightIcon } from 'lucide-react-native';
 import { type ReactNode, useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 
@@ -158,16 +144,11 @@ export default function ActivityPage() {
         ) : (
           <NativewindSectionList
             ListEmptyComponent={
-              <Empty className="border border-dashed border-border mx-4">
-                <EmptyHeader>
-                  <EmptyMedia variant="icon">
-                    <Icon size={22} as={BanIcon} className="text-primary-foreground" />
-                  </EmptyMedia>
-                  <EmptyTitle>No Activity</EmptyTitle>
-                  <EmptyDescription>
-                    No activity yet. Get out there and hoop to start seeing some activity!
-                  </EmptyDescription>
-                </EmptyHeader>
+              <Empty>
+                <EmptyTitle>No activity yet</EmptyTitle>
+                <EmptyDescription>
+                  Rate someone after a session and it shows up here.
+                </EmptyDescription>
               </Empty>
             }
             stickySectionHeadersEnabled={false}

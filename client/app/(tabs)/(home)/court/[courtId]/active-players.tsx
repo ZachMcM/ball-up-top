@@ -4,13 +4,7 @@ import { NativewindFlatList } from '@/components/NativewindFlatList';
 import { useCourtSession } from '@/components/providers/CourtSessionProvider';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from '@/components/ui/empty';
+import { Empty, EmptyDescription, EmptyTitle } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
@@ -20,7 +14,7 @@ import { getCourtActivePlayers } from '@/lib/endpoints';
 import { cn, openDirections } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { AlertTriangleIcon, MapIcon, UserX } from 'lucide-react-native';
+import { AlertTriangleIcon, MapIcon } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -148,14 +142,9 @@ export default function CourtActivePlayersPage() {
                 </Pressable>
               )}
               ListEmptyComponent={
-                <Empty className="m-4 border border-dashed border-border">
-                  <EmptyHeader>
-                    <EmptyMedia variant="icon">
-                      <Icon size={22} as={UserX} className="text-primary-foreground" />
-                    </EmptyMedia>
-                    <EmptyTitle>No one's playing</EmptyTitle>
-                    <EmptyDescription>Be the first one out there!</EmptyDescription>
-                  </EmptyHeader>
+                <Empty>
+                  <EmptyTitle>No one's playing</EmptyTitle>
+                  <EmptyDescription>Check in below and start the run.</EmptyDescription>
                 </Empty>
               }
               contentContainerStyle={{ paddingTop: 8, paddingBottom: 16 }}

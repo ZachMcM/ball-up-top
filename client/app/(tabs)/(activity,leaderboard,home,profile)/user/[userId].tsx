@@ -4,20 +4,14 @@ import { DeltaIndicator } from '@/components/design/DeltaIndicator';
 import { OVRDisplay } from '@/components/design/OVRDisplay';
 import { OverallHistoryGraph } from '@/components/design/OverallHistoryGraph';
 import { Avatar } from '@/components/ui/avatar';
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from '@/components/ui/empty';
+import { Empty, EmptyDescription, EmptyTitle } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { VerticalRatingBar } from '@/components/ui/vertical-rating-bar';
 import { getUser } from '@/lib/endpoints';
 import { useQuery } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import { BanIcon, ShareIcon } from 'lucide-react-native';
+import { ShareIcon } from 'lucide-react-native';
 import { ActivityIndicator, Pressable, Share, View } from 'react-native';
 
 export default function ProfilePage() {
@@ -115,16 +109,11 @@ export default function ProfilePage() {
               <View className="flex flex-col">
                 <Text className="text-sm font-semibold text-muted-foreground">Overall History</Text>
                 {user.overallHistory.length === 0 ? (
-                  <Empty className="border border-dashed border-border mt-6">
-                    <EmptyHeader>
-                      <EmptyMedia variant="icon">
-                        <Icon size={22} as={BanIcon} className="text-primary-foreground" />
-                      </EmptyMedia>
-                      <EmptyTitle>No overall data</EmptyTitle>
-                      <EmptyDescription>
-                        Get out there and hoop to increase your overall!
-                      </EmptyDescription>
-                    </EmptyHeader>
+                  <Empty>
+                    <EmptyTitle>No history yet</EmptyTitle>
+                    <EmptyDescription>
+                      Ratings will plot here once a few sessions land.
+                    </EmptyDescription>
                   </Empty>
                 ) : (
                   <OverallHistoryGraph points={user.overallHistory} />

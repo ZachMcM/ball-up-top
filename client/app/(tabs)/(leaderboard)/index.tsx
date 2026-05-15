@@ -4,13 +4,7 @@ import { LeaderboardSearchModal } from '@/components/design/LeaderboardSearchMod
 import { OVRDisplay } from '@/components/design/OVRDisplay';
 import { NativewindFlatList } from '@/components/NativewindFlatList';
 import { Avatar } from '@/components/ui/avatar';
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from '@/components/ui/empty';
+import { Empty, EmptyDescription, EmptyNumeral, EmptyTitle } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { useTabContext } from '@/hooks/useTabContext';
@@ -22,10 +16,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import {
   ArrowRight,
-  BanIcon,
   ChevronDown,
   ChevronRightIcon,
-  CrownIcon,
   SearchIcon,
 } from 'lucide-react-native';
 import { useMemo, useRef } from 'react';
@@ -94,16 +86,10 @@ export default function LeaderboardPage() {
           </View>
           <NativewindFlatList
             ListEmptyComponent={
-              <Empty className="mx-4 border border-dashed border-border">
-                <EmptyHeader>
-                  <EmptyMedia variant="icon">
-                    <Icon size={22} as={CrownIcon} className="text-primary-foreground" />
-                  </EmptyMedia>
-                  <EmptyTitle>No rankings yet</EmptyTitle>
-                  <EmptyDescription>
-                    Be the first to take the #1 spot on the leaderboard!
-                  </EmptyDescription>
-                </EmptyHeader>
+              <Empty>
+                <EmptyNumeral>0</EmptyNumeral>
+                <EmptyTitle>No rankings yet</EmptyTitle>
+                <EmptyDescription>Be the first to take the #1 spot.</EmptyDescription>
               </Empty>
             }
             ListHeaderComponent={
