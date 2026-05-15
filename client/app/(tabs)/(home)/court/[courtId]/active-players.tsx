@@ -99,7 +99,7 @@ export default function CourtActivePlayersPage() {
                   className={cn(
                     'flex flex-row items-center justify-between border-b border-border px-4 py-3',
                     player.id === currentUserData?.user.id &&
-                      'border-l-2 border-l-foreground bg-card'
+                      'bg-card'
                   )}>
                   <View className="flex flex-row items-center gap-3">
                     <View className="relative">

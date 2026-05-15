@@ -17,7 +17,7 @@ export function DeltaIndicator({ value, size = 'sm', className, ...props }: Delt
   const isPositive = value > 0;
   const absValue = Math.abs(value);
 
-  const colorClass = isPositive ? 'text-emerald-500' : 'text-destructive';
+  const colorClass = isPositive ? 'text-green-400' : 'text-destructive';
 
   const sizeClasses = {
     sm: {

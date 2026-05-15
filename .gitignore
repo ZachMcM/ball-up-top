@@ -34,3 +34,6 @@ credentials.json
 
 /reports
 /documents
+
+.impeccable/
+.claude/

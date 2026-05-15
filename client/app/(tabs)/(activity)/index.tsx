@@ -244,7 +244,7 @@ function getActivityDisplay(activity: Activity): {
   if (activity.type === 'overall_change' && activity.rating) {
     const delta = activity.rating.rateeNewOverall - activity.rating.rateeOldOverall;
     const isPositive = delta > 0;
-    const colorClass = isPositive ? 'text-emerald-500' : 'text-destructive';
+    const colorClass = isPositive ? 'text-green-400' : 'text-destructive';
     return {
       icon: Binary,
       descriptionComponent: (
@@ -273,7 +273,7 @@ function getActivityDisplay(activity: Activity): {
   if (activity.type === 'rank_change' && activity.rankChange) {
     const delta = activity.rankChange.oldRank - activity.rankChange.newRank;
     const isPositive = delta > 0;
-    const colorClass = isPositive ? 'text-emerald-500' : 'text-destructive';
+    const colorClass = isPositive ? 'text-green-400' : 'text-destructive';
     return {
       icon: ChartLine,
       descriptionComponent: (

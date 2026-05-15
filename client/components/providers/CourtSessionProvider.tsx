@@ -4,10 +4,13 @@ import { CourtSession } from '@/types/court';
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { usePathname, useRouter } from 'expo-router';
-import { PauseCircleIcon } from 'lucide-react-native';
+import {
+  ArrowRight
+} from 'lucide-react-native';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { toast } from 'sonner-native';
+import { Button } from '../ui/button';
 import { Icon } from '../ui/icon';
 import { Text } from '../ui/text';
 import { useLocation } from './LocationProvider';
@@ -213,7 +216,7 @@ export function SessionFooter() {
           />
           <View className="flex flex-col">
             <View className="flex flex-row items-baseline gap-2">
-              <Text className="font-bebas text-xl leading-[22px] tabular-nums text-foreground">
+              <Text className="font-bebas text-xl tabular-nums leading-[22px] text-foreground">
                 {duration}
               </Text>
               <Text className="text-xs text-muted-foreground">Elapsed</Text>
@@ -223,17 +226,14 @@ export function SessionFooter() {
             </Text>
           </View>
         </View>
-        <Pressable
-          onPress={checkOut}
-          className="flex flex-row items-center gap-1.5"
-          disabled={isCheckOutPending}>
-          <Text className="text-sm font-semibold">End</Text>
+        <Button onPress={checkOut} disabled={isCheckOutPending} size="sm" className="h8">
+          <Text>Check Out</Text>
           {isCheckOutPending ? (
-            <ActivityIndicator size="small" className='text-muted-foreground' />
+            <ActivityIndicator size="small" className="text-primary-foreground" />
           ) : (
-            <Icon as={PauseCircleIcon} size={18} />
+            <Icon as={ArrowRight} size={16} className="text-primary-foreground" />
           )}
-        </Pressable>
+        </Button>
       </View>
     </View>
   );

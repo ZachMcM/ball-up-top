@@ -35,10 +35,10 @@ export default function HomePage() {
             contentInsetAdjustmentBehavior="automatic"
             contentContainerClassName="flex w-full flex-col gap-4 py-6"
             keyboardShouldPersistTaps="handled">
-              <View className='flex flex-col px-4 pb-4'>
-                <Text className='text-muted-foreground text-xs font-medium'>Welcome Back,</Text>
-                <Text className='font-bold text-lg'>{home.userData.name}</Text>
-              </View>
+            <View className="flex flex-col px-4 pb-4">
+              <Text className="text-xs font-medium text-muted-foreground">Welcome Back,</Text>
+              <Text className="text-lg font-bold">{home.userData.name}</Text>
+            </View>
             <View className="flex flex-row items-start justify-between gap-4 px-4">
               <OVRDisplay value={home.userData.overall} size="md" />
               <View className="flex flex-1 flex-col">
@@ -56,7 +56,7 @@ export default function HomePage() {
                     </View>
                   </View>
                 ) : (
-                  <Text className="text-sm font-semibold text-muted-foreground">
+                  <Text className="text-sm font-semibold text-muted-foreground max-w-48">
                     Unranked at {home.primaryCollege.name}
                   </Text>
                 )}
@@ -64,24 +64,34 @@ export default function HomePage() {
             </View>
 
             <View className="flex flex-col gap-4">
-              <View className='flex flex-col px-4'>
-                <Text className="font-semibold">{home.primaryCollege.name} Courts</Text>
-                <Text className='text-muted-foreground text-sm font-medium'>{home.courts.length} Courts</Text>
+              <View className="flex flex-col gap-0.5 px-4">
+                <Text className="text-[16px] font-semibold">{home.primaryCollege.name} Courts</Text>
+                <Text className="text-sm font-medium text-muted-foreground">
+                  {(() => {
+                    const live = home.courts.filter((c) => c.activePlayerCount > 0).length;
+                    const quiet = home.courts.length - live;
+                    if (live === 0) return `${quiet} Quiet`;
+                    if (quiet === 0) return `${live} Live`;
+                    return `${live} Live • ${quiet} Quiet`;
+                  })()}
+                </Text>
               </View>
               <View className="flex flex-col">
-                {home.courts.map((c, i) => (
-                  <CourtRow
-                    key={c.id}
-                    court={c}
-                    isFirst={i === 0}
-                    onPress={() =>
-                      router.push({
-                        pathname: '/(tabs)/(home)/court/[courtId]/active-players',
-                        params: { courtId: c.id },
-                      })
-                    }
-                  />
-                ))}
+                {[...home.courts]
+                  .sort((a, b) => b.activePlayerCount - a.activePlayerCount)
+                  .map((c, i) => (
+                    <CourtRow
+                      key={c.id}
+                      court={c}
+                      isFirst={i === 0}
+                      onPress={() =>
+                        router.push({
+                          pathname: '/(tabs)/(home)/court/[courtId]/active-players',
+                          params: { courtId: c.id },
+                        })
+                      }
+                    />
+                  ))}
               </View>
             </View>
           </NativewindScrollView>
@@ -105,23 +115,21 @@ function CourtRow({
     <Pressable
       onPress={onPress}
       className={cn(
-        'flex flex-row items-center justify-between border-b border-border px-4 py-4',
+        'flex flex-row items-center justify-between border-b border-border px-4',
+        hasPlayers ? 'py-4' : 'py-3.5',
         isFirst && 'border-t'
       )}>
       <View className="flex flex-1 flex-col gap-1">
-        <Text className="font-semibold">{court.name}</Text>
+        <Text
+          className={cn(
+            hasPlayers ? 'text-[15px] font-semibold' : 'font-medium text-muted-foreground'
+          )}>
+          {court.name}
+        </Text>
         {hasPlayers ? (
           <View className="flex flex-row items-center gap-1.5">
-            <View
-              className="size-2 rounded-full bg-green-400"
-              style={{
-                shadowColor: '#4ade80',
-                shadowOffset: { width: 0, height: 0 },
-                shadowOpacity: 0.8,
-                shadowRadius: 4,
-              }}
-            />
-            <Text className="text-xs font-semibold text-green-400">
+            <View className="size-2 rounded-full bg-green-400" />
+            <Text className="text-sm font-semibold text-green-400">
               {court.activePlayerCount} playing
             </Text>
           </View>
@@ -130,7 +138,7 @@ function CourtRow({
         )}
       </View>
       <View className="flex flex-row items-center gap-2">
-        <AvatarStack players={court.activePlayers} />
+        {hasPlayers && <AvatarStack players={court.activePlayers} />}
         <Icon as={ChevronRight} size={18} className="text-muted-foreground" />
       </View>
     </Pressable>
@@ -144,7 +152,7 @@ function AvatarStack({ players }: { players: HomeCourt['activePlayers'] }) {
       {players.slice(0, 3).map((p, i) => (
         <Avatar
           key={p.id}
-          className={cn('size-7 border-2 border-background', i > 0 && '-ml-2')}
+          className={cn('size-9 border-2 border-background', i > 0 && '-ml-2')}
           alt={p.name}
           source={{ uri: p.image ?? undefined }}
         />

@@ -1,6 +1,6 @@
 import { NativewindScrollView } from '@/components/NativewindScrollView';
-import { DeltaIndicator } from '@/components/design';
 import { ArchetypeDisplay } from '@/components/design/ArchetypeDisplay';
+import { DeltaIndicator } from '@/components/design/DeltaIndicator';
 import { OVRDisplay } from '@/components/design/OVRDisplay';
 import { OverallHistoryGraph } from '@/components/design/OverallHistoryGraph';
 import { Avatar } from '@/components/ui/avatar';
