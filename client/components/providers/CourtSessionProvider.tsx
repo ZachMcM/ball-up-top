@@ -219,9 +219,9 @@ export function SessionFooter() {
               <Text className="font-bebas text-xl tabular-nums leading-[22px] text-foreground">
                 {duration}
               </Text>
-              <Text className="text-xs text-muted-foreground">Elapsed</Text>
+              <Text className="text-xs text-muted-foreground font-medium">Elapsed</Text>
             </View>
-            <Text className="text-xs text-muted-foreground">
+            <Text className="text-xs font-medium text-muted-foreground">
               Live at {court?.name ?? 'Loading...'}
             </Text>
           </View>

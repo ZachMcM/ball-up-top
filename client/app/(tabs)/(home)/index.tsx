@@ -2,11 +2,9 @@ import { ArchetypeDisplay } from '@/components/design/ArchetypeDisplay';
 import { DeltaIndicator } from '@/components/design/DeltaIndicator';
 import { OVRDisplay } from '@/components/design/OVRDisplay';
 import { NativewindScrollView } from '@/components/NativewindScrollView';
-import { useCourtSession } from '@/components/providers/CourtSessionProvider';
 import { Avatar } from '@/components/ui/avatar';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
-import { authClient } from '@/lib/auth-client';
 import { getHome } from '@/lib/endpoints';
 import { cn } from '@/lib/utils';
 import { HomeCourt } from '@/types/home';
@@ -112,9 +110,6 @@ function CourtRow({
   isFirst: boolean;
   onPress: () => void;
 }) {
-  const { activeCourtSession } = useCourtSession();
-  const { data: currentUserData } = authClient.useSession();
-
   const hasPlayers = court.activePlayerCount > 0;
   return (
     <Pressable
@@ -122,8 +117,6 @@ function CourtRow({
       className={cn(
         'flex flex-row items-center justify-between border-b border-border px-4',
         hasPlayers ? 'py-4' : 'py-3.5',
-        activeCourtSession?.courtId === court.id &&
-          'bg-muted-foreground/5 dark:bg-card/50',
         isFirst && 'border-t'
       )}>
       <View className="flex flex-1 flex-col gap-1">
