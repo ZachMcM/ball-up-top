@@ -60,15 +60,19 @@ export function OverallHistoryGraph({ points }: { points: OverallHistoryPoint[] 
         color: THEME[colorScheme!].mutedForeground,
         fontWeight: 500,
         width: 96,
-        marginLeft: 24,
+        marginLeft: 8,
         fontSize: 12,
       }}
       maxValue={99}
       data={points.map((entry) => ({
         value: entry.overall,
-        label: new Date(entry.createdAt).toLocaleDateString(),
+        label: new Date(entry.createdAt).toLocaleDateString("en-us", {
+          month: "2-digit",
+          day: "2-digit",
+          year: "2-digit"
+        }),
         dataPointLabelComponent: () => (
-          <Text className="text-xs font-medium text-muted-foreground">{entry.overall}</Text>
+          <Text className="text-lg leading-5 font-bebas font-medium text-muted-foreground">{entry.overall}</Text>
         ),
       }))}
     />

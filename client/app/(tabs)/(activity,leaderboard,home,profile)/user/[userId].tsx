@@ -75,9 +75,11 @@ export default function ProfilePage() {
                   <ArchetypeDisplay archetype={user.archetype} variant="hero" size="md" />
                   {user.rank && (
                     <View className="flex flex-row items-center gap-2">
-                      <Text className="font-bebas text-4xl tabular-nums leading-[54px]">
-                        #{user.rank ?? '—'}
-                      </Text>
+                      {user.rank && (
+                        <Text className="font-bebas text-4xl tabular-nums leading-[54px]">
+                          #{user.rank}
+                        </Text>
+                      )}
                       <View className="flex flex-row items-center gap-1">
                         <Text className="text-[13px] font-semibold text-muted-foreground">
                           At {user.primaryCollegeName}
@@ -102,12 +104,8 @@ export default function ProfilePage() {
                 </View>
               </View>
               <View className="flex flex-col">
-                <Text className="text-sm font-semibold text-muted-foreground">
-                  Overall History
-                </Text>
-                <OverallHistoryGraph
-                  points={user.overallHistory}
-                />
+                <Text className="text-sm font-semibold text-muted-foreground">Overall History</Text>
+                <OverallHistoryGraph points={user.overallHistory} />
               </View>
             </View>
           </NativewindScrollView>

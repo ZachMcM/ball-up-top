@@ -108,7 +108,7 @@ export function ActivePlayersModal({
                   <Text className="flex-1 font-semibold">
                     {user.name}
                     {user.id === currentUserData?.user.id && (
-                      <Text className="text-muted-foreground"> (You)</Text>
+                      <Text className="text-muted-foreground font-normal"> (You)</Text>
                     )}
                   </Text>
                   <ArchetypeDisplay size="md" archetype={user.archetype} />

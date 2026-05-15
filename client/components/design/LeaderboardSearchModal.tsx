@@ -83,7 +83,7 @@ export function LeaderboardSearchModal({ bottomSheetRef, users }: LeaderboardSea
               className={cn(
                 'flex flex-row items-center justify-between border-b border-border px-4 py-3',
                 index === 0 && 'border-t',
-                user.id === currentUserData?.user.id && 'bg-card'
+                user.id === currentUserData?.user.id && 'bg-muted-foreground/10 dark:bg-card'
               )}>
               <View className="flex flex-row items-center gap-3">
                 <Avatar
@@ -95,7 +95,7 @@ export function LeaderboardSearchModal({ bottomSheetRef, users }: LeaderboardSea
                   <Text className="font-semibold">
                     {user.name}
                     {user.id === currentUserData?.user.id && (
-                      <Text className="text-muted-foreground"> (You)</Text>
+                      <Text className="text-muted-foreground font-normal"> (You)</Text>
                     )}
                   </Text>
                   <ArchetypeDisplay

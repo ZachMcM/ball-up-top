@@ -179,7 +179,7 @@ export default function ActivityPage() {
             stickySectionHeadersEnabled={false}
             sections={activitySections}
             showsVerticalScrollIndicator={false}
-            SectionSeparatorComponent={() => <View className="h-4" />}
+            SectionSeparatorComponent={() => <View className="h-3" />}
             renderSectionHeader={({ section }) => (
               <Text className="px-4 font-semibold text-muted-foreground">{section.title}</Text>
             )}

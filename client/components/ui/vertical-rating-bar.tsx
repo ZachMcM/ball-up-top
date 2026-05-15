@@ -2,7 +2,7 @@ import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
 import { View } from 'react-native';
 
-const TOTAL_SEGMENTS = 22;
+const TOTAL_SEGMENTS = 25;
 
 interface VerticalRatingBarProps {
   value: number;
@@ -31,7 +31,7 @@ export function VerticalRatingBar({ value, label, className, color }: VerticalRa
             key={segmentNumber}
             className={cn(
               'h-1.5 w-full rounded-sm',
-              !isFilled ? 'bg-primary/10' : (color ?? 'bg-primary')
+              !isFilled ? 'bg-muted-foreground/25 dark:bg-muted' : (color ?? 'bg-primary')
             )}
           />
         ))}

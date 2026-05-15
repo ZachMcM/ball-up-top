@@ -9,18 +9,9 @@ type DeltaIndicatorProps = {
   size?: 'sm' | 'lg';
 } & ViewProps;
 
-export function DeltaIndicator({
-  value,
-  size = 'sm',
-  className,
-  ...props
-}: DeltaIndicatorProps) {
+export function DeltaIndicator({ value, size = 'sm', className, ...props }: DeltaIndicatorProps) {
   if (value === null || value === 0) {
-    return (
-      <View className={cn('flex flex-row items-center', className)} {...props}>
-        <Text className="text-muted-foreground">—</Text>
-      </View>
-    );
+    return null;
   }
 
   const isPositive = value > 0;
@@ -34,9 +25,9 @@ export function DeltaIndicator({
       icon: 16,
     },
     lg: {
-      text: "text-3xl",
-      icon: 20
-    }
+      text: 'text-3xl',
+      icon: 20,
+    },
   };
 
   return (

@@ -82,11 +82,11 @@ export default function HomePage() {
                     />
                   </View>
                   <View className="flex flex-col items-end gap-1">
-                    <View className="flex flex-row items-baseline gap-1">
+                    {home.userData.rank && (
                       <Text className="font-bebas text-5xl tabular-nums leading-[54px]">
-                        #{home.userData.rank ?? '—'}
+                        #{home.userData.rank}
                       </Text>
-                    </View>
+                    )}
                     <View className="flex flex-row items-center gap-1.5">
                       <Text className="text-[13px] font-semibold text-muted-foreground">
                         At {home.primaryCourt.collegeName}
@@ -169,7 +169,7 @@ export default function HomePage() {
                             <Text className="font-semibold">
                               {player.name}
                               {player.id === currentUserData?.user.id && (
-                                <Text className="text-muted-foreground"> (You)</Text>
+                                <Text className="font-normal text-muted-foreground"> (You)</Text>
                               )}
                             </Text>
                             <ArchetypeDisplay size="md" archetype={player.archetype} />

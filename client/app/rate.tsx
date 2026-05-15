@@ -136,7 +136,7 @@ function RatingInput({
             <Icon size={20} as={MinusIcon} />
           </Button>
           <View className="flex size-12 flex-row items-center justify-center">
-            <Text className="font-bebas text-3xl leading-none">{value}</Text>
+            <Text className="font-bebas text-3xl leading-10">{value}</Text>
           </View>
           <Button
             onPressIn={startIncrement}
@@ -277,7 +277,7 @@ export default function RatePage() {
     onSuccess: () => {
       queryClient.setQueryData(['courtSession', 'unrated'], null);
       toast.success('Ratings submitted successfully!', { position: 'bottom-center' });
-      router.back();
+      router.dismiss();
     },
     onError: (error) => {
       toast.error(error.message, { position: 'bottom-center' });
@@ -334,7 +334,7 @@ export default function RatePage() {
               </Text>
 
               <Text className="text-center text-sm font-medium">
-                Fair ratings make everyone's OVR accurate — including yours.
+                Fair ratings make everyone's OVR accurate, including yours.
               </Text>
             </View>
 

@@ -503,7 +503,6 @@ courtSessionsRoute.post(
             ratedUserIds.push(ep.rateeId);
           }
 
-          // Phase 3: ONE leaderboard reorder for ALL changes
           const leaderboardEntries = await tx
             .select({
               userId: leaderboard.userId,
