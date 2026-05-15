@@ -140,7 +140,7 @@ export default function CourtActivePlayersPage() {
                 <Empty className="border border-dashed border-border m-4">
                   <EmptyHeader>
                     <EmptyMedia variant="icon">
-                      <Icon size={22} as={UserX} className="text-secondary-foreground" />
+                      <Icon size={22} as={UserX} className="text-primary-foreground" />
                     </EmptyMedia>
                     <EmptyTitle>No one's playing</EmptyTitle>
                     <EmptyDescription>Be the first one out there!</EmptyDescription>

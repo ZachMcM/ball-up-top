@@ -118,7 +118,7 @@ export default function ProfilePage() {
                   <Empty className="border border-dashed border-border mt-6">
                     <EmptyHeader>
                       <EmptyMedia variant="icon">
-                        <Icon size={22} as={BanIcon} className="text-secondary-foreground" />
+                        <Icon size={22} as={BanIcon} className="text-primary-foreground" />
                       </EmptyMedia>
                       <EmptyTitle>No overall data</EmptyTitle>
                       <EmptyDescription>

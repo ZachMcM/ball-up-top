@@ -1,5 +1,5 @@
 import { DarkTheme, DefaultTheme, type Theme } from '@react-navigation/native';
- 
+
 export const THEME = {
   light: {
     background: 'hsl(224 0% 100%)',
@@ -8,7 +8,7 @@ export const THEME = {
     cardForeground: 'hsl(224 0% 3.94%)',
     popover: 'hsl(224 0% 100%)',
     popoverForeground: 'hsl(224 0% 3.94%)',
-    primary: 'hsl(224 0% 9.05%)',
+    primary: 'hsl(18, 98%, 50%)',
     primaryForeground: 'hsl(224 0% 98.03%)',
     secondary: 'hsl(224 0% 96.06%)',
     secondaryForeground: 'hsl(224 0% 9.05%)',
@@ -20,7 +20,7 @@ export const THEME = {
     destructiveForeground: 'hsl(224 0% 100%)',
     border: 'hsl(224 0% 89.82%)',
     input: 'hsl(224 0% 89.82%)',
-    ring: 'hsl(224 0% 63.02%)',
+    ring: 'hsl(18, 98%, 50%)',
     radius: '0.625rem',
     chart1: 'hsl(212 102% 78.68%)',
     chart2: 'hsl(217 91% 59.58%)',
@@ -35,8 +35,8 @@ export const THEME = {
     cardForeground: 'hsl(224 0% 98.03%)',
     popover: 'hsl(224 0% 3.94%)',
     popoverForeground: 'hsl(224 0% 98.03%)',
-    primary: 'hsl(223.8136 0.0001% 89.8161%)',
-    primaryForeground: 'hsl(223.8136 0.0000% 9.0527%)',
+    primary: 'hsl(18, 98%, 50%)',
+    primaryForeground: 'hsl(224 0% 98.03%)',
     secondary: 'hsl(224 0% 14.94%)',
     secondaryForeground: 'hsl(224 0% 98.03%)',
     muted: 'hsl(224 0% 14.94%)',
@@ -47,7 +47,7 @@ export const THEME = {
     destructiveForeground: 'hsl(224 0% 98.03%)',
     border: 'hsl(224 0% 15.51%)',
     input: 'hsl(224 0% 20.39%)',
-    ring: 'hsl(224 0% 45.15%)',
+    ring: 'hsl(18, 98%, 50%)',
     radius: '0.625rem',
     chart1: 'hsl(212 102% 78.68%)',
     chart2: 'hsl(217 91% 59.58%)',
@@ -56,7 +56,7 @@ export const THEME = {
     chart5: 'hsl(227 70% 39.92%)',
   },
 };
- 
+
 export const NAV_THEME: Record<'light' | 'dark', Theme> = {
   light: {
     ...DefaultTheme,

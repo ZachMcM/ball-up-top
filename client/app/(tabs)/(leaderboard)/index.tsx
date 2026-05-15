@@ -97,7 +97,7 @@ export default function LeaderboardPage() {
               <Empty className="mx-4 border border-dashed border-border">
                 <EmptyHeader>
                   <EmptyMedia variant="icon">
-                    <Icon size={22} as={CrownIcon} className="text-secondary-foreground" />
+                    <Icon size={22} as={CrownIcon} className="text-primary-foreground" />
                   </EmptyMedia>
                   <EmptyTitle>No rankings yet</EmptyTitle>
                   <EmptyDescription>

@@ -161,7 +161,7 @@ export default function ActivityPage() {
               <Empty className="border border-dashed border-border mx-4">
                 <EmptyHeader>
                   <EmptyMedia variant="icon">
-                    <Icon size={22} as={BanIcon} className="text-secondary-foreground" />
+                    <Icon size={22} as={BanIcon} className="text-primary-foreground" />
                   </EmptyMedia>
                   <EmptyTitle>No Activity</EmptyTitle>
                   <EmptyDescription>
@@ -225,8 +225,8 @@ function ActivityRow({ activity }: { activity: Activity }) {
         !activity.read && 'bg-accent/30'
       )}>
       <View className="relative h-10 w-10">
-        <View className="h-10 w-10 items-center justify-center rounded-2xl border border-border bg-card/70">
-          <Icon as={icon} size={20} />
+        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary">
+          <Icon as={icon} size={20} className="text-primary-foreground" />
         </View>
         {!activity.read && (
           <View className="absolute -right-0 top-0 h-2 w-2 rounded-full bg-primary" />
