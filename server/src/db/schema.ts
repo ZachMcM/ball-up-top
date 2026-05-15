@@ -4,9 +4,12 @@ import {
   doublePrecision,
   index,
   integer,
-  pgTable, primaryKey, serial,
+  pgTable,
+  primaryKey,
+  serial,
   text,
-  timestamp, uniqueIndex
+  timestamp,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable(
@@ -32,7 +35,9 @@ export const user = pgTable(
     defenseRating: integer("defense_rating").default(60).notNull(),
     shootingRating: integer("shooting_rating").default(60).notNull(),
 
-    primaryCollegeId: integer("primary_college_id").references(() => college.id),
+    primaryCollegeId: integer("primary_college_id").references(
+      () => college.id,
+    ),
 
     // archetype
     archetype: text().default("Prospect").notNull(),
@@ -143,7 +148,9 @@ export const court = pgTable(
 
     lat: doublePrecision("lat").notNull(),
     lng: doublePrecision("lng").notNull(),
-    
+
+    image: text().notNull(),
+
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -315,11 +322,7 @@ export const activity = pgTable("activity", {
     .references(() => user.id)
     .notNull(),
   type: text()
-    .$type<
-      | "overall_change"
-      | "rank_change"
-      | "archetype_change"
-    >()
+    .$type<"overall_change" | "rank_change" | "archetype_change">()
     .notNull(),
 
   ratingId: integer("rating_id").references(() => rating.id),

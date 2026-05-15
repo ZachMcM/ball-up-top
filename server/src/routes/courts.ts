@@ -62,6 +62,7 @@ courtsRoute.get(
             address: court.address,
             lat: court.lat,
             lng: court.lng,
+            image: court.image,
           })
           .from(court)
           .where(eq(court.id, courtId)),

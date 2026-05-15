@@ -176,6 +176,13 @@
       "when": 1778865433435,
       "tag": "0024_grey_unus",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1778882795231,
+      "tag": "0025_supreme_boomerang",
+      "breakpoints": true
     }
   ]
 }

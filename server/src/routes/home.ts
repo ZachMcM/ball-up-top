@@ -76,6 +76,7 @@ homeRoute.get("/home", authMiddleware, async (_, res) => {
             id: court.id,
             name: court.name,
             address: court.address,
+            image: court.image,
           })
           .from(court)
           .where(eq(court.collegeId, collegeId))
@@ -94,18 +95,12 @@ homeRoute.get("/home", authMiddleware, async (_, res) => {
           .innerJoin(user, eq(courtSession.userId, user.id))
           .innerJoin(court, eq(courtSession.courtId, court.id))
           .where(
-            and(
-              eq(court.collegeId, collegeId),
-              isNull(courtSession.endTime),
-            ),
+            and(eq(court.collegeId, collegeId), isNull(courtSession.endTime)),
           )
           .orderBy(asc(courtSession.startTime)),
       ]);
 
-    const playersByCourt = new Map<
-      number,
-      typeof activePlayerRows
-    >();
+    const playersByCourt = new Map<number, typeof activePlayerRows>();
     for (const row of activePlayerRows) {
       const list = playersByCourt.get(row.courtId);
       if (list) {
@@ -118,9 +113,7 @@ homeRoute.get("/home", authMiddleware, async (_, res) => {
     const courtsWithActivity = courts.map((c) => {
       const players = playersByCourt.get(c.id) ?? [];
       return {
-        id: c.id,
-        name: c.name,
-        address: c.address,
+        ...c,
         activePlayerCount: players.length,
         activePlayers: players.slice(0, 3).map((p) => ({
           id: p.id,

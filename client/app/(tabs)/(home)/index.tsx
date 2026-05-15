@@ -2,6 +2,7 @@ import { ArchetypeDisplay } from '@/components/design/ArchetypeDisplay';
 import { DeltaIndicator } from '@/components/design/DeltaIndicator';
 import { OVRDisplay } from '@/components/design/OVRDisplay';
 import { NativewindScrollView } from '@/components/NativewindScrollView';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Avatar } from '@/components/ui/avatar';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
@@ -9,6 +10,7 @@ import { getHome } from '@/lib/endpoints';
 import { cn } from '@/lib/utils';
 import { HomeCourt } from '@/types/home';
 import { useQuery } from '@tanstack/react-query';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { ChevronRight } from 'lucide-react-native';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
@@ -110,35 +112,47 @@ function CourtRow({
   isFirst: boolean;
   onPress: () => void;
 }) {
-  const hasPlayers = court.activePlayerCount > 0;
   return (
     <Pressable
       onPress={onPress}
       className={cn(
         'flex flex-row items-center justify-between border-b border-border px-4',
-        hasPlayers ? 'py-4' : 'py-3.5',
+        court.activePlayerCount > 0 ? 'py-4' : 'py-3.5',
         isFirst && 'border-t'
       )}>
-      <View className="flex flex-1 flex-col gap-1">
-        <Text
-          className={cn(
-            hasPlayers ? 'text-[16px] font-semibold' : 'font-medium text-muted-foreground'
-          )}>
-          {court.name}
-        </Text>
-        {hasPlayers ? (
-          <View className="flex flex-row items-center gap-1.5">
-            <View className="size-2 rounded-full bg-green-400" />
-            <Text className="text-sm font-semibold text-green-400">
-              {court.activePlayerCount} playing
-            </Text>
-          </View>
-        ) : (
-          <Text className="text-xs text-muted-foreground">No one playing</Text>
-        )}
+      <View className="flex flex-1 flex-row items-center gap-3">
+        <AspectRatio ratio={1} className="relative aspect-square w-12 overflow-hidden rounded-xl bg-card">
+          <Image
+            source={{
+              uri: court.image!,
+            }}
+            style={{ width: '100%', height: '100%' }}
+            className="absolute inset-0 object-cover"
+          />
+        </AspectRatio>
+        <View className="flex flex-1 flex-col gap-1">
+          <Text
+            className={cn(
+              court.activePlayerCount > 0
+                ? 'text-[16px] font-semibold'
+                : 'font-medium text-muted-foreground'
+            )}>
+            {court.name}
+          </Text>
+          {court.activePlayerCount > 0 ? (
+            <View className="flex flex-row items-center gap-1.5">
+              <View className="size-2 rounded-full bg-green-400" />
+              <Text className="text-sm font-semibold text-green-400">
+                {court.activePlayerCount} playing
+              </Text>
+            </View>
+          ) : (
+            <Text className="text-xs text-muted-foreground">No one playing</Text>
+          )}
+        </View>
       </View>
       <View className="flex flex-row items-center gap-2">
-        {hasPlayers && <AvatarStack players={court.activePlayers} />}
+        {court.activePlayerCount > 0 && <AvatarStack players={court.activePlayers} />}
         <Icon as={ChevronRight} size={18} className="text-muted-foreground" />
       </View>
     </Pressable>

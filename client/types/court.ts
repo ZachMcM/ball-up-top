@@ -13,6 +13,7 @@ export type CourtResponse = {
   address: string;
   lat: number;
   lng: number;
+  image: string | null
 };
 
 export type ActivePlayer = {

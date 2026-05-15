@@ -1,0 +1,1 @@
+ALTER TABLE "court" ADD COLUMN "image" text;

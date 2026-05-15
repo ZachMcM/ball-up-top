@@ -95,6 +95,8 @@ usersRoute.patch("/users/name", authMiddleware, async (req, res) => {
       .set({ name, onboardingStep: "height" })
       .where(eq(user.id, res.locals.userId!));
 
+    invalidateQueries(["user", res.locals.userId!]);
+
     res.json({ success: true });
   } catch (error) {
     handleError(error, res, "PATCH /users/name");
@@ -118,6 +120,8 @@ usersRoute.patch("/users/height", authMiddleware, async (req, res) => {
       .update(user)
       .set({ height, onboardingStep: "image" })
       .where(eq(user.id, res.locals.userId!));
+
+    invalidateQueries(["user", res.locals.userId!]);
 
     res.json({ success: true });
   } catch (error) {
