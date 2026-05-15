@@ -18,11 +18,11 @@ async function processLeaderboardCleanupJob(_: Job) {
         isNotNull(leaderboard.rank),
       ),
     )
-    .returning({ courtId: leaderboard.courtId });
+    .returning({ collegeId: leaderboard.collegeId });
 
-  const uniqueCourtIds = [...new Set(affectedRows.map((r) => r.courtId))];
-  for (const courtId of uniqueCourtIds) {
-    invalidateQueries(["leaderboard", courtId]);
+  const uniqueCollegeIds = [...new Set(affectedRows.map((r) => r.collegeId))];
+  for (const collegeId of uniqueCollegeIds) {
+    invalidateQueries(["leaderboard", collegeId]);
   }
 }
 

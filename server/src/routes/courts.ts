@@ -1,19 +1,13 @@
-import { and, asc, desc, eq, isNotNull, isNull, or, sql } from "drizzle-orm";
+import { and, eq, isNull, or } from "drizzle-orm";
 import { Router } from "express";
 import * as z from "zod";
 import { MAX_DISTANCE_FOR_CHECK_IN } from "../config/courts";
 import { db } from "../db";
-import {
-  court,
-  courtSession,
-  leaderboard,
-  rankChange,
-  user,
-} from "../db/schema";
+import { court, courtSession, user } from "../db/schema";
 import { notificationsQueue } from "../queues/notificationsQueue";
 import { getDistanceInMiles } from "../utils/getDistanceMiles";
 import { handleError } from "../utils/handleError";
-import { invalidateHomeForCourt } from "../utils/invalidateHomeForCourt";
+import { invalidateHomeForCollege } from "../utils/invalidateHomeForCollege";
 import {
   invalidateQueries,
   invalidateQueriesForUser,
@@ -22,92 +16,6 @@ import { logger } from "../utils/logger";
 import { authMiddleware } from "../utils/middleware";
 
 export const courtsRoute = Router();
-
-courtsRoute.get("/colleges", authMiddleware, async (_, res) => {
-  try {
-    const colleges = await db
-      .select({
-        courtId: court.id,
-        collegeName: court.collegeName,
-        collegeColor: court.collegeColor,
-      })
-      .from(court)
-      .orderBy(asc(court.collegeName), asc(court.name));
-
-    res.json(colleges);
-  } catch (error) {
-    handleError(error, res, "GET /colleges");
-  }
-});
-
-courtsRoute.get("/courts/:id/leaderboard", authMiddleware, async (req, res) => {
-  try {
-    const courtId = parseInt(req.params.id);
-
-    if (!Number.isInteger(courtId)) {
-      logger.error("Court ID is not an integer.");
-      return res.status(400).json({ error: "Court ID is not an integer." });
-    }
-
-    const [[courtData], leaderboardUsers, topMovers] = await Promise.all([
-      db
-        .select({
-          id: court.id,
-          name: court.name,
-          address: court.address,
-          collegeName: court.collegeName,
-          collegeColor: court.collegeColor,
-          lat: court.lat,
-          lng: court.lng,
-        })
-        .from(court)
-        .where(eq(court.id, courtId)),
-      db
-        .select({
-          rank: leaderboard.rank,
-          overall: user.overall,
-          id: user.id,
-          name: user.name,
-          image: user.image,
-          archetype: user.archetype,
-        })
-        .from(leaderboard)
-        .innerJoin(user, eq(leaderboard.userId, user.id))
-        .where(eq(leaderboard.courtId, courtId))
-        .orderBy(asc(leaderboard.rank)),
-      db
-        .selectDistinctOn([rankChange.userId], {
-          overall: user.overall,
-          oldRank: rankChange.oldRank,
-          rank: rankChange.newRank,
-          id: rankChange.userId,
-          name: user.name,
-          image: user.image,
-          archetype: user.archetype,
-          rankImprovement:
-            sql<number>`(${rankChange.oldRank} - ${rankChange.newRank})`.as(
-              "rank_improvement",
-            ),
-        })
-        .from(rankChange)
-        .innerJoin(user, eq(rankChange.userId, user.id))
-        .where(
-          and(eq(rankChange.courtId, courtId), isNotNull(rankChange.oldRank)),
-        )
-        .orderBy(rankChange.userId, desc(rankChange.createdAt))
-        .then((rows) =>
-          rows
-            .filter((r) => r.rankImprovement > 0)
-            .sort((a, b) => b.rankImprovement - a.rankImprovement)
-            .slice(0, 3),
-        ),
-    ]);
-
-    res.json({ court: courtData, users: leaderboardUsers, topMovers });
-  } catch (error) {
-    handleError(error, res, "GET /courts/:id/leaderboard");
-  }
-});
 
 courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
   try {
@@ -123,8 +31,6 @@ courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
         id: court.id,
         name: court.name,
         address: court.address,
-        collegeName: court.collegeName,
-        collegeColor: court.collegeColor,
         lat: court.lat,
         lng: court.lng,
       })
@@ -136,6 +42,56 @@ courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
     handleError(error, res, "GET /courts/:id");
   }
 });
+
+courtsRoute.get(
+  "/courts/:courtId/active-players",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const courtId = parseInt(req.params.courtId);
+
+      if (!Number.isInteger(courtId)) {
+        return res.status(400).json({ error: "Court ID is not an integer." });
+      }
+
+      const [targetCourt] = await db
+        .select({
+          id: court.id,
+          name: court.name,
+          address: court.address,
+          lat: court.lat,
+          lng: court.lng,
+        })
+        .from(court)
+        .where(eq(court.id, courtId));
+
+      if (!targetCourt) {
+        return res.status(404).json({ error: "No court was found." });
+      }
+
+      const activePlayers = await db
+        .select({
+          id: user.id,
+          name: user.name,
+          overall: user.overall,
+          archetype: user.archetype,
+          image: user.image,
+        })
+        .from(courtSession)
+        .innerJoin(user, eq(courtSession.userId, user.id))
+        .where(
+          and(
+            eq(courtSession.courtId, courtId),
+            isNull(courtSession.endTime),
+          ),
+        );
+
+      res.json({ court: targetCourt, activePlayers });
+    } catch (error) {
+      handleError(error, res, "GET /courts/:courtId/active-players");
+    }
+  },
+);
 
 const CourtSessionPostBodySchema = z.object({
   lat: z.number().min(-90).max(90),
@@ -220,9 +176,10 @@ courtsRoute.post(
       res.json({ success: true });
 
       invalidateQueries(["courts"], ["court", courtId]);
+      invalidateQueries(["court", courtId, "active-players"]);
       invalidateQueries(["user", res.locals.userId!]);
       invalidateQueriesForUser(res.locals.userId!, ["home"]);
-      await invalidateHomeForCourt(courtId);
+      await invalidateHomeForCollege(targetCourt.collegeId);
 
       // Queue court threshold check for notifications
       notificationsQueue.add("court_threshold_check", {

@@ -4,6 +4,13 @@ import { LeaderboardSearchModal } from '@/components/design/LeaderboardSearchMod
 import { OVRDisplay } from '@/components/design/OVRDisplay';
 import { NativewindFlatList } from '@/components/NativewindFlatList';
 import { Avatar } from '@/components/ui/avatar';
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { useTabContext } from '@/hooks/useTabContext';
@@ -13,7 +20,14 @@ import { cn } from '@/lib/utils';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { ArrowRight, ChevronDown, ChevronRightIcon, SearchIcon } from 'lucide-react-native';
+import {
+  ArrowRight,
+  BanIcon,
+  ChevronDown,
+  ChevronRightIcon,
+  CrownIcon,
+  SearchIcon,
+} from 'lucide-react-native';
 import { useMemo, useRef } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 
@@ -21,22 +35,22 @@ export default function LeaderboardPage() {
   const { data: currentUserData } = authClient.useSession();
   const currentUserId = currentUserData?.user.id;
 
-  // Get the user's primary court ID
-  const primaryCourtId = (currentUserData?.user as any)?.primaryCourtId;
+  // Get the user's primary college ID
+  const primaryCollegeId = (currentUserData?.user as any)?.primaryCollegeId;
 
   const { data: leaderboard, isPending } = useQuery({
-    queryKey: ['leaderboard', primaryCourtId],
-    queryFn: () => getLeaderboard(primaryCourtId!),
-    enabled: !!primaryCourtId,
+    queryKey: ['leaderboard', primaryCollegeId],
+    queryFn: () => getLeaderboard(primaryCollegeId!),
+    enabled: !!primaryCollegeId,
   });
-
-  const currentUserEntry = useMemo(() => {
-    return leaderboard?.users.find((u) => u.id === currentUserId);
-  }, [leaderboard, currentUserId]);
 
   const rankedUsers = useMemo(() => {
     return leaderboard?.users.filter((u) => u.rank !== null) ?? [];
   }, [leaderboard?.users]);
+
+  const currentUserEntry = useMemo(() => {
+    return rankedUsers.find((u) => u.id === currentUserId);
+  }, [leaderboard, currentUserId]);
 
   const searchSheetRef = useRef<BottomSheetModal | null>(null);
 
@@ -76,9 +90,22 @@ export default function LeaderboardPage() {
               <Text className="text-xs font-medium text-muted-foreground">Search All Players</Text>
               <Icon as={ChevronRightIcon} size={14} className="text-muted-foreground" />
             </Pressable>
-            <Text className="text-3xl font-bold">{leaderboard.court.collegeName}</Text>
+            <Text className="text-3xl font-bold">{leaderboard.college.name}</Text>
           </View>
           <NativewindFlatList
+            ListEmptyComponent={
+              <Empty className="mx-4 border border-dashed border-border">
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <Icon size={22} as={CrownIcon} className="text-secondary-foreground" />
+                  </EmptyMedia>
+                  <EmptyTitle>No rankings yet</EmptyTitle>
+                  <EmptyDescription>
+                    Be the first to take the #1 spot on the leaderboard!
+                  </EmptyDescription>
+                </EmptyHeader>
+              </Empty>
+            }
             ListHeaderComponent={
               leaderboard.topMovers && leaderboard.topMovers.length > 0 ? (
                 <View className="mb-6 flex flex-col gap-4 px-4">

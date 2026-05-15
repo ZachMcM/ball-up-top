@@ -82,7 +82,6 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
             userId: rc.userId,
             type: "rank_change",
             rankChangeId: rc.id,
-            courtId: rc.courtId,
           });
 
           const msg =
@@ -129,13 +128,14 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
           columns: {
             id: true,
             name: true,
+            collegeId: true,
           },
         });
 
         if (!targetCourt) break;
 
         const subscribedUsers = await db.query.user.findMany({
-          where: eq(user.primaryCourtId, targetCourt.id),
+          where: eq(user.primaryCollegeId, targetCourt.collegeId),
           columns: {
             id: true,
           },

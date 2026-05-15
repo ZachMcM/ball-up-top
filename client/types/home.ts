@@ -1,3 +1,14 @@
+import { ActivePlayer } from './court';
+import { College } from './college';
+
+export type HomeCourt = {
+  id: number;
+  name: string;
+  address: string;
+  activePlayerCount: number;
+  activePlayers: ActivePlayer[];
+};
+
 export type HomeResponse = {
   userData: {
     name: string;
@@ -6,18 +17,6 @@ export type HomeResponse = {
     rank: number | null;
     rankDelta: number | null;
   };
-  activePlayers: {
-    id: string
-    name: string;
-    overall: number;
-    archetype: string;
-    image: string | null;
-  }[];
-  primaryCourt: {
-    id: number,
-    name: string;
-    address: string,
-    collegeName: string;
-    collegeColor: string;
-  };
+  primaryCollege: College;
+  courts: HomeCourt[];
 };

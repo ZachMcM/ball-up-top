@@ -23,7 +23,7 @@ const emptyMediaVariants = cva('flex items-center justify-center', {
   variants: {
     variant: {
       default: 'h-16 w-16',
-      icon: 'h-9 w-9 rounded-full bg-muted p-3',
+      icon: 'h-9 w-9 rounded-full bg-muted/70 border border-border p-3',
     },
   },
   defaultVariants: {

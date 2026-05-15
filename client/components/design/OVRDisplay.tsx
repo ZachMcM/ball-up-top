@@ -9,7 +9,7 @@ type OVRDisplayProps = {
 
 const SIZE_CLASSES = {
   sm: 'text-[26px] leading-[29px]',
-  md: 'text-[32px] leading-[35px]',
+  md: 'text-[96px] leading-[100px]',
   lg: 'text-[132px] leading-[135px]',
   xl: 'text-[148px] leading-[150px]',
 };

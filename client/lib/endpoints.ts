@@ -1,5 +1,6 @@
 import { Activity } from '@/types/activity';
-import { CollegeOption, CourtResponse, CourtSession, Leaderboard, UserEntry } from '@/types/court';
+import { College, CollegeLeaderboard } from '@/types/college';
+import { CourtActivePlayersResponse, CourtResponse, CourtSession } from '@/types/court';
 import { EncounteredPlayer } from '@/types/encounteredPlayer';
 import { HomeResponse } from '@/types/home';
 import { User } from '@/types/user';
@@ -49,12 +50,12 @@ export async function serverRequest({ endpoint, method, body, formData }: server
   return data;
 }
 
-export async function patchUserPrimaryCollege(primaryCourtId: number) {
+export async function patchUserPrimaryCollege(primaryCollegeId: number) {
   await serverRequest({
     endpoint: '/users/primary-college',
     method: 'PATCH',
     body: JSON.stringify({
-      primaryCourtId,
+      primaryCollegeId,
     }),
   });
 }
@@ -107,23 +108,32 @@ export async function getCourt(id: number): Promise<CourtResponse> {
   return court;
 }
 
-export async function getCourtLeaderboard(id: number): Promise<Leaderboard> {
+export async function getCollegeLeaderboard(id: number): Promise<CollegeLeaderboard> {
   const leaderboard = await serverRequest({
-    endpoint: `/courts/${id}/leaderboard`,
+    endpoint: `/colleges/${id}/leaderboard`,
     method: 'GET',
   });
 
   return leaderboard;
 }
 
-export async function getHome({ lat, lng }: { lat: number; lng: number }): Promise<HomeResponse> {
+export async function getCourtActivePlayers(
+  courtId: number
+): Promise<CourtActivePlayersResponse> {
   return await serverRequest({
-    endpoint: `/home?lat=${lat}&lng=${lng}`,
+    endpoint: `/courts/${courtId}/active-players`,
     method: 'GET',
   });
 }
 
-export async function getColleges(): Promise<CollegeOption[]> {
+export async function getHome(): Promise<HomeResponse> {
+  return await serverRequest({
+    endpoint: `/home`,
+    method: 'GET',
+  });
+}
+
+export async function getColleges(): Promise<College[]> {
   return await serverRequest({
     endpoint: '/colleges',
     method: 'GET',
@@ -219,9 +229,9 @@ export async function getActivity(): Promise<Activity[]> {
   return activityList;
 }
 
-export async function getLeaderboard(id: number): Promise<Leaderboard> {
+export async function getLeaderboard(id: number): Promise<CollegeLeaderboard> {
   const leaderboard = await serverRequest({
-    endpoint: `/courts/${id}/leaderboard`,
+    endpoint: `/colleges/${id}/leaderboard`,
     method: 'GET',
   });
 

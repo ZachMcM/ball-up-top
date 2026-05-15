@@ -2,7 +2,7 @@ import { useTabContext } from '@/hooks/useTabContext';
 import { authClient } from '@/lib/auth-client';
 import { THEME } from '@/lib/theme';
 import { cn } from '@/lib/utils';
-import { UserEntry } from '@/types/court';
+import { CollegeLeaderboardUser } from '@/types/college';
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from 'nativewind';
@@ -17,7 +17,7 @@ import { OVRDisplay } from './OVRDisplay';
 
 type LeaderboardSearchModalProps = {
   bottomSheetRef: RefObject<BottomSheetModal | null>;
-  users: UserEntry[];
+  users: CollegeLeaderboardUser[];
 };
 
 export function LeaderboardSearchModal({ bottomSheetRef, users }: LeaderboardSearchModalProps) {

@@ -12,6 +12,7 @@ import {
 import { Router } from "express";
 import { db } from "../db";
 import {
+  court,
   courtSession,
   encounteredPlayer,
   leaderboard,
@@ -40,7 +41,7 @@ import {
 } from "../utils/checkoutSession";
 import { clamp } from "../utils/clamp";
 import { generateArchetype } from "../utils/generateArchetype";
-import { invalidateHomeForCourt } from "../utils/invalidateHomeForCourt";
+import { invalidateHomeForCollege } from "../utils/invalidateHomeForCollege";
 import {
   invalidateQueries,
   invalidateQueriesForUser,
@@ -327,9 +328,22 @@ courtSessionsRoute.post(
         });
       }
 
+      const sessionCourt = await db.query.court.findFirst({
+        where: eq(court.id, targetCourtSession.courtId),
+        columns: { id: true, collegeId: true },
+      });
+
+      if (!sessionCourt) {
+        return res
+          .status(404)
+          .json({ error: "Court for this session no longer exists." });
+      }
+
+      const sessionCollegeId = sessionCourt.collegeId;
+
       const { ratingIds, rankChangeIds, rateeIds } = await db.transaction(
         async (tx) => {
-          const courtId = targetCourtSession.courtId;
+          const collegeId = sessionCollegeId;
           const createdRatingIds: number[] = [];
           const createdRankChangeIds: number[] = [];
           const ratedUserIds: string[] = [];
@@ -354,7 +368,7 @@ courtSessionsRoute.post(
             .from(leaderboard)
             .where(
               and(
-                eq(leaderboard.courtId, courtId),
+                eq(leaderboard.collegeId, collegeId),
                 or(
                   isNotNull(leaderboard.rank),
                   inArray(leaderboard.userId, potentialRateeIds),
@@ -512,7 +526,7 @@ courtSessionsRoute.post(
             .innerJoin(user, eq(leaderboard.userId, user.id))
             .where(
               and(
-                eq(leaderboard.courtId, courtId),
+                eq(leaderboard.collegeId, collegeId),
                 or(
                   isNotNull(leaderboard.rank),
                   inArray(leaderboard.userId, ratedUserIds),
@@ -537,7 +551,7 @@ courtSessionsRoute.post(
               .where(
                 and(
                   eq(leaderboard.userId, entry.userId),
-                  eq(leaderboard.courtId, courtId),
+                  eq(leaderboard.collegeId, collegeId),
                 ),
               );
           }
@@ -553,7 +567,7 @@ courtSessionsRoute.post(
                 .insert(rankChange)
                 .values({
                   userId: entry.userId,
-                  courtId,
+                  collegeId,
                   raterCourtSessionId: sessionId,
                   oldRank,
                   newRank,
@@ -588,8 +602,13 @@ courtSessionsRoute.post(
       }
 
       invalidateQueries(["court", targetCourtSession.courtId]);
-      invalidateQueries(["leaderboard", targetCourtSession.courtId]);
-      await invalidateHomeForCourt(targetCourtSession.courtId);
+      invalidateQueries([
+        "court",
+        targetCourtSession.courtId,
+        "active-players",
+      ]);
+      invalidateQueries(["leaderboard", sessionCollegeId]);
+      await invalidateHomeForCollege(sessionCollegeId);
 
       if (ratingIds.length > 0 || rankChangeIds.length > 0) {
         notificationsQueue.add("rating_effects", {
@@ -648,11 +667,23 @@ courtSessionsRoute.patch(
         );
       });
 
+      const sessionCourt = await db.query.court.findFirst({
+        where: eq(court.id, targetCourtSession.courtId),
+        columns: { id: true, collegeId: true },
+      });
+
       res.json({ success: true });
 
       invalidateQueries(["courts"], ["court", targetCourtSession.courtId]);
+      invalidateQueries([
+        "court",
+        targetCourtSession.courtId,
+        "active-players",
+      ]);
       invalidateQueriesForUser(res.locals.userId!, ["home"]);
-      await invalidateHomeForCourt(targetCourtSession.courtId);
+      if (sessionCourt) {
+        await invalidateHomeForCollege(sessionCourt.collegeId);
+      }
     } catch (error) {
       handleError(error, res, "PATCH /court-sessions/:sessionId");
     }

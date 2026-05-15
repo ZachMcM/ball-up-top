@@ -1,0 +1,1 @@
+ALTER TABLE "user" ALTER COLUMN "archetype" SET DEFAULT 'Prospect';

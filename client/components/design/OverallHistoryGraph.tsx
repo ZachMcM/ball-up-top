@@ -24,10 +24,6 @@ export function OverallHistoryGraph({ points }: { points: OverallHistoryPoint[] 
     return maxIndex;
   }, [points]);
 
-  if (points.length === 0) {
-    return <Text className="text-center text-xs font-medium">No ratings data yet.</Text>;
-  }
-
   const areaStartOpacity = colorScheme === 'dark' ? 0.2 : 0.15;
 
   return (

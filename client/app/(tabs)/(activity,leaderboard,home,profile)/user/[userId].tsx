@@ -4,13 +4,20 @@ import { ArchetypeDisplay } from '@/components/design/ArchetypeDisplay';
 import { OVRDisplay } from '@/components/design/OVRDisplay';
 import { OverallHistoryGraph } from '@/components/design/OverallHistoryGraph';
 import { Avatar } from '@/components/ui/avatar';
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { VerticalRatingBar } from '@/components/ui/vertical-rating-bar';
 import { getUser } from '@/lib/endpoints';
 import { useQuery } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import { ShareIcon } from 'lucide-react-native';
+import { BanIcon, ShareIcon } from 'lucide-react-native';
 import { ActivityIndicator, Pressable, Share, View } from 'react-native';
 
 export default function ProfilePage() {
@@ -72,14 +79,12 @@ export default function ProfilePage() {
               <View className="flex flex-row items-start justify-between gap-6">
                 <OVRDisplay value={user.overall} size="lg" />
                 <View className="flex flex-1 flex-col justify-center gap-2">
-                  <ArchetypeDisplay archetype={user.archetype} variant="hero" size="md" />
-                  {user.rank && (
+                  <ArchetypeDisplay archetype={user.archetype} variant="hero" size="lg" />
+                  {user.rank ? (
                     <View className="flex flex-row items-center gap-2">
-                      {user.rank && (
-                        <Text className="font-bebas text-4xl tabular-nums leading-[54px]">
-                          #{user.rank}
-                        </Text>
-                      )}
+                      <Text className="font-bebas text-4xl tabular-nums leading-[54px]">
+                        #{user.rank}
+                      </Text>
                       <View className="flex flex-row items-center gap-1">
                         <Text className="text-[13px] font-semibold text-muted-foreground">
                           At {user.primaryCollegeName}
@@ -87,6 +92,10 @@ export default function ProfilePage() {
                         <DeltaIndicator value={user.rankDelta} size="sm" />
                       </View>
                     </View>
+                  ) : (
+                    <Text className="text-sm font-semibold text-muted-foreground">
+                      Unranked at {user.primaryCollegeName}
+                    </Text>
                   )}
                 </View>
               </View>
@@ -105,7 +114,21 @@ export default function ProfilePage() {
               </View>
               <View className="flex flex-col">
                 <Text className="text-sm font-semibold text-muted-foreground">Overall History</Text>
-                <OverallHistoryGraph points={user.overallHistory} />
+                {user.overallHistory.length === 0 ? (
+                  <Empty className="border border-dashed border-border mt-6">
+                    <EmptyHeader>
+                      <EmptyMedia variant="icon">
+                        <Icon size={22} as={BanIcon} className="text-secondary-foreground" />
+                      </EmptyMedia>
+                      <EmptyTitle>No overall data</EmptyTitle>
+                      <EmptyDescription>
+                        Get out there and hoop to increase your overall!
+                      </EmptyDescription>
+                    </EmptyHeader>
+                  </Empty>
+                ) : (
+                  <OverallHistoryGraph points={user.overallHistory} />
+                )}
               </View>
             </View>
           </NativewindScrollView>

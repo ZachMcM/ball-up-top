@@ -32,10 +32,10 @@ export const user = pgTable(
     defenseRating: integer("defense_rating").default(60).notNull(),
     shootingRating: integer("shooting_rating").default(60).notNull(),
 
-    primaryCourtId: integer("primary_court_id").references(() => court.id),
+    primaryCollegeId: integer("primary_college_id").references(() => college.id),
 
     // archetype
-    archetype: text().default("Unranked").notNull(),
+    archetype: text().default("Prospect").notNull(),
 
     // extra attributes
     height: text(),
@@ -109,6 +109,27 @@ export const verification = pgTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
+export const college = pgTable(
+  "college",
+  {
+    id: serial().primaryKey().notNull(),
+    name: text("name").notNull(),
+    state: text("state").notNull(),
+    city: text("city").notNull(),
+    primaryColor: text("primary_color").notNull(),
+    secondaryColor: text("secondary_color").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("college_name_state_idx").on(table.name, table.state),
+    index("college_state_city_idx").on(table.state, table.city),
+  ],
+);
+
 export const court = pgTable(
   "court",
   {
@@ -116,16 +137,13 @@ export const court = pgTable(
     name: text().notNull(),
     address: text("address").notNull(),
 
-    collegeName: text("college_name").notNull(),
-    collegeColor: text("college_color").notNull(),
+    collegeId: integer("college_id")
+      .notNull()
+      .references(() => college.id),
 
     lat: doublePrecision("lat").notNull(),
     lng: doublePrecision("lng").notNull(),
-
-    indoor: boolean("indoor").notNull().default(false),
-
-    image: text("image").notNull(),
-
+    
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -134,7 +152,7 @@ export const court = pgTable(
   },
   (table) => [
     index("court_lat_lng_idx").on(table.lat, table.lng),
-    index("court_indoor_idx").on(table.indoor),
+    index("court_college_id_idx").on(table.collegeId),
   ],
 );
 
@@ -306,7 +324,6 @@ export const activity = pgTable("activity", {
 
   ratingId: integer("rating_id").references(() => rating.id),
   rankChangeId: integer("rank_change_id"),
-  courtId: integer("court_id").references(() => court.id),
 
   read: boolean("read").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -318,9 +335,9 @@ export const leaderboard = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => user.id),
-    courtId: integer("court_id")
+    collegeId: integer("college_id")
       .notNull()
-      .references(() => court.id),
+      .references(() => college.id),
     rank: integer("rank"),
     lastRatedAt: timestamp("last_rated_at"),
     updatedAt: timestamp("updated_at")
@@ -329,8 +346,8 @@ export const leaderboard = pgTable(
       .notNull(),
   },
   (table) => [
-    primaryKey({ columns: [table.userId, table.courtId] }),
-    index("leaderboard_court_rank_idx").on(table.courtId, table.rank),
+    primaryKey({ columns: [table.userId, table.collegeId] }),
+    index("leaderboard_college_rank_idx").on(table.collegeId, table.rank),
     index("leaderboard_last_rated_idx").on(table.lastRatedAt),
   ],
 );
@@ -342,9 +359,9 @@ export const rankChange = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => user.id),
-    courtId: integer("court_id")
+    collegeId: integer("college_id")
       .notNull()
-      .references(() => court.id),
+      .references(() => college.id),
     raterCourtSessionId: integer("rater_court_session_id")
       .notNull()
       .references(() => courtSession.id),
@@ -354,7 +371,7 @@ export const rankChange = pgTable(
   },
   (table) => [
     index("rank_change_user_id_idx").on(table.userId),
-    index("rank_change_court_id_idx").on(table.courtId),
+    index("rank_change_college_id_idx").on(table.collegeId),
     index("rank_change_rater_court_session_idx").on(table.raterCourtSessionId),
     index("rank_change_created_at_idx").on(table.createdAt),
   ],

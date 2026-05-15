@@ -17,6 +17,13 @@ export default function HomeLayout() {
           headerLeft: () => <BackButton />,
         }}
       />
+      <Stack.Screen
+        name="court/[courtId]/active-players"
+        options={{
+          presentation: 'modal',
+          headerShown: true,
+        }}
+      />
     </Stack>
   );
 }

@@ -2,10 +2,10 @@ import { Job, Worker } from "bullmq";
 import { and, eq, isNull, lt, sql } from "drizzle-orm";
 import { SESSION_TIMEOUT_HOURS } from "../config/courtSessions";
 import { db } from "../db";
-import { courtSession } from "../db/schema";
+import { court, courtSession } from "../db/schema";
 import { redisConnection } from "../queues";
 import { createEncounteredPlayersForSession } from "../utils/checkoutSession";
-import { invalidateHomeForCourt } from "../utils/invalidateHomeForCourt";
+import { invalidateHomeForCollege } from "../utils/invalidateHomeForCollege";
 import { invalidateQueries } from "../utils/invalidateQueries";
 import { logger } from "../utils/logger";
 
@@ -53,8 +53,20 @@ async function processSesssionTimeoutJob(_: Job) {
       (id) => ["court", id] as (string | number)[],
     );
     invalidateQueries(["courts"], ...courtKeys);
-    for (const courtId of affectedCourtIds) {
-      await invalidateHomeForCourt(courtId);
+
+    const affectedCourts = await db
+      .select({ id: court.id, collegeId: court.collegeId })
+      .from(court)
+      .where(
+        sql`${court.id} IN (${sql.join(
+          [...affectedCourtIds].map((id) => sql`${id}`),
+          sql`, `,
+        )})`,
+      );
+
+    const uniqueCollegeIds = new Set(affectedCourts.map((c) => c.collegeId));
+    for (const collegeId of uniqueCollegeIds) {
+      await invalidateHomeForCollege(collegeId);
     }
   }
 

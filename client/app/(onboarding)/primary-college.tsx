@@ -16,7 +16,7 @@ import { toast } from 'sonner-native';
 import * as z from 'zod';
 
 const PrimaryCollegeSchema = z.object({
-  primaryCourtId: z
+  primaryCollegeId: z
     .number({ message: 'Please select your primary college' })
     .int()
     .positive('Please select your primary college'),
@@ -32,7 +32,7 @@ export default function PrimaryCollegePage() {
   const { control, handleSubmit } = useForm<z.infer<typeof PrimaryCollegeSchema>>({
     resolver: zodResolver(PrimaryCollegeSchema),
     defaultValues: {
-      primaryCourtId: currentUserData?.user.primaryCourtId ?? undefined,
+      primaryCollegeId: (currentUserData?.user as any)?.primaryCollegeId ?? undefined,
     },
   });
 
@@ -42,18 +42,18 @@ export default function PrimaryCollegePage() {
   const queryClient = useQueryClient();
 
   const { mutate: savePrimaryCollege, isPending: isSaving } = useMutation({
-    mutationFn: async (primaryCourtId: number) => {
-      await patchUserPrimaryCollege(primaryCourtId);
-      return primaryCourtId;
+    mutationFn: async (primaryCollegeId: number) => {
+      await patchUserPrimaryCollege(primaryCollegeId);
+      return primaryCollegeId;
     },
 
-    onSuccess: (primaryCourtId) => {
+    onSuccess: (primaryCollegeId) => {
       refetchAuthClientSession();
       queryClient.invalidateQueries({
         queryKey: ['home'],
       });
       queryClient.invalidateQueries({
-        queryKey: ['leaderboard', primaryCourtId],
+        queryKey: ['leaderboard', primaryCollegeId],
       });
       toast.success('Primary college saved!', { position: 'bottom-center' });
     },
@@ -88,24 +88,24 @@ export default function PrimaryCollegePage() {
                   <Text className='text-sm text-muted-foreground'>Results</Text>
                   {colleges
                     ?.filter((c) =>
-                      c.collegeName.toLocaleLowerCase().includes(searchInput.toLocaleLowerCase())
+                      c.name.toLocaleLowerCase().includes(searchInput.toLocaleLowerCase())
                     )
                     .map((c) => (
                       <Pressable
                         onPress={() => {
-                          if (c.courtId === value) {
+                          if (c.id === value) {
                             onChange(undefined);
                           } else {
-                            onChange(c.courtId);
+                            onChange(c.id);
                           }
                         }}
-                        key={c.courtId}
+                        key={c.id}
                         className={cn(
                           'flex flex-row items-center justify-between rounded-2xl border border-border bg-card px-4 py-3',
-                          value === c.courtId && 'border-primary'
+                          value === c.id && 'border-primary'
                         )}>
-                        <Text className="font-medium text-sm">{c.collegeName}</Text>
-                        {value === c.courtId && (
+                        <Text className={cn("font-medium text-sm")}>{c.name}</Text>
+                        {value === c.id && (
                           <Icon as={CheckCircle} size={14} className="text-primary" />
                         )}
                       </Pressable>
@@ -117,7 +117,7 @@ export default function PrimaryCollegePage() {
               </View>
             );
           }}
-          name="primaryCourtId"
+          name="primaryCollegeId"
         />
         <Text className="text-center text-xs font-medium text-muted-foreground">
           Your primary college will appear on your home page. You can change this later.
@@ -133,7 +133,7 @@ export default function PrimaryCollegePage() {
             disabled={isSaving}
             size="lg"
             className="flex-1"
-            onPress={handleSubmit((values) => savePrimaryCollege(values.primaryCourtId))}>
+            onPress={handleSubmit((values) => savePrimaryCollege(values.primaryCollegeId))}>
             <Text>Continue</Text>
             {isSaving && <ActivityIndicator />}
           </Button>

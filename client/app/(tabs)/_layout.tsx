@@ -5,7 +5,12 @@ import { THEME } from '@/lib/theme';
 import { BottomTabBar, BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useQuery } from '@tanstack/react-query';
 import { Tabs } from 'expo-router';
-import { Activity, ChartNoAxesColumn, Home as HomeIcon, User } from 'lucide-react-native';
+import {
+  Activity,
+  ChartBarDecreasingIcon,
+  Home as HomeIcon,
+  User
+} from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { View } from 'react-native';
 
@@ -43,7 +48,7 @@ export default function TabsLayout() {
         options={{
           headerShown: false,
           title: 'Leaderboard',
-          tabBarIcon: ({ color }) => <Icon as={ChartNoAxesColumn} size={18} color={color} />,
+          tabBarIcon: ({ color }) => <Icon as={ChartBarDecreasingIcon} size={18} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -57,7 +62,7 @@ export default function TabsLayout() {
             backgroundColor: THEME[colorScheme!].primary,
             color: THEME[colorScheme!].primaryForeground,
             fontWeight: 700,
-            fontSize: 12
+            fontSize: 12,
           },
         }}
       />

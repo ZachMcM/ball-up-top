@@ -5,7 +5,7 @@ import * as z from "zod";
 import { db } from "../db";
 import {
   activity,
-  court,
+  college,
   leaderboard,
   rankChange,
   rating,
@@ -23,7 +23,7 @@ import { redis } from "../utils/redis";
 export const usersRoute = Router();
 
 const PatchPrimaryCollegeSchema = z.object({
-  primaryCourtId: z.number(),
+  primaryCollegeId: z.number(),
 });
 
 usersRoute.patch("/users/primary-college", authMiddleware, async (req, res) => {
@@ -33,13 +33,13 @@ usersRoute.patch("/users/primary-college", authMiddleware, async (req, res) => {
       return res.status(400).json({ error: validBody.error.message });
     }
 
-    const { primaryCourtId } = validBody.data;
+    const { primaryCollegeId } = validBody.data;
 
     await db.transaction(async (tx) => {
       await tx
         .update(user)
         .set({
-          primaryCourtId,
+          primaryCollegeId,
         })
         .where(eq(user.id, res.locals.userId!));
 
@@ -55,7 +55,7 @@ usersRoute.patch("/users/primary-college", authMiddleware, async (req, res) => {
         .insert(leaderboard)
         .values({
           userId: res.locals.userId!,
-          courtId: primaryCourtId,
+          collegeId: primaryCollegeId,
           rank: null,
           lastRatedAt: null,
         })
@@ -68,7 +68,7 @@ usersRoute.patch("/users/primary-college", authMiddleware, async (req, res) => {
       }
     });
 
-    invalidateQueries(["leaderboard", primaryCourtId]);
+    invalidateQueries(["leaderboard", primaryCollegeId]);
     invalidateQueriesForUser(res.locals.userId!, ["home"]);
 
     res.json({ success: true });
@@ -167,14 +167,6 @@ usersRoute.get("/users/activity", authMiddleware, async (_, res) => {
       ),
       orderBy: desc(activity.createdAt),
       with: {
-        court: {
-          columns: {
-            id: true,
-            name: true,
-            collegeName: true,
-            collegeColor: true,
-          },
-        },
         rating: {
           columns: {
             rateeOldOverall: true,
@@ -215,11 +207,11 @@ usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
         defenseRating: user.defenseRating,
         shootingRating: user.shootingRating,
         rank: leaderboard.rank,
-        primaryCollegeName: court.collegeName,
+        primaryCollegeName: college.name,
         rankDelta: sql<number | null>`(SELECT ${rankChange.newRank} - COALESCE(${rankChange.oldRank}, ${rankChange.newRank})
                 FROM ${rankChange}
                 WHERE ${rankChange.userId} = ${user.id}
-                  AND ${rankChange.courtId} = ${user.primaryCourtId}                                                                  
+                  AND ${rankChange.collegeId} = ${user.primaryCollegeId}
                 ORDER BY ${rankChange.createdAt} DESC
                 LIMIT 1 )`,
         overallHistory: sql<{ overall: number; createdAt: Date }[]>`(
@@ -235,11 +227,11 @@ usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
         )`,
       })
       .from(user)
-      .innerJoin(court, eq(user.primaryCourtId, court.id))
+      .innerJoin(college, eq(user.primaryCollegeId, college.id))
       .innerJoin(
         leaderboard,
         and(
-          eq(user.primaryCourtId, leaderboard.courtId),
+          eq(user.primaryCollegeId, leaderboard.collegeId),
           eq(user.id, leaderboard.userId),
         ),
       )
@@ -308,12 +300,12 @@ usersRoute.patch(
         .where(eq(user.id, res.locals.userId!));
 
       const userLeaderboards = await db
-        .select({ courtId: leaderboard.courtId })
+        .select({ collegeId: leaderboard.collegeId })
         .from(leaderboard)
         .where(eq(leaderboard.userId, res.locals.userId!));
 
       for (const entry of userLeaderboards) {
-        invalidateQueries(["leaderboard", entry.courtId]);
+        invalidateQueries(["leaderboard", entry.collegeId]);
       }
 
       return res.json({ image: imageUrl });
@@ -423,12 +415,12 @@ usersRoute.patch(
         .where(eq(user.id, res.locals.userId!));
 
       const userLeaderboards = await db
-        .select({ courtId: leaderboard.courtId })
+        .select({ collegeId: leaderboard.collegeId })
         .from(leaderboard)
         .where(eq(leaderboard.userId, res.locals.userId!));
 
       for (const entry of userLeaderboards) {
-        invalidateQueries(["leaderboard", entry.courtId]);
+        invalidateQueries(["leaderboard", entry.collegeId]);
       }
 
       invalidateQueries(["home"]);

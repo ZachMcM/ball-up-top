@@ -38,7 +38,7 @@ type HeroArchetypeProps = {
 } & ViewProps;
 
 const HERO_SIZE_CLASSES = {
-  sm: 'text-[20px] leading-[22px]',
+  sm: 'text-[24px] leading-[28px]',
   md: 'text-[28px] leading-[31px]',
   lg: 'text-[36px] leading-[40px]',
   xl: 'text-[44px] leading-[48px]',

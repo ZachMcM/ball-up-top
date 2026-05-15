@@ -151,31 +151,25 @@ export default function ActivityPage() {
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator />
           </View>
-        ) : !activityList || activityList.length === 0 ? (
-          <View className="px-4 py-6">
-            <Empty className="border border-dashed border-border">
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <Icon size={22} as={BanIcon} className="text-secondary-foreground" />
-                </EmptyMedia>
-                <EmptyTitle>No Activity</EmptyTitle>
-                <EmptyDescription>
-                  No activity yet. Get out there and hoop to start seeing some activity!
-                </EmptyDescription>
-              </EmptyHeader>
-              <EmptyContent>
-                <Button onPress={() => router.navigate('/(tabs)/(home)')} size="sm">
-                  <Text>Go Home</Text>
-                </Button>
-              </EmptyContent>
-            </Empty>
-          </View>
         ) : hasActivityButFilteredEmpty ? (
           <Text className="text-center text-muted-foreground">
             No {FILTERS.find((f) => f.key === activeFilter)?.label.toLowerCase()} activity yet
           </Text>
         ) : (
           <NativewindSectionList
+            ListEmptyComponent={
+              <Empty className="border border-dashed border-border mx-4">
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <Icon size={22} as={BanIcon} className="text-secondary-foreground" />
+                  </EmptyMedia>
+                  <EmptyTitle>No Activity</EmptyTitle>
+                  <EmptyDescription>
+                    No activity yet. Get out there and hoop to start seeing some activity!
+                  </EmptyDescription>
+                </EmptyHeader>
+              </Empty>
+            }
             stickySectionHeadersEnabled={false}
             sections={activitySections}
             showsVerticalScrollIndicator={false}

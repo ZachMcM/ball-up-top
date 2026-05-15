@@ -24,7 +24,7 @@ export const authClient = createAuthClient({
         height: {
           type: 'string',
         },
-        primaryCourtId: {
+        primaryCollegeId: {
           type: 'number',
         },
       },

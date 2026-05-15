@@ -2,9 +2,11 @@ import { relations } from "drizzle-orm";
 import {
   account,
   activity,
+  college,
   court,
   courtSession,
   encounteredPlayer,
+  leaderboard,
   rankChange,
   rating,
   session,
@@ -20,9 +22,9 @@ export const userRelations = relations(user, ({ many, one }) => ({
   outgoingRatings: many(rating, { relationName: "outgoingRatings" }),
   encounteredPlayersAsRatee: many(encounteredPlayer),
   rankChanges: many(rankChange),
-  primaryCourt: one(court, {
-    fields: [user.primaryCourtId],
-    references: [court.id],
+  primaryCollege: one(college, {
+    fields: [user.primaryCollegeId],
+    references: [college.id],
   }),
 }));
 
@@ -40,9 +42,19 @@ export const accountRelations = relations(account, ({ one }) => ({
   }),
 }));
 
+export const collegeRelations = relations(college, ({ many }) => ({
+  courts: many(court),
+  leaderboards: many(leaderboard),
+  rankChanges: many(rankChange),
+}));
+
 export const courtRelations = relations(court, ({ one, many }) => ({
   createdByUser: many(user),
   courtSessions: many(courtSession),
+  college: one(college, {
+    fields: [court.collegeId],
+    references: [college.id],
+  }),
 }));
 
 export const courtSessionRelations = relations(
@@ -105,9 +117,16 @@ export const activityRelations = relations(activity, ({ one }) => ({
     fields: [activity.rankChangeId],
     references: [rankChange.id],
   }),
-  court: one(court, {
-    fields: [activity.courtId],
-    references: [court.id],
+}));
+
+export const leaderboardRelations = relations(leaderboard, ({ one }) => ({
+  user: one(user, {
+    fields: [leaderboard.userId],
+    references: [user.id],
+  }),
+  college: one(college, {
+    fields: [leaderboard.collegeId],
+    references: [college.id],
   }),
 }));
 
@@ -116,9 +135,9 @@ export const rankChangeRelations = relations(rankChange, ({ one }) => ({
     fields: [rankChange.userId],
     references: [user.id],
   }),
-  court: one(court, {
-    fields: [rankChange.courtId],
-    references: [court.id],
+  college: one(college, {
+    fields: [rankChange.collegeId],
+    references: [college.id],
   }),
   raterCourtSession: one(courtSession, {
     fields: [rankChange.raterCourtSessionId],
