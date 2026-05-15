@@ -16,7 +16,7 @@ import { cn, openDirections } from '@/lib/utils';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { ChevronRight, Navigation } from 'lucide-react-native';
+import { AlertTriangleIcon, ChevronRight, Navigation } from 'lucide-react-native';
 import React, { useCallback, useRef } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 
@@ -88,7 +88,7 @@ export default function HomePage() {
                       </Text>
                     </View>
                     <View className="flex flex-row items-center gap-1.5">
-                      <Text className="text-[13px] text-muted-foreground font-semibold">
+                      <Text className="text-[13px] font-semibold text-muted-foreground">
                         At {home.primaryCourt.collegeName}
                       </Text>
                       <DeltaIndicator value={home.userData.rankDelta} size="sm" />
@@ -222,9 +222,12 @@ export default function HomePage() {
                         )}
                       </Button>
                       {unratedCourtSession && (
-                        <Text className="text-center text-xs text-destructive">
-                          Rate your last session before checking in again
-                        </Text>
+                        <View className="flex flex-row items-center gap-2 self-center">
+                          <Icon as={AlertTriangleIcon} className="text-muted-foreground" />
+                          <Text className="text-center text-xs text-muted-foreground">
+                            Rate your last session before checking in again
+                          </Text>
+                        </View>
                       )}
                       {!unratedCourtSession && (
                         <Text className="text-center text-xs text-muted-foreground">

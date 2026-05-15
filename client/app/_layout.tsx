@@ -1,5 +1,5 @@
 import BackButton from '@/components/BackButton';
-import { CourtSessionProvider, useCourtSession } from '@/components/providers/CourtSessionProvider';
+import { CourtSessionProvider } from '@/components/providers/CourtSessionProvider';
 import { InvalidationProvider } from '@/components/providers/InvalidationProvider';
 import { LocationProvider, useLocation } from '@/components/providers/LocationProvider';
 import { PushNotificationProvider } from '@/components/providers/PushNotificationProvider';
@@ -86,35 +86,17 @@ export default function RootLayout() {
 export function RootNavigator() {
   const { data: currentUserData, isPending: isSessionPending } = authClient.useSession();
   const { locationPermissionStatus } = useLocation();
-  const { unratedCourtSession, areUnratedCourtSessionPending } = useCourtSession();
   const isOnboardingComplete = currentUserData?.user.onboardingStep === 'complete';
 
   const isLoading =
     isSessionPending ||
-    (currentUserData !== null && isOnboardingComplete && locationPermissionStatus === null) ||
-    (currentUserData !== null && isOnboardingComplete && locationPermissionStatus === 'granted' && areUnratedCourtSessionPending);
+    (currentUserData !== null && isOnboardingComplete && locationPermissionStatus === null);
 
   const onboardingStep = currentUserData?.user.onboardingStep!;
   const showOnboarding = !isLoading && currentUserData !== null && !isOnboardingComplete;
 
   return (
     <Stack>
-      <Stack.Protected
-        guard={
-          !isLoading &&
-          currentUserData !== null &&
-          isOnboardingComplete &&
-          locationPermissionStatus === 'granted' &&
-          !!unratedCourtSession
-        }>
-        <Stack.Screen
-          name="rate"
-          options={{
-            title: 'Rate Players',
-            headerBackVisible: false,
-          }}
-        />
-      </Stack.Protected>
       <Stack.Protected
         guard={
           !isLoading &&
@@ -193,11 +175,11 @@ export function RootNavigator() {
         />
       </Stack.Protected>
       <Stack.Screen
+        name="rate"
         options={{
-          presentation: 'modal',
-          headerShown: false,
+          title: 'Rate Players',
+          presentation: "modal"
         }}
-        name="edit-profile"
       />
     </Stack>
   );

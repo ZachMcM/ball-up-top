@@ -3,6 +3,7 @@ import { getDistanceInMiles } from '@/lib/utils';
 import { CourtSession } from '@/types/court';
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { usePathname, useRouter } from 'expo-router';
 import { PauseCircleIcon } from 'lucide-react-native';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
@@ -28,6 +29,8 @@ const CourtSessionContext = createContext<null | CourtSessionContextValues>(null
 
 export function CourtSessionProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const { location } = useLocation();
 
@@ -46,6 +49,12 @@ export function CourtSessionProvider({ children }: { children: ReactNode }) {
     queryKey: ['courtSession', 'unrated'],
     queryFn: async () => await getCourtSessions({ isActive: false, hasRated: false }),
   });
+
+  useEffect(() => {
+    if (!areUnratedCourtSessionPending && unratedCourtSession && pathname !== '/rate') {
+      router.navigate('/rate');
+    }
+  }, [areUnratedCourtSessionPending, unratedCourtSession]);
 
   useEffect(() => {
     if (activeCourtSession && court && location) {

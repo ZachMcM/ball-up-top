@@ -22,7 +22,14 @@ export function ArchetypeDisplay({
     return <HeroArchetype archetype={archetype} size={size} className={className} {...props} />;
   }
 
-  return <InlineArchetype archetype={archetype} size={size} className={className} {...props} />;
+  return (
+    <InlineArchetype
+      archetype={archetype}
+      size={size !== 'xl' ? size : 'lg'}
+      className={className}
+      {...props}
+    />
+  );
 }
 
 type HeroArchetypeProps = {
@@ -39,11 +46,7 @@ const HERO_SIZE_CLASSES = {
 
 function HeroArchetype({ archetype, size = 'md' }: HeroArchetypeProps) {
   return (
-    <Text
-      className={cn(
-        'font-bebas tracking-tighter text-foreground',
-        HERO_SIZE_CLASSES[size]
-      )}>
+    <Text className={cn('font-bebas tracking-tighter text-foreground', HERO_SIZE_CLASSES[size])}>
       {archetype}
     </Text>
   );
@@ -81,7 +84,7 @@ function InlineArchetype({
 
   const textToneClasses = {
     fill: 'text-background',
-    muted: 'text-muted-foreground',
+    muted: 'text-foreground',
   };
 
   return (

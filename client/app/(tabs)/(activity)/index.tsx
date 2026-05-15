@@ -176,6 +176,7 @@ export default function ActivityPage() {
           </Text>
         ) : (
           <NativewindSectionList
+            stickySectionHeadersEnabled={false}
             sections={activitySections}
             showsVerticalScrollIndicator={false}
             SectionSeparatorComponent={() => <View className="h-4" />}
@@ -237,12 +238,7 @@ function ActivityRow({ activity }: { activity: Activity }) {
           <View className="absolute -right-0 top-0 h-2 w-2 rounded-full bg-primary" />
         )}
       </View>
-      <View className="flex flex-1 flex-row items-baseline gap-3">
-        {descriptionComponent}
-        <Text className="text-sm font-medium text-muted-foreground">
-          {getRelativeTime(new Date(activity.createdAt))}
-        </Text>
-      </View>
+      <View className="flex-1">{descriptionComponent}</View>
     </Pressable>
   );
 }
@@ -259,18 +255,21 @@ function getActivityDisplay(activity: Activity): {
       icon: Binary,
       descriptionComponent: (
         <Text className="leading-[22px]">
-          <Text className="text-muted-foreground">Your </Text>
-          <Text className="font-semibold text-muted-foreground">OVR</Text>
-          <Text className="text-muted-foreground">
+          <Text>Your </Text>
+          <Text className="font-semibold">OVR</Text>
+          <Text>
             {' '}
             went {isPositive ? 'up' : 'down'} to{'  '}
           </Text>
-          <Text className="font-bebas text-2xl tabular-nums text-foreground">
+          <Text className="font-bebas text-2xl tabular-nums">
             {activity.rating.rateeNewOverall}
             <Text className={cn('text-lg', colorClass)}>
               {'   '}({isPositive ? '+' : ''}
-              {delta})
+              {delta}){'    '}
             </Text>
+          </Text>
+          <Text className="text-[13px] font-medium text-muted-foreground">
+            {getRelativeTime(new Date(activity.createdAt))}
           </Text>
         </Text>
       ),
@@ -285,18 +284,21 @@ function getActivityDisplay(activity: Activity): {
       icon: ChartLine,
       descriptionComponent: (
         <Text className="leading-[22px]">
-          <Text className="text-muted-foreground">Your </Text>
-          <Text className="font-semibold text-muted-foreground">Rank</Text>
-          <Text className="text-muted-foreground">
+          <Text>Your </Text>
+          <Text className="font-semibold">Rank</Text>
+          <Text>
             {' '}
             went {isPositive ? 'up' : 'down'} to{'  '}
           </Text>
-          <Text className="font-bebas text-2xl tabular-nums text-foreground">
+          <Text className="font-bebas text-2xl tabular-nums">
             #{activity.rankChange.newRank}
             <Text className={cn('text-lg', colorClass)}>
               {'   '}({isPositive ? '+' : ''}
-              {delta})
+              {delta}){'    '}
             </Text>
+          </Text>
+          <Text className="text-[13px] font-medium text-muted-foreground">
+            {getRelativeTime(new Date(activity.createdAt))}
           </Text>
         </Text>
       ),
@@ -307,15 +309,22 @@ function getActivityDisplay(activity: Activity): {
     return {
       icon: ChartPie,
       descriptionComponent: (
-        <View className="flex flex-row items-center gap-2">
-          <Text className="font-bebas text-xl leading-[22px] text-muted-foreground">
-            {activity.rating.rateeOldArchetype}
+        <Text className="leading-[22px]">
+          <Text>Your </Text>
+          <Text className="font-semibold">Overall </Text>
+          <Text>changed from </Text>
+          <Text className="font-bebas text-xl tabular-nums text-muted-foreground">
+            {activity.rating.rateeOldArchetype}{' '}
           </Text>
-          <Icon as={MoveRightIcon} className="text-muted-foreground" size={20} />
-          <Text className="font-bebas text-xl leading-[22px] text-foreground">
+          <Text>to </Text>
+          <Text className="font-bebas text-xl tabular-nums">
             {activity.rating.rateeNewArchetype}
+            {'   '}
           </Text>
-        </View>
+          <Text className="text-[13px] font-medium text-muted-foreground">
+            {getRelativeTime(new Date(activity.createdAt))}
+          </Text>
+        </Text>
       ),
     };
   }

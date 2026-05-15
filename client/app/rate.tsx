@@ -25,6 +25,7 @@ import {
   postSessionRatings,
 } from '@/lib/endpoints';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
 import {
   ArrowLeft,
   ArrowRight,
@@ -180,6 +181,7 @@ export default function RatePage() {
   const [debouncedRatings] = useDebounce(localRatings, 500);
   const hasSubmittedRef = useRef(false);
 
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const { data: hasSubmittedRatingsData, isPending: isHasSubmittedRatingsPending } = useQuery({
@@ -252,6 +254,7 @@ export default function RatePage() {
       if (isLastStep) {
         queryClient.setQueryData(['courtSession', 'unrated'], null);
         toast.success('Ratings submitted successfully!', { position: 'bottom-center' });
+        router.dismiss();
       } else {
         refetch();
         setStep((prev) => prev + 1);
@@ -274,6 +277,7 @@ export default function RatePage() {
     onSuccess: () => {
       queryClient.setQueryData(['courtSession', 'unrated'], null);
       toast.success('Ratings submitted successfully!', { position: 'bottom-center' });
+      router.back();
     },
     onError: (error) => {
       toast.error(error.message, { position: 'bottom-center' });
