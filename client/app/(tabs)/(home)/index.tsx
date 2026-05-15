@@ -35,6 +35,10 @@ export default function HomePage() {
             contentInsetAdjustmentBehavior="automatic"
             contentContainerClassName="flex w-full flex-col gap-4 py-6"
             keyboardShouldPersistTaps="handled">
+              <View className='flex flex-col px-4 pb-4'>
+                <Text className='text-muted-foreground text-xs font-medium'>Welcome Back,</Text>
+                <Text className='font-bold text-lg'>{home.userData.name}</Text>
+              </View>
             <View className="flex flex-row items-start justify-between gap-4 px-4">
               <OVRDisplay value={home.userData.overall} size="md" />
               <View className="flex flex-1 flex-col">

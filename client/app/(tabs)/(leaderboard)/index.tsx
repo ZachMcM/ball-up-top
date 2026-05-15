@@ -90,7 +90,7 @@ export default function LeaderboardPage() {
               <Text className="text-xs font-medium text-muted-foreground">Search All Players</Text>
               <Icon as={ChevronRightIcon} size={14} className="text-muted-foreground" />
             </Pressable>
-            <Text className="text-3xl font-bold">{leaderboard.college.name}</Text>
+            <Text className="text-2xl font-bold">{leaderboard.college.name}</Text>
           </View>
           <NativewindFlatList
             ListEmptyComponent={
