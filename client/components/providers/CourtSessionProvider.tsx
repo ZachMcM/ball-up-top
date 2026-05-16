@@ -238,7 +238,7 @@ export function SessionFooter() {
         <View className="flex flex-row items-center justify-between">
           <View className="flex flex-col">
             <Text className="text-[15px] font-semibold leading-tight text-foreground">
-              Unrated run
+              Unrated Run
             </Text>
             <Text className="text-xs font-medium text-muted-foreground">
               {unratedCourt?.name ?? 'Loading...'}
