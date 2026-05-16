@@ -1,5 +1,15 @@
 import { NativewindScrollView } from '@/components/NativewindScrollView';
 import { Avatar } from '@/components/ui/avatar';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
@@ -29,6 +39,7 @@ export default function EditProfilePage() {
   const [nameValue, setNameValue] = useState(user?.name ?? '');
   const [selectedAsset, setSelectedAsset] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [collegeSearch, setCollegeSearch] = useState('');
+  const [pendingCollegeId, setPendingCollegeId] = useState<number | null>(null);
 
   const { data: colleges, isPending: collegesPending } = useQuery({
     queryKey: ['colleges'],
@@ -143,6 +154,7 @@ export default function EditProfilePage() {
         <Input
           placeholder="Search for your college..."
           value={collegeSearch}
+          className='rounded-full'
           onChangeText={setCollegeSearch}
           editable={!collegesPending}
         />
@@ -155,7 +167,7 @@ export default function EditProfilePage() {
           {filteredColleges?.map((c) => (
             <Pressable
               key={c.id}
-              onPress={() => saveCollege(c.id)}
+              onPress={() => c.id !== currentCollegeId && setPendingCollegeId(c.id)}
               className={cn(
                 'flex flex-row items-center justify-between rounded-2xl border border-border bg-card px-4 py-3 active:opacity-70',
                 currentCollegeId === c.id && 'border-primary'
@@ -184,6 +196,32 @@ export default function EditProfilePage() {
           <Icon as={ChevronRightIcon} size={16} className="text-muted-foreground" />
         </Pressable>
       </View>
+      <AlertDialog open={pendingCollegeId !== null} onOpenChange={(open) => !open && setPendingCollegeId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Switch primary court?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your leaderboard and home feed will switch to{' '}
+              {colleges?.find((c) => c.id === pendingCollegeId)?.name ?? 'this court'}. You can
+              always change it back.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className='flex flex-row items-center'>
+            <AlertDialogCancel onPress={() => setPendingCollegeId(null)}>
+              <Text>Cancel</Text>
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onPress={() => {
+                if (pendingCollegeId !== null) {
+                  saveCollege(pendingCollegeId);
+                  setPendingCollegeId(null);
+                }
+              }}>
+              <Text>Switch</Text>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </NativewindScrollView>
   );
 }
