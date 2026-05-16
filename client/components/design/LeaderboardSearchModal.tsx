@@ -79,31 +79,48 @@ export function LeaderboardSearchModal({ bottomSheetRef, users }: LeaderboardSea
           showsVerticalScrollIndicator={false}
           renderItem={({ item: user, index }) => (
             <Pressable
-              onPress={() => handlePlayerPress(user.id)}
+              key={user.id}
+              onPress={() =>
+                router.push({
+                  pathname: `/(tabs)/(${tabContext})/user/[userId]` as const,
+                  params: { userId: user.id },
+                })
+              }
               className={cn(
                 'flex flex-row items-center justify-between border-b border-border px-4 py-3',
-                index === 0 && 'border-t',
+                index == 0 && 'border-t',
                 user.id === currentUserData?.user.id && 'bg-muted-foreground/10 dark:bg-card'
               )}>
-              <View className="flex flex-row items-center gap-3">
-                <Avatar
-                  className="size-10"
-                  alt={user.name}
-                  source={{ uri: user.image ?? undefined }}
-                />
-                <View className="flex flex-col gap-1">
-                  <Text className="font-semibold">
-                    {user.name}
-                    {user.id === currentUserData?.user.id && (
-                      <Text className="text-muted-foreground font-normal"> (You)</Text>
-                    )}
+              <View className="flex flex-row items-center gap-1">
+                {user.rank && (
+                  <Text
+                    className={cn(
+                      'font-bebas w-8 text-2xl tabular-nums leading-[33px]',
+                      user.rank && user.rank <= 3 ? 'text-foreground' : 'text-muted-foreground'
+                    )}>
+                    #{user.rank}
                   </Text>
-                  <ArchetypeDisplay
-                    tone="muted"
-                    size="md"
-                    variant="inline"
-                    archetype={user.archetype}
+                )}
+                <View className="flex flex-row items-center gap-3">
+                  <Avatar
+                    className="size-10"
+                    alt={user.name}
+                    source={{ uri: user.image ?? undefined }}
                   />
+                  <View className="flex flex-col gap-1">
+                    <Text className="font-semibold">
+                      {user.name}
+                      {user.id === currentUserData?.user.id && (
+                        <Text className="font-normal text-muted-foreground"> (You)</Text>
+                      )}
+                    </Text>
+                    <ArchetypeDisplay
+                      tone="muted"
+                      size="md"
+                      variant="inline"
+                      archetype={user.archetype}
+                    />
+                  </View>
                 </View>
               </View>
               <View className="flex flex-col items-center">

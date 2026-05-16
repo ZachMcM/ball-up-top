@@ -140,16 +140,19 @@ export async function getColleges(): Promise<College[]> {
   });
 }
 
-export async function postCourtSession(id: number, coords: { lat: number; lng: number }) {
-  await serverRequest({
+export async function postCourtSession(
+  id: number,
+  coords: { lat: number; lng: number }
+): Promise<CourtSession> {
+  return await serverRequest({
     endpoint: `/courts/${id}/sessions`,
     method: 'POST',
     body: JSON.stringify(coords),
   });
 }
 
-export async function patchCourtSession(id: number) {
-  await serverRequest({
+export async function patchCourtSession(id: number): Promise<CourtSession> {
+  return await serverRequest({
     endpoint: `/court-sessions/${id}`,
     method: 'PATCH',
   });

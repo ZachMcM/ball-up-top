@@ -79,27 +79,23 @@ export function CourtSessionProvider({ children }: { children: ReactNode }) {
 
   const { mutate: checkIn, isPending: isCheckInPending } = useMutation({
     mutationFn: async (id: number) => {
-      await postCourtSession(id, {
+      return await postCourtSession(id, {
         lat: location?.coords.latitude!,
         lng: location?.coords.longitude!,
       });
-      return id;
     },
     onError: (error) => {
       console.log('Error', error);
       (toast.error(error.message), { position: 'bottom-center' });
     },
-    onSuccess: (courtId) => {
+    onSuccess: async (session) => {
+      const courtId = session.courtId;
+      await queryClient.cancelQueries({ queryKey: ['courtSession', 'isActive'] });
+      queryClient.setQueryData(['courtSession', 'isActive'], session);
       queryClient.invalidateQueries({
         queryKey: ['court', courtId],
       });
       queryClient.invalidateQueries({ queryKey: ['court', courtId, 'active-players'] });
-      queryClient.invalidateQueries({
-        queryKey: ['courtSession', 'isActive'],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['courtSession', 'unrated'],
-      });
       queryClient.invalidateQueries({
         queryKey: ['courts'],
       });
@@ -111,25 +107,24 @@ export function CourtSessionProvider({ children }: { children: ReactNode }) {
 
   const { mutate: checkOut, isPending: isCheckOutPending } = useMutation({
     mutationFn: async () => {
-      await patchCourtSession(activeCourtSession?.id!);
-      return activeCourtSession?.courtId!;
+      return await patchCourtSession(activeCourtSession?.id!);
     },
     onError: (error) => {
       console.log('Error', error);
       (toast.error(error.message), { position: 'bottom-center' });
     },
-    onSuccess: (courtId) => {
+    onSuccess: async (session) => {
+      const courtId = session.courtId;
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: ['courtSession', 'isActive'] }),
+        queryClient.cancelQueries({ queryKey: ['courtSession', 'unrated'] }),
+      ]);
       queryClient.setQueryData(['courtSession', 'isActive'], null);
+      queryClient.setQueryData(['courtSession', 'unrated'], session);
       queryClient.invalidateQueries({
         queryKey: ['court', courtId],
       });
       queryClient.invalidateQueries({ queryKey: ['court', courtId, 'active-players'] });
-      queryClient.invalidateQueries({
-        queryKey: ['courtSession', 'isActive'],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['courtSession', 'unrated'],
-      });
       queryClient.invalidateQueries({
         queryKey: ['courts'],
       });

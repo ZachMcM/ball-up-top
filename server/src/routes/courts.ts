@@ -152,12 +152,15 @@ courtsRoute.post(
         });
       }
 
-      await db.insert(courtSession).values({
-        userId: res.locals.userId!,
-        courtId,
-      });
+      const [insertedSession] = await db
+        .insert(courtSession)
+        .values({
+          userId: res.locals.userId!,
+          courtId,
+        })
+        .returning();
 
-      res.json({ success: true });
+      res.json(insertedSession);
 
       invalidateQueries(["courts"], ["court", courtId]);
       invalidateQueries(["court", courtId, "active-players"]);

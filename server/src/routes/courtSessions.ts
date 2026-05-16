@@ -654,8 +654,8 @@ courtSessionsRoute.patch(
           .json({ error: "Unauthorized for this court session." });
       }
 
-      await db.transaction(async (tx) => {
-        const [updatedCourtSession] = await tx
+      const updatedCourtSession = await db.transaction(async (tx) => {
+        const [updated] = await tx
           .update(courtSession)
           .set({ endTime: new Date(), hasRated: false })
           .where(eq(courtSession.id, sessionId))
@@ -663,9 +663,11 @@ courtSessionsRoute.patch(
 
         await createEncounteredPlayersForSession(
           tx,
-          updatedCourtSession,
+          updated,
           res.locals.userId!,
         );
+
+        return updated;
       });
 
       await sessionRatingReminderQueue.add(
@@ -683,7 +685,7 @@ courtSessionsRoute.patch(
         columns: { id: true, collegeId: true },
       });
 
-      res.json({ success: true });
+      res.json(updatedCourtSession);
 
       invalidateQueries(["courts"], ["court", targetCourtSession.courtId]);
       invalidateQueries([
