@@ -1,6 +1,4 @@
-import { NativewindScrollView } from '@/components/NativewindScrollView';
 import { NativewindSectionList } from '@/components/NativewindSectionList';
-import { Button } from '@/components/ui/button';
 import { Empty, EmptyDescription, EmptyTitle } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
@@ -12,7 +10,12 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format, formatDistanceToNow, isAfter, isToday, isYesterday, subDays } from 'date-fns';
 import { useRouter } from 'expo-router';
-import { Binary, ChartLine, ChartPie, ChevronRightIcon, MoveRightIcon } from 'lucide-react-native';
+import {
+  Binary,
+  ChartColumnIcon,
+  ChartNoAxesCombinedIcon,
+  ChartPieIcon,
+} from 'lucide-react-native';
 import { type ReactNode, useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 
@@ -227,7 +230,7 @@ function getActivityDisplay(activity: Activity): {
     const isPositive = delta > 0;
     const colorClass = isPositive ? 'text-green-400' : 'text-destructive';
     return {
-      icon: Binary,
+      icon: ChartColumnIcon,
       descriptionComponent: (
         <Text className="leading-[22px]">
           <Text>Your </Text>
@@ -256,7 +259,7 @@ function getActivityDisplay(activity: Activity): {
     const isPositive = delta > 0;
     const colorClass = isPositive ? 'text-green-400' : 'text-destructive';
     return {
-      icon: ChartLine,
+      icon: ChartNoAxesCombinedIcon,
       descriptionComponent: (
         <Text className="leading-[22px]">
           <Text>Your </Text>
@@ -282,7 +285,7 @@ function getActivityDisplay(activity: Activity): {
 
   if (activity.type === 'archetype_change' && activity.rating) {
     return {
-      icon: ChartPie,
+      icon: ChartPieIcon,
       descriptionComponent: (
         <Text className="leading-[22px]">
           <Text>Your </Text>

@@ -5,6 +5,7 @@ export type College = {
   city: string;
   primaryColor: string;
   secondaryColor: string;
+  abbreviation: string
 };
 
 export type CollegeLeaderboardUser = {

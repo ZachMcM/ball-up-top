@@ -70,25 +70,25 @@ export default function ProfilePage() {
                   </Text>
                 </View>
               </View>
-              <View className="flex flex-row flex-1 items-start gap-6">
+              <View className="flex flex-1 flex-row items-start gap-6">
                 <OVRDisplay value={user.overall} size="lg" />
-                <View className="flex flex-1 flex-col justify-center gap-2 flex-wrap">
+                <View className="flex flex-1 flex-col justify-center">
                   <ArchetypeDisplay archetype={user.archetype} variant="hero" size="lg" />
                   {user.rank ? (
-                    <View className="flex flex-row items-center gap-2">
+                    <View className="flex flex-row flex-wrap items-center gap-2">
                       <Text className="font-bebas text-4xl tabular-nums leading-[54px]">
                         #{user.rank}
                       </Text>
                       <View className="flex flex-row items-center gap-1">
-                        <Text className="text-[13px] font-semibold text-muted-foreground">
-                          At {user.primaryCollegeName}
+                        <Text className="text-sm font-semibold text-muted-foreground">
+                          At {user.primaryCollegeAbbr}
                         </Text>
                         <DeltaIndicator value={user.rankDelta} size="sm" />
                       </View>
                     </View>
                   ) : (
                     <Text className="text-sm font-semibold text-muted-foreground">
-                      Unranked at {user.primaryCollegeName}
+                      Unranked at {user.primaryCollegeAbbr}
                     </Text>
                   )}
                 </View>

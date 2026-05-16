@@ -183,6 +183,20 @@
       "when": 1778882795231,
       "tag": "0025_supreme_boomerang",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1778889917316,
+      "tag": "0026_outgoing_jetstream",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1778889931755,
+      "tag": "0027_loud_enchantress",
+      "breakpoints": true
     }
   ]
 }

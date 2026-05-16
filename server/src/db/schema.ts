@@ -121,6 +121,7 @@ export const college = pgTable(
     name: text("name").notNull(),
     state: text("state").notNull(),
     city: text("city").notNull(),
+    abbreviation: text().notNull(),
     primaryColor: text("primary_color").notNull(),
     secondaryColor: text("secondary_color").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),

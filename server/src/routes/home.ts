@@ -68,6 +68,7 @@ homeRoute.get("/home", authMiddleware, async (_, res) => {
             city: college.city,
             primaryColor: college.primaryColor,
             secondaryColor: college.secondaryColor,
+            abbreviation: college.abbreviation,
           })
           .from(college)
           .where(eq(college.id, collegeId)),

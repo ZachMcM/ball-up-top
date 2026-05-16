@@ -1,0 +1,1 @@
+ALTER TABLE "college" ALTER COLUMN "abbreviation" DROP DEFAULT;

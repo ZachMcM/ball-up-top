@@ -41,25 +41,25 @@ export default function HomePage() {
               <Text className="text-xs font-medium text-muted-foreground">Welcome Back,</Text>
               <Text className="text-lg font-bold">{home.userData.name}</Text>
             </View>
-            <View className="flex flex-row items-start justify-between gap-4 px-4">
+            <View className="flex flex-1 flex-row items-start gap-6 px-4">
               <OVRDisplay value={home.userData.overall} size="md" />
-              <View className="flex flex-1 flex-col">
+              <View className="flex flex-1 flex-col justify-center">
                 <ArchetypeDisplay archetype={home.userData.archetype} variant="hero" size="md" />
                 {home.userData.rank ? (
-                  <View className="flex flex-row items-center gap-2">
-                    <Text className="font-bebas text-xl tabular-nums leading-[36px]">
+                  <View className="flex flex-row flex-wrap items-center gap-2">
+                    <Text className="font-bebas text-4xl tabular-nums leading-[54px]">
                       #{home.userData.rank}
                     </Text>
                     <View className="flex flex-row items-center gap-1">
-                      <Text className="text-[13px] font-semibold text-muted-foreground">
-                        At {home.primaryCollege.name}
+                      <Text className="text-sm font-semibold text-muted-foreground">
+                        At {home.primaryCollege.abbreviation}
                       </Text>
                       <DeltaIndicator value={home.userData.rankDelta} size="sm" />
                     </View>
                   </View>
                 ) : (
-                  <Text className="max-w-48 text-sm font-semibold text-muted-foreground">
-                    Unranked at {home.primaryCollege.name}
+                  <Text className="text-sm font-semibold text-muted-foreground">
+                    Unranked at {home.primaryCollege.abbreviation}
                   </Text>
                 )}
               </View>
@@ -121,7 +121,9 @@ function CourtRow({
         isFirst && 'border-t'
       )}>
       <View className="flex flex-1 flex-row items-center gap-3">
-        <AspectRatio ratio={1} className="relative aspect-square w-12 overflow-hidden rounded-xl bg-card">
+        <AspectRatio
+          ratio={1}
+          className="relative aspect-square w-12 overflow-hidden rounded-xl bg-card">
           <Image
             source={{
               uri: court.image!,

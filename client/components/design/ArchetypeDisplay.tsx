@@ -40,14 +40,14 @@ type HeroArchetypeProps = {
 const HERO_SIZE_CLASSES = {
   sm: 'text-[24px] leading-[28px]',
   md: 'text-[28px] leading-[31px]',
-  lg: 'text-[36px] leading-[40px]',
+  lg: 'text-[32px] leading-[34px]',
   xl: 'text-[44px] leading-[48px]',
 };
 
 function HeroArchetype({ archetype, size = 'md' }: HeroArchetypeProps) {
   return (
     <Text className={cn('font-bebas tracking-tighter text-foreground', HERO_SIZE_CLASSES[size])}>
-      DOGGY DOG WORLD {archetype}
+      {archetype}
     </Text>
   );
 }
