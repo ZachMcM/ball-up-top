@@ -104,7 +104,7 @@ export default function PrimaryCollegePage() {
                           'flex flex-row items-center justify-between rounded-2xl border border-border bg-card px-4 py-3',
                           value === c.id && 'border-primary'
                         )}>
-                        <Text className={cn("font-medium text-sm")}>{c.name}</Text>
+                        <Text className={cn("font-medium text-sm")}>{c.name} ({c.abbreviation})</Text>
                         {value === c.id && (
                           <Icon as={CheckCircle} size={14} className="text-primary" />
                         )}

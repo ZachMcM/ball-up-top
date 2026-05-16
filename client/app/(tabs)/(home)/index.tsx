@@ -67,7 +67,7 @@ export default function HomePage() {
 
             <View className="flex flex-col gap-4">
               <View className="flex flex-col gap-0.5 px-4">
-                <Text className="text-[16px] font-semibold">{home.primaryCollege.name} Courts</Text>
+                <Text className="text-[17px] font-semibold">{home.primaryCollege.abbreviation} Courts</Text>
                 <Text className="text-sm font-medium text-muted-foreground">
                   {(() => {
                     const live = home.courts.filter((c) => c.activePlayerCount > 0).length;
