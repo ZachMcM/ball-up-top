@@ -1,5 +1,4 @@
 import { NativewindScrollView } from '@/components/NativewindScrollView';
-import { Avatar } from '@/components/ui/avatar';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,6 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
@@ -25,7 +25,7 @@ import { cn } from '@/lib/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { CheckCircleIcon, ChevronRightIcon } from 'lucide-react-native';
+import { CheckCircleIcon, ChevronRightIcon, SquarePenIcon } from 'lucide-react-native';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import { toast } from 'sonner-native';
@@ -100,8 +100,7 @@ export default function EditProfilePage() {
   });
 
   const avatarUri = selectedAsset?.uri ?? user?.image ?? undefined;
-  const identityChanged =
-    (nameValue.trim() && nameValue.trim() !== user?.name) || !!selectedAsset;
+  const identityChanged = (nameValue.trim() && nameValue.trim() !== user?.name) || !!selectedAsset;
 
   const filteredColleges = colleges?.filter((c) =>
     c.name.toLocaleLowerCase().includes(collegeSearch.toLocaleLowerCase())
@@ -112,7 +111,6 @@ export default function EditProfilePage() {
       contentInsetAdjustmentBehavior="automatic"
       keyboardShouldPersistTaps="handled"
       contentContainerClassName="flex flex-col gap-6 px-4 pt-6 pb-12">
-
       {/* Identity */}
       <View className="flex flex-col gap-4">
         <Text className="text-sm font-semibold text-muted-foreground">Identity</Text>
@@ -125,7 +123,10 @@ export default function EditProfilePage() {
             />
           </Pressable>
           <Pressable onPress={pickImage} className="active:opacity-70">
-            <Text className="text-sm font-medium text-primary">Edit Photo</Text>
+            <View className="flex flex-row items-center gap-1">
+              <Text className="text-sm font-medium text-muted-foreground">Edit Photo</Text>
+              <Icon as={SquarePenIcon} className="text-muted-foreground" size={14} />
+            </View>
           </Pressable>
         </View>
         <View className="flex flex-col gap-1.5">
@@ -154,7 +155,7 @@ export default function EditProfilePage() {
         <Input
           placeholder="Search for your college..."
           value={collegeSearch}
-          className='rounded-full'
+          className="rounded-full"
           onChangeText={setCollegeSearch}
           editable={!collegesPending}
         />
@@ -188,15 +189,13 @@ export default function EditProfilePage() {
         <Text className="text-sm font-semibold text-muted-foreground">Email</Text>
         <Pressable
           onPress={() => router.push('/(tabs)/(profile)/edit-email')}
-          className="flex flex-row items-center justify-between rounded-2xl border border-border bg-card px-4 py-3 active:opacity-70">
-          <View className="flex flex-col gap-0.5">
-            <Text className="text-sm font-medium">{user?.email}</Text>
-            <Text className="text-xs text-muted-foreground">Tap to change email</Text>
-          </View>
-          <Icon as={ChevronRightIcon} size={16} className="text-muted-foreground" />
+          className="flex h-10 w-full min-w-0 flex-row items-center rounded-2xl border border-input bg-background px-3 py-1 text-base leading-5 text-foreground shadow-sm shadow-black/5 dark:bg-input/30">
+          <Text>{user?.email}</Text>
         </Pressable>
       </View>
-      <AlertDialog open={pendingCollegeId !== null} onOpenChange={(open) => !open && setPendingCollegeId(null)}>
+      <AlertDialog
+        open={pendingCollegeId !== null}
+        onOpenChange={(open) => !open && setPendingCollegeId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Switch primary court?</AlertDialogTitle>
@@ -206,7 +205,7 @@ export default function EditProfilePage() {
               always change it back.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className='flex flex-row items-center'>
+          <AlertDialogFooter className="flex flex-row items-center">
             <AlertDialogCancel onPress={() => setPendingCollegeId(null)}>
               <Text>Cancel</Text>
             </AlertDialogCancel>
