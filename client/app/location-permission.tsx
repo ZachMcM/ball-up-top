@@ -3,7 +3,7 @@ import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
-import { AlertTriangle, MapPin } from 'lucide-react-native';
+import { AlertCircleIcon, AlertTriangle, MapPin } from 'lucide-react-native';
 import { ActivityIndicator, Linking, View } from 'react-native';
 
 export default function LocationPermissionPage() {
@@ -11,22 +11,20 @@ export default function LocationPermissionPage() {
 
   return (
     <View className="flex w-full flex-1 flex-col items-center justify-center gap-4 p-8">
-      <View className="h-20 w-20 items-center justify-center rounded-full bg-primary/10">
-        <Icon as={MapPin} size={40} className="text-foreground" />
-      </View>
       <View className="items-center gap-2">
         <Text className="text-center text-2xl font-bold">Location Access Needed</Text>
-        <Text className="max-w-xs text-center text-sm font-medium text-muted-foreground">
+        <Text className="max-w-72 text-center text-sm font-medium text-muted-foreground">
           We need your location to show you nearby basketball courts and help you find games.
         </Text>
       </View>
       {locationPermissionStatus === 'denied' ? (
         <>
-          <Alert variant="destructive" icon={AlertTriangle}>
-            <AlertTitle>
+          <View className="flex flex-row items-center gap-2.5 self-center max-w-80">
+            <Icon size={18} as={AlertCircleIcon} className="text-destructive" />
+            <Text className="text-sm text-destructive">
               Loaction access was denied. Please enable it in Settings to continue.
-            </AlertTitle>
-          </Alert>
+            </Text>
+          </View>
           <Button className="w-full" onPress={() => Linking.openSettings()}>
             <Text>Open Settings</Text>
           </Button>
@@ -34,7 +32,7 @@ export default function LocationPermissionPage() {
       ) : (
         <Button className="w-full" onPress={requestPermission} disabled={isRequestingPermission}>
           <Text>Enable Location Access</Text>
-          {isRequestingPermission && <ActivityIndicator className='text-primary-foreground' />}
+          {isRequestingPermission && <ActivityIndicator className="text-primary-foreground" />}
         </Button>
       )}
       <Text className="max-w-sm text-center text-xs text-muted-foreground">

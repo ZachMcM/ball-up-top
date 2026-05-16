@@ -60,11 +60,11 @@ export async function patchUserPrimaryCollege(primaryCollegeId: number) {
   });
 }
 
-export async function patchUserName(name: string) {
+export async function patchUserName(name: string, options?: { onboardingStep?: 'height' }) {
   await serverRequest({
     endpoint: '/users/name',
     method: 'PATCH',
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ name, ...options }),
   });
 }
 

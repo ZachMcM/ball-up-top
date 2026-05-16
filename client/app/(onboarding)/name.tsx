@@ -32,7 +32,7 @@ export default function NamePage() {
 
   const { mutate: saveName, isPending } = useMutation({
     mutationFn: async (name: string) => {
-      await patchUserName(name);
+      await patchUserName(name, { onboardingStep: 'height' });
     },
     onSuccess: () => {
       refetchAuthClientSession();

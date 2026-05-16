@@ -1,5 +1,5 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, gt, ne, sql } from "drizzle-orm";
 import { Router } from "express";
 import * as z from "zod";
 import { db } from "../db";
@@ -10,6 +10,7 @@ import {
   rankChange,
   rating,
   user,
+  verification,
 } from "../db/schema";
 import { handleError } from "../utils/handleError";
 import {
@@ -79,6 +80,7 @@ usersRoute.patch("/users/primary-college", authMiddleware, async (req, res) => {
 
 const PatchNameSchema = z.object({
   name: z.string().min(1),
+  onboardingStep: z.literal("height").optional(),
 });
 
 usersRoute.patch("/users/name", authMiddleware, async (req, res) => {
@@ -89,10 +91,11 @@ usersRoute.patch("/users/name", authMiddleware, async (req, res) => {
     }
 
     const { name } = validBody.data;
+    const advanceStep = validBody.data.onboardingStep === "height";
 
     await db
       .update(user)
-      .set({ name, onboardingStep: "height" })
+      .set({ name, ...(advanceStep && { onboardingStep: "height" }) })
       .where(eq(user.id, res.locals.userId!));
 
     invalidateQueries(["user", res.locals.userId!]);
@@ -314,6 +317,8 @@ usersRoute.patch(
       for (const entry of userLeaderboards) {
         invalidateQueries(["leaderboard", entry.collegeId]);
       }
+
+      invalidateQueries(["user", res.locals.userId!]);
 
       return res.json({ image: imageUrl });
     } catch (error) {

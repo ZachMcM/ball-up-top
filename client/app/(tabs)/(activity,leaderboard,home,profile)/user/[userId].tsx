@@ -8,15 +8,17 @@ import { Empty, EmptyDescription, EmptyTitle } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { VerticalRatingBar } from '@/components/ui/vertical-rating-bar';
+import { authClient } from '@/lib/auth-client';
 import { getUser } from '@/lib/endpoints';
 import { useQuery } from '@tanstack/react-query';
-import { Stack, useLocalSearchParams } from 'expo-router';
-import { ShareIcon } from 'lucide-react-native';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { CogIcon, ShareIcon } from 'lucide-react-native';
 import { ActivityIndicator, Pressable, Share, View } from 'react-native';
 
 export default function ProfilePage() {
   const searchParams = useLocalSearchParams();
   const { userId } = searchParams as { userId: string };
+  const { data: currentUserData } = authClient.useSession();
 
   const { data: user, isPending } = useQuery({
     queryFn: async () => getUser(userId),
@@ -36,14 +38,25 @@ export default function ProfilePage() {
     }
   };
 
+  const router = useRouter();
+
   return (
     <>
       <Stack.Screen
         options={{
           headerRight: () => (
-            <Pressable className="active:opacity-70" onPress={handleShareProfile}>
-              <Icon size={22} as={ShareIcon} />
-            </Pressable>
+            <View className="flex flex-row items-center gap-4">
+              <Pressable className="active:opacity-70" onPress={handleShareProfile}>
+                <Icon size={22} as={ShareIcon} />
+              </Pressable>
+              {currentUserData?.user.id === userId && (
+                <Pressable
+                  className="active:opacity-70"
+                  onPress={() => router.navigate('/(tabs)/(profile)/edit')}>
+                  <Icon size={22} as={CogIcon} />
+                </Pressable>
+              )}
+            </View>
           ),
         }}
       />

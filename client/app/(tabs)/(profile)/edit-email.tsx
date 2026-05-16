@@ -6,6 +6,8 @@ import { useCountdown } from '@/hooks/useCountdown';
 import { authClient } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
 import { ArrowLeftIcon } from 'lucide-react-native';
 import { Fragment, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -14,79 +16,98 @@ import { toast } from 'sonner-native';
 import * as z from 'zod';
 
 const EmailSchema = z.object({
-  email: z.email(),
+  email: z.string().email('Please enter a valid email address'),
 });
 
-export default function AuthPage() {
-  const [isPending, setIsPending] = useState(false);
-  const { countdown, restartCountdown } = useCountdown(30);
+export default function EditEmailPage() {
+  const { data: session, refetch: refetchAuthClientSession } = authClient.useSession();
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
   const [step, setStep] = useState<0 | 1>(0);
   const [otp, setOtp] = useState('');
+  const [isPending, setIsPending] = useState(false);
+  const { countdown, restartCountdown } = useCountdown(30);
 
   const {
-    control: emailControl,
-    handleSubmit: handleEmailSubmit,
-    watch: watchEmail,
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors },
   } = useForm<z.infer<typeof EmailSchema>>({
     resolver: zodResolver(EmailSchema),
   });
 
-  const { email } = watchEmail();
+  const { email } = watch();
+
+  async function sendOTP(emailAddr: string) {
+    const { error } = await authClient.emailOtp.requestEmailChange({
+      newEmail: emailAddr,
+    });
+    if (error) {
+      toast.error(error.message ?? 'Error sending code', { position: 'bottom-center' });
+      return false;
+    }
+    return true;
+  }
+
+  const onSubmitEmail = async ({ email: newEmail }: z.infer<typeof EmailSchema>) => {
+    if (newEmail === session?.user.email) {
+      toast.error('New email must be different from your current email', {
+        position: 'bottom-center',
+      });
+      return;
+    }
+    setIsPending(true);
+    const ok = await sendOTP(newEmail);
+    setIsPending(false);
+    if (ok) {
+      restartCountdown();
+      setStep(1);
+    }
+  };
 
   const onSubmitOtp = async () => {
     setIsPending(true);
-    const { error } = await authClient.signIn.emailOtp({
-      email,
+    const { error } = await authClient.emailOtp.changeEmail({
+      newEmail: email,
       otp,
     });
     setIsPending(false);
+    toast.success("Successfully changed email!")
     if (error && error.message) {
       console.log('Error', error);
       toast.error(error.message, { position: 'bottom-center' });
     }
   };
 
-  const onSubmitEmail = ({ email }: z.infer<typeof EmailSchema>) => {
-    sendOTP(email);
-    restartCountdown();
-    setStep(1);
-  };
-
-  async function sendOTP(email: string) {
-    const { error } = await authClient.emailOtp.sendVerificationOtp({
-      email,
-      type: 'sign-in',
-    });
-    if (error) {
-      console.log('Error:', error);
-      toast.error(error.message ?? 'Error sending OTP', { position: 'bottom-center' });
-    }
-  }
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       className="flex-1 items-center">
       <View className="flex w-full flex-col items-center gap-4 p-8">
-        {step == 0 ? (
+        {step === 0 ? (
           <Fragment>
-            <Text className="text-xl font-bold">What's your email?</Text>
+            <Text className="text-xl font-bold">Enter your new email</Text>
+            <Text className="text-center text-sm text-muted-foreground">
+              Current: {session?.user.email}
+            </Text>
             <Controller
-              control={emailControl}
+              control={control}
               rules={{ required: true }}
               render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
                 <View className="flex w-full flex-col gap-2">
                   <Input
                     autoFocus
-                    placeholder="johndoe@example.com"
+                    placeholder="new@example.com"
                     onBlur={onBlur}
                     onChangeText={onChange}
+                    value={value}
                     className={cn(error && 'border-destructive', 'rounded-full')}
                     textContentType="emailAddress"
                     autoComplete="email"
-                    value={value}
-                    onSubmitEditing={handleEmailSubmit(onSubmitEmail)}
                     keyboardType="email-address"
+                    onSubmitEditing={handleSubmit(onSubmitEmail)}
                   />
                   {error && (
                     <Text className="text-sm font-medium text-destructive">{error.message}</Text>
@@ -95,16 +116,21 @@ export default function AuthPage() {
               )}
               name="email"
             />
-            <Text className="text-center text-xs font-medium text-muted-foreground">
-              By continuing, you agree to our Privacy Policy and Terms of Service
-            </Text>
-            <Button className="w-full" size="lg" onPress={handleEmailSubmit(onSubmitEmail)}>
-              <Text>Continue</Text>
+            <Button
+              className="w-full"
+              size="lg"
+              disabled={isPending}
+              onPress={handleSubmit(onSubmitEmail)}>
+              <Text>Send Code</Text>
+              {isPending && <ActivityIndicator size="small" className="text-primary-foreground" />}
             </Button>
           </Fragment>
         ) : (
           <Fragment>
-            <Text className="text-xl font-bold">Verify your email</Text>
+            <Text className="text-xl font-bold">Verify your new email</Text>
+            <Text className="text-center text-sm text-muted-foreground">
+              We sent a code to {email}
+            </Text>
             <Input
               value={otp}
               onChangeText={setOtp}
@@ -122,8 +148,8 @@ export default function AuthPage() {
               variant="link"
               size="sm"
               disabled={countdown > 0}
-              onPress={() => {
-                sendOTP(email);
+              onPress={async () => {
+                await sendOTP(email);
                 restartCountdown();
               }}>
               <Text className="text-center text-xs">
@@ -135,16 +161,20 @@ export default function AuthPage() {
               <Button
                 variant="outline"
                 onPress={() => {
-                  sendOTP('');
                   setStep(0);
+                  setOtp('');
                 }}
                 size="lg"
                 className="flex-1">
                 <Icon as={ArrowLeftIcon} size={18} />
                 <Text>Back</Text>
               </Button>
-              <Button className="flex-1" disabled={isPending} onPress={onSubmitOtp} size="lg">
-                <Text>Continue</Text>
+              <Button
+                className="flex-1"
+                disabled={isPending || otp.length < 6}
+                onPress={onSubmitOtp}
+                size="lg">
+                <Text>Confirm</Text>
                 {isPending && (
                   <ActivityIndicator size="small" className="text-primary-foreground" />
                 )}

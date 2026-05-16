@@ -188,21 +188,21 @@ export default function LeaderboardPage() {
         </>
       )}
       {currentUserEntry && (
-        <View className="absolute bottom-2 left-3 right-3 flex flex-row items-center gap-3 rounded-2xl bg-foreground px-4 py-3">
+        <View className="absolute bottom-2 left-3 right-3 flex flex-row items-center gap-3 rounded-2xl bg-primary px-4 py-3">
           {currentUserEntry.rank && (
-            <Text className="font-bebas text-3xl font-extrabold leading-[33px] text-background">
+            <Text className="font-bebas text-3xl font-extrabold leading-[33px] text-primary-foreground">
               #{currentUserEntry.rank}
             </Text>
           )}
           <View className="flex-1">
-            <Text className="font-bold text-background">Your Ranking</Text>
-            <Text className="text-xs text-background/70">
+            <Text className="font-bold text-primary-foreground">Your Ranking</Text>
+            <Text className="text-xs text-primary-foreground/90">
               {getPositionContext(leaderboard?.users ?? [], currentUserEntry)}
             </Text>
           </View>
           <View className="flex flex-col items-center">
-            <OVRDisplay value={currentUserEntry.overall} size="sm" className="text-background" />
-            <Text className="text-[10px] font-medium tracking-tight text-background/70">OVR</Text>
+            <OVRDisplay value={currentUserEntry.overall} size="sm" className="text-primary-foreground" />
+            <Text className="text-[10px] font-medium tracking-tight text-primary-foreground/90">OVR</Text>
           </View>
         </View>
       )}

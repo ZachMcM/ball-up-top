@@ -1,6 +1,6 @@
 import { useNavigationState } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
-import { ChevronLeft } from 'lucide-react-native';
+import { ChevronLeftIcon } from 'lucide-react-native';
 import { Pressable } from 'react-native';
 import { Icon } from './ui/icon';
 
@@ -20,7 +20,7 @@ export default function BackButton() {
 
   return (
     <Pressable className='active:opacity-70' onPress={() => router.back()}>
-      <Icon size={22} as={ChevronLeft} />
+      <Icon size={24} as={ChevronLeftIcon} />
     </Pressable>
   );
 }
