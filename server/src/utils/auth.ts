@@ -28,9 +28,12 @@ export const auth = betterAuth({
   plugins: [
     expo(),
     emailOTP({
+      changeEmail: {
+        enabled: true,
+      },
       async sendVerificationOTP({ email, otp, type }) {
-        if (type === "sign-in" || type === "email-verification") {
-          resend.emails.send({
+        if (type === "sign-in" || type === "change-email") {
+          await resend.emails.send({
             from: `Ball Up Top <${process.env.RESEND_FROM_OTP_DNS}>`,
             to: email,
             subject: "Your Ball Up Top one-time verification code",

@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { useCountdown } from '@/hooks/useCountdown';
 import { authClient } from '@/lib/auth-client';
-import { patchUserEmail } from '@/lib/endpoints';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
@@ -42,9 +41,8 @@ export default function EditEmailPage() {
   const { email } = watch();
 
   async function sendOTP(emailAddr: string) {
-    const { error } = await authClient.emailOtp.sendVerificationOtp({
-      email: emailAddr,
-      type: 'email-verification',
+    const { error } = await authClient.emailOtp.requestEmailChange({
+      newEmail: emailAddr,
     });
     if (error) {
       toast.error(error.message ?? 'Error sending code', { position: 'bottom-center' });
@@ -70,18 +68,16 @@ export default function EditEmailPage() {
   };
 
   const onSubmitOtp = async () => {
-    if (!otp || otp.length < 6) return;
     setIsPending(true);
-    try {
-      await patchUserEmail(email, otp);
-      await refetchAuthClientSession();
-      queryClient.invalidateQueries({ queryKey: ['user', session?.user.id] });
-      toast.success('Email updated!', { position: 'bottom-center' });
-      router.back();
-    } catch (error: any) {
-      toast.error(error.message ?? 'Failed to update email', { position: 'bottom-center' });
-    } finally {
-      setIsPending(false);
+    const { error } = await authClient.emailOtp.changeEmail({
+      newEmail: email,
+      otp,
+    });
+    setIsPending(false);
+    toast.success("Successfully changed email!")
+    if (error && error.message) {
+      console.log('Error', error);
+      toast.error(error.message, { position: 'bottom-center' });
     }
   };
 
@@ -126,9 +122,7 @@ export default function EditEmailPage() {
               disabled={isPending}
               onPress={handleSubmit(onSubmitEmail)}>
               <Text>Send Code</Text>
-              {isPending && (
-                <ActivityIndicator size="small" className="text-primary-foreground" />
-              )}
+              {isPending && <ActivityIndicator size="small" className="text-primary-foreground" />}
             </Button>
           </Fragment>
         ) : (

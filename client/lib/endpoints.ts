@@ -249,14 +249,6 @@ export async function patchExpoPushToken(expoPushToken: string): Promise<void> {
   });
 }
 
-export async function patchUserEmail(email: string, otp: string): Promise<void> {
-  await serverRequest({
-    endpoint: '/users/email',
-    method: 'PATCH',
-    body: JSON.stringify({ email, otp }),
-  });
-}
-
 export async function patchActivityRead(): Promise<void> {
   await serverRequest({
     endpoint: '/users/activity/read',
