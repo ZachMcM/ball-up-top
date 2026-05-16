@@ -1,13 +1,13 @@
 import { leaderboardCleanupWorker } from "./leaderboardCleanupWorker";
 import { notificationsWorker } from "./notificationsWorker";
+import { sessionRatingReminderWorker } from "./sessionRatingReminderWorker";
 import { sessionTimeoutWorker } from "./sessionTimeoutWorker";
-import { unratedSessionsWorker } from "./unratedSessionsWorker";
 
 const workersList = [
   leaderboardCleanupWorker,
   notificationsWorker,
+  sessionRatingReminderWorker,
   sessionTimeoutWorker,
-  unratedSessionsWorker,
 ];
 
 export async function closeWorkers() {

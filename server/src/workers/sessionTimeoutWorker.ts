@@ -4,6 +4,7 @@ import { SESSION_TIMEOUT_HOURS } from "../config/courtSessions";
 import { db } from "../db";
 import { court, courtSession } from "../db/schema";
 import { redisConnection } from "../queues";
+import { sessionRatingReminderQueue } from "../queues/sessionRatingReminderQueue";
 import { createEncounteredPlayersForSession } from "../utils/checkoutSession";
 import { invalidateHomeForCollege } from "../utils/invalidateHomeForCollege";
 import { invalidateQueries } from "../utils/invalidateQueries";
@@ -26,6 +27,7 @@ async function processSesssionTimeoutJob(_: Job) {
 
   const now = new Date();
   const affectedCourtIds = new Set<number>();
+  const sessionsNeedingReminders: Array<{ id: number; userId: string }> = [];
 
   for (const session of staleSessions) {
     await db.transaction(async (tx) => {
@@ -46,6 +48,22 @@ async function processSesssionTimeoutJob(_: Job) {
       );
       affectedCourtIds.add(session.courtId);
     });
+
+    const finalSession = await db.query.courtSession.findFirst({
+      where: eq(courtSession.id, session.id),
+      columns: { hasRated: true },
+    });
+    if (finalSession && !finalSession.hasRated) {
+      sessionsNeedingReminders.push({ id: session.id, userId: session.userId });
+    }
+  }
+
+  for (const s of sessionsNeedingReminders) {
+    await sessionRatingReminderQueue.add(
+      "remind_rating",
+      { courtSessionId: s.id, userId: s.userId, reminderCount: 0 },
+      { delay: 60 * 60 * 1000 },
+    );
   }
 
   if (affectedCourtIds.size > 0) {

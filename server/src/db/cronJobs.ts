@@ -1,6 +1,5 @@
 import { leaderboardCleanupQueue } from "../queues/leaderboardCleanupQueue";
 import { sessionTimeoutQueue } from "../queues/sessionTimeoutQueue";
-import { unratedSessionsQueue } from "../queues/unratedSessionsQueue";
 import { logger } from "../utils/logger";
 
 export async function initSessionTimeoutCronJob() {
@@ -27,23 +26,7 @@ export async function initLeaderboardCleanupCronJob() {
   );
 }
 
-export async function initUnratedSessionsCronJob() {
-  await unratedSessionsQueue.add(
-    "notify_unrated_sessions",
-    {},
-    {
-      repeat: { pattern: "0 * * * *" },
-      jobId: "notify-unrated-sessions",
-    },
-  );
-  logger.info("Unrated sessions notification cron job started");
-}
-
-const cronJobsList = [
-  initLeaderboardCleanupCronJob,
-  initSessionTimeoutCronJob,
-  initUnratedSessionsCronJob,
-];
+const cronJobsList = [initLeaderboardCleanupCronJob, initSessionTimeoutCronJob];
 
 export async function initCronJobs() {
   for (const initJob of cronJobsList) {

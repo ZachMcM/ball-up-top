@@ -35,6 +35,7 @@ import {
   OVERLAP_DIFF_THRESH_2_WT,
 } from "../config/ratings";
 import { notificationsQueue } from "../queues/notificationsQueue";
+import { sessionRatingReminderQueue } from "../queues/sessionRatingReminderQueue";
 import {
   createEncounteredPlayersForSession,
   getEncounteredPlayers,
@@ -666,6 +667,23 @@ courtSessionsRoute.patch(
           res.locals.userId!,
         );
       });
+
+      const finalSession = await db.query.courtSession.findFirst({
+        where: eq(courtSession.id, sessionId),
+        columns: { hasRated: true },
+      });
+
+      if (finalSession && !finalSession.hasRated) {
+        await sessionRatingReminderQueue.add(
+          "remind_rating",
+          {
+            courtSessionId: sessionId,
+            userId: res.locals.userId!,
+            reminderCount: 0,
+          },
+          { delay: 60 * 60 * 1000 },
+        );
+      }
 
       const sessionCourt = await db.query.court.findFirst({
         where: eq(court.id, targetCourtSession.courtId),
