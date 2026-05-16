@@ -1,7 +1,8 @@
 import { and, asc, desc, eq, isNotNull, sql } from "drizzle-orm";
 import { Router } from "express";
 import { db } from "../db";
-import { college, leaderboard, rankChange, user } from "../db/schema";
+import { leaderboard, rankChange, user } from "../db/schema";
+import { getAllColleges, getCollegeById } from "../utils/cache";
 import { handleError } from "../utils/handleError";
 import { logger } from "../utils/logger";
 import { authMiddleware } from "../utils/middleware";
@@ -10,19 +11,7 @@ export const collegesRoute = Router();
 
 collegesRoute.get("/colleges", authMiddleware, async (_, res) => {
   try {
-    const colleges = await db
-      .select({
-        id: college.id,
-        name: college.name,
-        state: college.state,
-        city: college.city,
-        primaryColor: college.primaryColor,
-        secondaryColor: college.secondaryColor,
-        abbreviation: college.abbreviation,
-      })
-      .from(college)
-      .orderBy(asc(college.name));
-
+    const colleges = await getAllColleges();
     res.json(colleges);
   } catch (error) {
     handleError(error, res, "GET /colleges");
@@ -41,19 +30,8 @@ collegesRoute.get(
         return res.status(400).json({ error: "College ID is not an integer." });
       }
 
-      const [[collegeData], leaderboardUsers, topMovers] = await Promise.all([
-        db
-          .select({
-            id: college.id,
-            name: college.name,
-            state: college.state,
-            city: college.city,
-            primaryColor: college.primaryColor,
-            secondaryColor: college.secondaryColor,
-            abbreviation: college.abbreviation,
-          })
-          .from(college)
-          .where(eq(college.id, collegeId)),
+      const [collegeData, leaderboardUsers, topMovers] = await Promise.all([
+        getCollegeById(collegeId),
         db
           .select({
             rank: leaderboard.rank,

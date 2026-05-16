@@ -246,6 +246,7 @@ export const rating = pgTable(
     index("rating_rater_court_session_idx").on(table.raterCourtSessionId),
     index("rating_created_at_idx").on(table.createdAt),
     index("rating_ratee_court_session_idx").on(table.rateeCourtSessionId),
+    index("rating_ratee_created_at_idx").on(table.rateeId, table.createdAt),
   ],
 );
 
@@ -316,22 +317,31 @@ export const encounteredPlayer = pgTable(
   ],
 );
 
-export const activity = pgTable("activity", {
-  id: serial().primaryKey().notNull(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id)
-    .notNull(),
-  type: text()
-    .$type<"overall_change" | "rank_change" | "archetype_change">()
-    .notNull(),
+export const activity = pgTable(
+  "activity",
+  {
+    id: serial().primaryKey().notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id)
+      .notNull(),
+    type: text()
+      .$type<"overall_change" | "rank_change" | "archetype_change">()
+      .notNull(),
 
-  ratingId: integer("rating_id").references(() => rating.id),
-  rankChangeId: integer("rank_change_id"),
+    ratingId: integer("rating_id").references(() => rating.id),
+    rankChangeId: integer("rank_change_id"),
 
-  read: boolean("read").notNull().default(false),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+    read: boolean("read").notNull().default(false),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("activity_user_created_at_idx").on(
+      table.userId,
+      table.createdAt.desc(),
+    ),
+  ],
+);
 
 export const leaderboard = pgTable(
   "leaderboard",
@@ -378,5 +388,15 @@ export const rankChange = pgTable(
     index("rank_change_college_id_idx").on(table.collegeId),
     index("rank_change_rater_court_session_idx").on(table.raterCourtSessionId),
     index("rank_change_created_at_idx").on(table.createdAt),
+    index("rank_change_user_college_created_at_idx").on(
+      table.userId,
+      table.collegeId,
+      table.createdAt.desc(),
+    ),
+    index("rank_change_college_user_created_at_idx").on(
+      table.collegeId,
+      table.userId,
+      table.createdAt.desc(),
+    ),
   ],
 );

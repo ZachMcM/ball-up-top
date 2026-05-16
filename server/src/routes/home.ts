@@ -1,14 +1,8 @@
 import { and, asc, eq, isNull, sql } from "drizzle-orm";
 import { Router } from "express";
 import { db } from "../db";
-import {
-  college,
-  court,
-  courtSession,
-  leaderboard,
-  rankChange,
-  user,
-} from "../db/schema";
+import { court, courtSession, leaderboard, rankChange, user } from "../db/schema";
+import { getCollegeById, getCourtsByCollege } from "../utils/cache";
 import { handleError } from "../utils/handleError";
 import { authMiddleware } from "../utils/middleware";
 
@@ -34,7 +28,7 @@ homeRoute.get("/home", authMiddleware, async (_, res) => {
 
     const collegeId = currentUser.primaryCollegeId;
 
-    const [[userData], [primaryCollege], courts, activePlayerRows] =
+    const [[userData], primaryCollege, courts, activePlayerRows] =
       await Promise.all([
         db
           .select({
@@ -60,28 +54,8 @@ homeRoute.get("/home", authMiddleware, async (_, res) => {
             ),
           )
           .where(eq(user.id, userId)),
-        db
-          .select({
-            id: college.id,
-            name: college.name,
-            state: college.state,
-            city: college.city,
-            primaryColor: college.primaryColor,
-            secondaryColor: college.secondaryColor,
-            abbreviation: college.abbreviation,
-          })
-          .from(college)
-          .where(eq(college.id, collegeId)),
-        db
-          .select({
-            id: court.id,
-            name: court.name,
-            address: court.address,
-            image: court.image,
-          })
-          .from(court)
-          .where(eq(court.collegeId, collegeId))
-          .orderBy(asc(court.name)),
+        getCollegeById(collegeId),
+        getCourtsByCollege(collegeId),
         db
           .select({
             courtId: courtSession.courtId,

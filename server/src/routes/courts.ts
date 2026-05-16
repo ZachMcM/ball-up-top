@@ -5,6 +5,7 @@ import { MAX_DISTANCE_FOR_CHECK_IN } from "../config/courts";
 import { db } from "../db";
 import { court, courtSession, user } from "../db/schema";
 import { notificationsQueue } from "../queues/notificationsQueue";
+import { getCourtById } from "../utils/cache";
 import { getDistanceInMiles } from "../utils/getDistanceMiles";
 import { handleError } from "../utils/handleError";
 import { invalidateHomeForCollege } from "../utils/invalidateHomeForCollege";
@@ -26,16 +27,7 @@ courtsRoute.get("/courts/:id", authMiddleware, async (req, res) => {
       return res.status(400).json({ error: "Court ID is not an integer." });
     }
 
-    const [targetCourt] = await db
-      .select({
-        id: court.id,
-        name: court.name,
-        address: court.address,
-        lat: court.lat,
-        lng: court.lng,
-      })
-      .from(court)
-      .where(eq(court.id, courtId));
+    const targetCourt = await getCourtById(courtId);
 
     res.json(targetCourt);
   } catch (error) {
@@ -54,18 +46,8 @@ courtsRoute.get(
         return res.status(400).json({ error: "Court ID is not an integer." });
       }
 
-      const [[targetCourt], activePlayers] = await Promise.all([
-        db
-          .select({
-            id: court.id,
-            name: court.name,
-            address: court.address,
-            lat: court.lat,
-            lng: court.lng,
-            image: court.image,
-          })
-          .from(court)
-          .where(eq(court.id, courtId)),
+      const [targetCourt, activePlayers] = await Promise.all([
+        getCourtById(courtId),
         db
           .select({
             id: user.id,
