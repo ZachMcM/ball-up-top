@@ -40,6 +40,7 @@ export default function EditProfilePage() {
   const [selectedAsset, setSelectedAsset] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [collegeSearch, setCollegeSearch] = useState('');
   const [pendingCollegeId, setPendingCollegeId] = useState<number | null>(null);
+  const [signOutDialogOpen, setSignOutDialogOpen] = useState(false)
 
   const { data: colleges, isPending: collegesPending } = useQuery({
     queryKey: ['colleges'],
@@ -93,6 +94,16 @@ export default function EditProfilePage() {
       queryClient.invalidateQueries({ queryKey: ['home'] });
       queryClient.invalidateQueries({ queryKey: ['leaderboard', collegeId] });
       toast.success('Primary court updated!', { position: 'bottom-center' });
+    },
+    onError: (error) => {
+      toast.error(error.message, { position: 'bottom-center' });
+    },
+  });
+
+  const { mutate: signOut, isPending: isSigningOut } = useMutation({
+    mutationFn: () => authClient.signOut(),
+    onSuccess: () => {
+      router.replace('/auth');
     },
     onError: (error) => {
       toast.error(error.message, { position: 'bottom-center' });
@@ -164,23 +175,46 @@ export default function EditProfilePage() {
             <ActivityIndicator size="small" />
           </View>
         )}
-        <View className="flex flex-col gap-2">
-          {filteredColleges?.map((c) => (
-            <Pressable
-              key={c.id}
-              onPress={() => c.id !== currentCollegeId && setPendingCollegeId(c.id)}
-              className={cn(
-                'flex flex-row items-center justify-between rounded-2xl border border-border bg-card px-4 py-3 active:opacity-70',
-                currentCollegeId === c.id && 'border-primary'
-              )}>
-              <Text className="text-sm font-medium">
-                {c.name} ({c.abbreviation})
+        <View className="flex flex-col">
+          {collegesPending ? (
+            [1, 2, 3, 4].map((i) => (
+              <View key={i} className="flex flex-col gap-1.5 border-b border-border px-4 py-3">
+                <View className="h-3 rounded-full bg-muted" style={{ width: 140 + i * 24 }} />
+                <View className="h-2 rounded-full bg-muted" style={{ width: 52 + i * 8 }} />
+              </View>
+            ))
+          ) : filteredColleges?.length === 0 && collegeSearch.length > 0 ? (
+            <View className="items-center py-8">
+              <Text className="text-center text-sm text-muted-foreground">
+                No colleges match "{collegeSearch}". Try a shorter term.
               </Text>
-              {currentCollegeId === c.id && (
-                <Icon as={CheckCircleIcon} size={14} className="text-primary" />
-              )}
-            </Pressable>
-          ))}
+            </View>
+          ) : (
+            filteredColleges?.map((c, index) => (
+              <Pressable
+                key={c.id}
+                onPress={() => c.id !== currentCollegeId && setPendingCollegeId(c.id)}
+                className={cn(
+                  'flex flex-row items-center justify-between border-b border-border px-4 py-3 active:opacity-70',
+                  index === 0 && 'border-t',
+                  currentCollegeId === c.id && 'bg-primary/10'
+                )}>
+                <View className="flex flex-col gap-0.5">
+                  <Text
+                    className={cn(
+                      'text-sm',
+                      currentCollegeId === c.id ? 'font-semibold' : 'font-medium'
+                    )}>
+                    {c.name}
+                  </Text>
+                  <Text className="text-xs text-muted-foreground">{c.abbreviation}</Text>
+                </View>
+                {currentCollegeId === c.id && (
+                  <Icon as={CheckCircleIcon} size={18} className="text-primary" />
+                )}
+              </Pressable>
+            ))
+          )}
         </View>
       </View>
 
@@ -193,6 +227,15 @@ export default function EditProfilePage() {
           <Text>{user?.email}</Text>
         </Pressable>
       </View>
+
+      {/* Account */}
+      <View className="flex flex-col gap-4">
+        <Text className="text-sm font-semibold text-muted-foreground">Account</Text>
+        <AlertDialog open={signOutDialogOpen} onOpenChange={setSignOutDialogOpen}>
+          
+        </AlertDialog>
+      </View>
+
       <AlertDialog
         open={pendingCollegeId !== null}
         onOpenChange={(open) => !open && setPendingCollegeId(null)}>

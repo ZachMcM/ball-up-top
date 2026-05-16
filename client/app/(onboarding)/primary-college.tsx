@@ -75,23 +75,38 @@ export default function PrimaryCollegePage() {
           control={control}
           rules={{ required: true }}
           render={({ field: { onChange, value }, fieldState: { error } }) => {
+            const filtered =
+              searchInput.length > 0
+                ? colleges?.filter((c) =>
+                    c.name.toLocaleLowerCase().includes(searchInput.toLocaleLowerCase())
+                  )
+                : [];
             return (
               <View className="flex w-full flex-col gap-4">
                 <Input
-                  className='rounded-full'
+                  className="rounded-full"
                   placeholder="Search for your college..."
                   value={searchInput}
                   onChangeText={setSearchInput}
-                  editable={!collegesPending || !colleges}
+                  editable={!collegesPending && !!colleges}
                 />
-                <View className="flex flex-col gap-2">
-                  <Text className='text-sm text-muted-foreground'>Results</Text>
-                  {colleges
-                    ?.filter((c) =>
-                      c.name.toLocaleLowerCase().includes(searchInput.toLocaleLowerCase())
-                    )
-                    .map((c) => (
+                <View className="flex flex-col">
+                  {searchInput.length === 0 ? (
+                    <View className="items-center py-8">
+                      <Text className="text-sm text-center text-muted-foreground">
+                        Type your college name to find your court.
+                      </Text>
+                    </View>
+                  ) : filtered?.length === 0 ? (
+                    <View className="items-center py-8">
+                      <Text className="text-sm text-center text-muted-foreground">
+                        No colleges match "{searchInput}". Try a shorter term.
+                      </Text>
+                    </View>
+                  ) : (
+                    filtered?.map((c, index) => (
                       <Pressable
+                        key={c.id}
                         onPress={() => {
                           if (c.id === value) {
                             onChange(undefined);
@@ -99,17 +114,27 @@ export default function PrimaryCollegePage() {
                             onChange(c.id);
                           }
                         }}
-                        key={c.id}
                         className={cn(
-                          'flex flex-row items-center justify-between rounded-2xl border border-border bg-card px-4 py-3',
-                          value === c.id && 'border-primary'
+                          'flex flex-row items-center justify-between border-b border-border px-4 py-3 active:opacity-70',
+                          index === 0 && 'border-t',
+                          value === c.id && 'bg-primary/10'
                         )}>
-                        <Text className={cn("font-medium text-sm")}>{c.name} ({c.abbreviation})</Text>
+                        <View className="flex flex-col gap-0.5">
+                          <Text
+                            className={cn(
+                              'text-sm',
+                              value === c.id ? 'font-semibold' : 'font-medium'
+                            )}>
+                            {c.name}
+                          </Text>
+                          <Text className="text-xs text-muted-foreground">{c.abbreviation}</Text>
+                        </View>
                         {value === c.id && (
-                          <Icon as={CheckCircle} size={14} className="text-primary" />
+                          <Icon as={CheckCircle} size={18} className="text-primary" />
                         )}
                       </Pressable>
-                    ))}
+                    ))
+                  )}
                 </View>
                 {error && (
                   <Text className="text-sm font-medium text-destructive">{error.message}</Text>
