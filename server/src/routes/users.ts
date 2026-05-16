@@ -1,5 +1,5 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, gt, ne, sql } from "drizzle-orm";
 import { Router } from "express";
 import * as z from "zod";
 import { db } from "../db";
@@ -10,6 +10,7 @@ import {
   rankChange,
   rating,
   user,
+  verification,
 } from "../db/schema";
 import { handleError } from "../utils/handleError";
 import {
@@ -79,6 +80,7 @@ usersRoute.patch("/users/primary-college", authMiddleware, async (req, res) => {
 
 const PatchNameSchema = z.object({
   name: z.string().min(1),
+  onboardingStep: z.literal("height").optional(),
 });
 
 usersRoute.patch("/users/name", authMiddleware, async (req, res) => {
@@ -89,10 +91,11 @@ usersRoute.patch("/users/name", authMiddleware, async (req, res) => {
     }
 
     const { name } = validBody.data;
+    const advanceStep = validBody.data.onboardingStep === "height";
 
     await db
       .update(user)
-      .set({ name, onboardingStep: "height" })
+      .set({ name, ...(advanceStep && { onboardingStep: "height" }) })
       .where(eq(user.id, res.locals.userId!));
 
     invalidateQueries(["user", res.locals.userId!]);
@@ -315,6 +318,8 @@ usersRoute.patch(
         invalidateQueries(["leaderboard", entry.collegeId]);
       }
 
+      invalidateQueries(["user", res.locals.userId!]);
+
       return res.json({ image: imageUrl });
     } catch (error) {
       handleError(error, res, "PATCH /users/image");
@@ -438,3 +443,53 @@ usersRoute.patch(
     }
   },
 );
+
+const PatchEmailSchema = z.object({
+  email: z.string().email(),
+  otp: z.string().length(6),
+});
+
+usersRoute.patch("/users/email", authMiddleware, async (req, res) => {
+  try {
+    const validBody = PatchEmailSchema.safeParse(req.body);
+    if (!validBody.success) {
+      return res.status(400).json({ error: validBody.error.message });
+    }
+
+    const { email, otp } = validBody.data;
+    const userId = res.locals.userId!;
+
+    const existingUser = await db.query.user.findFirst({
+      where: and(eq(user.email, email), ne(user.id, userId)),
+      columns: { id: true },
+    });
+
+    if (existingUser) {
+      return res.status(400).json({ error: "Email already in use" });
+    }
+
+    const record = await db.query.verification.findFirst({
+      where: and(
+        eq(verification.identifier, email),
+        gt(verification.expiresAt, new Date()),
+      ),
+    });
+
+    if (!record || record.value !== otp) {
+      return res.status(400).json({ error: "Invalid or expired code" });
+    }
+
+    await db.delete(verification).where(eq(verification.id, record.id));
+
+    await db
+      .update(user)
+      .set({ email, emailVerified: true })
+      .where(eq(user.id, userId));
+
+    invalidateQueries(["user", userId]);
+
+    return res.json({ success: true });
+  } catch (error) {
+    handleError(error, res, "PATCH /users/email");
+  }
+});

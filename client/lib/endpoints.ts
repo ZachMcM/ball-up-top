@@ -60,11 +60,11 @@ export async function patchUserPrimaryCollege(primaryCollegeId: number) {
   });
 }
 
-export async function patchUserName(name: string) {
+export async function patchUserName(name: string, options?: { onboardingStep?: 'height' }) {
   await serverRequest({
     endpoint: '/users/name',
     method: 'PATCH',
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ name, ...options }),
   });
 }
 
@@ -246,6 +246,14 @@ export async function patchExpoPushToken(expoPushToken: string): Promise<void> {
     endpoint: '/users/expoPushToken',
     method: 'PATCH',
     body: JSON.stringify({ expoPushToken }),
+  });
+}
+
+export async function patchUserEmail(email: string, otp: string): Promise<void> {
+  await serverRequest({
+    endpoint: '/users/email',
+    method: 'PATCH',
+    body: JSON.stringify({ email, otp }),
   });
 }
 

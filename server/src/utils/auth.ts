@@ -29,7 +29,7 @@ export const auth = betterAuth({
     expo(),
     emailOTP({
       async sendVerificationOTP({ email, otp, type }) {
-        if (type === "sign-in") {
+        if (type === "sign-in" || type === "email-verification") {
           resend.emails.send({
             from: `Ball Up Top <${process.env.RESEND_FROM_OTP_DNS}>`,
             to: email,
