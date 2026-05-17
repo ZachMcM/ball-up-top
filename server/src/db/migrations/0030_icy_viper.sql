@@ -1,0 +1,1 @@
+ALTER TABLE "rating" ALTER COLUMN "anonymous_rater_at_time" DROP DEFAULT;

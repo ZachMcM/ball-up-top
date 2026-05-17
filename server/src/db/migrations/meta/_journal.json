@@ -204,6 +204,20 @@
       "when": 1778899267336,
       "tag": "0028_abandoned_spyke",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1779064569940,
+      "tag": "0029_grey_black_widow",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1779064588990,
+      "tag": "0030_icy_viper",
+      "breakpoints": true
     }
   ]
 }

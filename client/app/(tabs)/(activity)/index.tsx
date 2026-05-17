@@ -2,6 +2,7 @@ import { NativewindSectionList } from '@/components/NativewindSectionList';
 import { Empty, EmptyDescription, EmptyTitle } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
+import { useTabContext } from '@/hooks/useTabContext';
 import { authClient } from '@/lib/auth-client';
 import { getActivity, patchActivityRead } from '@/lib/endpoints';
 import { cn } from '@/lib/utils';
@@ -9,6 +10,7 @@ import { Activity } from '@/types/activity';
 import { useFocusEffect } from '@react-navigation/native';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format, formatDistanceToNow, isAfter, isToday, isYesterday, subDays } from 'date-fns';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import {
   Binary,
@@ -28,14 +30,13 @@ type FilterType = 'all' | 'overall_change' | 'rank_change' | 'archetype_change';
 
 const FILTERS: { key: FilterType; label: string }[] = [
   { key: 'all', label: 'All' },
-  { key: 'overall_change', label: 'Ratings' },
+  { key: 'overall_change', label: 'Overall' },
   { key: 'rank_change', label: 'Rank' },
   { key: 'archetype_change', label: 'Archetype' },
 ];
 
 export default function ActivityPage() {
   const queryClient = useQueryClient();
-  const router = useRouter();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
 
   const { data: activityList, isPending: activityPending } = useQuery({
@@ -171,7 +172,7 @@ export default function ActivityPage() {
 }
 
 function getRelativeTime(date: Date): string {
-  if (isToday(date)) {
+  if (isToday(date) || isYesterday(date)) {
     const distance = formatDistanceToNow(date, { addSuffix: false });
     if (distance.includes('less than')) return 'now';
     return distance
@@ -181,12 +182,14 @@ function getRelativeTime(date: Date): string {
       .replace(' hours', 'h')
       .replace(' hour', 'h');
   }
-  return format(date, 'h:mm a');
+  return format(date, 'MM/d/yy');
 }
 
 function ActivityRow({ activity }: { activity: Activity }) {
   const router = useRouter();
   const { data: currentUserdata } = authClient.useSession();
+
+  const tabContext = useTabContext();
 
   const handlePress = () => {
     if (activity.type === 'overall_change' || activity.type === 'archetype_change') {
@@ -196,10 +199,15 @@ function ActivityRow({ activity }: { activity: Activity }) {
       });
     } else if (activity.type === 'rank_change') {
       router.push('/(tabs)/(leaderboard)');
+    } else {
+      router.push({
+        pathname: `/(tabs)/(${tabContext})/user/[userId]` as const,
+        params: { userId: activity.rating?.rater.id! },
+      });
     }
   };
 
-  const { icon, descriptionComponent } = getActivityDisplay(activity);
+  const { icon, imageUrl, descriptionComponent } = getActivityDisplay(activity);
 
   return (
     <Pressable
@@ -208,10 +216,22 @@ function ActivityRow({ activity }: { activity: Activity }) {
         'w-full flex-row items-center gap-3 px-4 py-3 active:opacity-80',
         !activity.read && 'bg-accent/30'
       )}>
-      <View className="relative h-10 w-10">
-        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary">
-          <Icon as={icon} size={20} className="text-primary-foreground" />
-        </View>
+      <View className="relative h-10 w-10 overflow-hidden">
+        {icon ? (
+          <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary">
+            <Icon as={icon} size={20} className="text-primary-foreground" />
+          </View>
+        ) : (
+          imageUrl && (
+            <Image
+              source={{
+                uri: imageUrl,
+              }}
+              style={{ width: '100%', height: '100%' }}
+              className="absolute inset-0 object-cover"
+            />
+          )
+        )}
         {!activity.read && (
           <View className="absolute -right-0 top-0 h-2 w-2 rounded-full bg-primary" />
         )}
@@ -222,7 +242,8 @@ function ActivityRow({ activity }: { activity: Activity }) {
 }
 
 function getActivityDisplay(activity: Activity): {
-  icon: typeof Binary;
+  icon?: typeof Binary;
+  imageUrl?: string;
   descriptionComponent: ReactNode;
 } {
   if (activity.type === 'overall_change' && activity.rating) {
@@ -275,6 +296,10 @@ function getActivityDisplay(activity: Activity): {
               {delta}){'    '}
             </Text>
           </Text>
+          <Text>
+            at {activity.rankChange.college.name}
+            {'  '}
+          </Text>
           <Text className="text-[13px] font-medium text-muted-foreground">
             {getRelativeTime(new Date(activity.createdAt))}
           </Text>
@@ -299,6 +324,22 @@ function getActivityDisplay(activity: Activity): {
             {activity.rating.rateeNewArchetype}
             {'   '}
           </Text>
+          <Text className="text-[13px] font-medium text-muted-foreground">
+            {getRelativeTime(new Date(activity.createdAt))}
+          </Text>
+        </Text>
+      ),
+    };
+  }
+
+  if (activity.type === 'rating' && activity.rating) {
+    return {
+      imageUrl: activity.rating.rater.image,
+      descriptionComponent: (
+        <Text className="leading-[22px]">
+          <Text>You received a rating from</Text>
+          <Text className="font-semibold">{activity.rating.rater.name} </Text>
+          <Text>at {activity.rating.rateeCourtSession.court.name}</Text>
           <Text className="text-[13px] font-medium text-muted-foreground">
             {getRelativeTime(new Date(activity.createdAt))}
           </Text>

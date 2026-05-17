@@ -52,16 +52,12 @@ export function LeaderboardSearchModal({ bottomSheetRef, users }: LeaderboardSea
       handleIndicatorStyle={{ backgroundColor: THEME[colorScheme!].muted }}
       onDismiss={() => setSearchQuery('')}>
       <BottomSheetView className="flex flex-1 flex-col gap-6">
-        <View className="flex flex-col gap-0.5 px-4">
-          <Text className="text-lg font-bold">Search All Players</Text>
-          <Text className="text-sm font-medium text-muted-foreground">{users.length} players</Text>
-        </View>
-        <View className="px-4">
+        <View className="px-4 pt-4">
           <Input
             className="h-9 rounded-full"
             value={searchQuery}
             onChangeText={setSearchQuery}
-            placeholder="Search players..."
+            placeholder="Search All Players..."
             autoCorrect={false}
           />
         </View>

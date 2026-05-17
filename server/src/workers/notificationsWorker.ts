@@ -8,13 +8,11 @@ import {
   courtSession,
   rankChange,
   rating,
-  user
+  user,
 } from "../db/schema";
 import { redisConnection } from "../queues";
 import { NotificationJobData } from "../queues/notificationsQueue";
-import {
-  invalidateQueriesForUser
-} from "../utils/invalidateQueries";
+import { invalidateQueriesForUser } from "../utils/invalidateQueries";
 import { logger } from "../utils/logger";
 import {
   sendPushNotification,
@@ -30,6 +28,14 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
       if (data.ratingIds.length > 0) {
         const ratings = await db.query.rating.findMany({
           where: inArray(rating.id, data.ratingIds),
+          with: {
+            ratee: {
+              columns: {
+                id: true,
+                name: true,
+              },
+            },
+          },
         });
 
         for (const r of ratings) {
@@ -47,7 +53,7 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
               userId: r.rateeId,
               title: "Overall Changed",
               body: `Your overall ${direction} to ${r.rateeNewOverall}!`,
-              data: { type: "overall_change", ratingId: r.id },
+              data: { url: "(tabs)/activity" },
             });
           }
 
@@ -63,7 +69,22 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
               userId: r.rateeId,
               title: "Archetype Changed",
               body: `Your archetype is now ${r.rateeNewArchetype}!`,
-              data: { type: "archetype_change", ratingId: r.id },
+              data: { url: "(tabs)/activity" },
+            });
+          }
+
+          if (!r.anonymousRaterAtTime) {
+            await db.insert(activity).values({
+              userId: r.rateeId,
+              type: "rating",
+              ratingId: r.id,
+            });
+
+            await sendPushNotification({
+              userId: r.rateeId,
+              title: "Received A Rating",
+              body: `You received a rating from ${r.ratee.name}!`,
+              data: { url: "(tabs)/activity" },
             });
           }
 
@@ -95,7 +116,7 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
             userId: rc.userId,
             title: "Rank Changed",
             body: msg,
-            data: { type: "rank_change", rankChangeId: rc.id },
+            data: { url: "(tabs)/activity" },
           });
 
           invalidateQueriesForUser(rc.userId, ["activity"]);
@@ -121,8 +142,6 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
       const activeCount = result?.count ?? 0;
 
       if (activeCount >= COURT_NOTI_THRESHOLD) {
-        // TODO change this to all users with this primary court versus subscribers
-        // Get court info
         const targetCourt = await db.query.court.findFirst({
           where: eq(court.id, data.courtId),
           columns: {
@@ -147,7 +166,14 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
             userIds: subscribedUsers.map((su) => su.id),
             title: `${targetCourt.name} is Active!`,
             body: `${activeCount} ${activeCount === 1 ? "player" : "players"} are currently playing.`,
-            data: { type: "court_activity", courtId: data.courtId },
+            data: {
+              url: {
+                pathname: "(tabs)/home/court/[courtId]/active-players",
+                params: {
+                  courtId: targetCourt.id,
+                },
+              },
+            },
           });
         }
       }

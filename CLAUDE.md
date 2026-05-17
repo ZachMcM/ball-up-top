@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Ball Up Top is a mobile pickup basketball app where players check into courts via GPS, rate opponents after sessions, and build skill profiles with EMA-weighted ratings (45-99) and 40+ archetypes. Positioned as "Yik Yak for college pickup basketball" — one court per campus, leaderboard-driven.
+Ball Up Top is a mobile pickup basketball app where players check into courts via GPS, rate opponents after sessions, and build skill profiles with EMA-weighted ratings (45-99) and 40+ archetypes. Positioned as "Yik Yak for college pickup basketball" — identity-driven.
 
 ## Commands
 
@@ -54,11 +54,11 @@ Next.js marketing site — standard `npm run dev` / `npm run build`.
 
 ### Key Tables
 - `user` — ratings stored directly (overall, shooting, defense, playmaking, finishing)
-- `court` — single court per college campus
+- `court` — each college can have multiple courts
 - `courtSession` — check-in/out tracking, unique constraint ensures one active session per user
 - `encounteredPlayer` — draft ratings and precomputed weights for the rating form
 - `rating` — finalized ratings with full audit trail
-- `leaderboard` — per-court rankings, updated on rating submission
+- `leaderboard` — per-college rankings, updated on rating submission
 
 ## Environment Variables
 

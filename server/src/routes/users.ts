@@ -1,5 +1,5 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { and, desc, eq, gt, ne, sql } from "drizzle-orm";
+import { and, desc, eq, ne, sql } from "drizzle-orm";
 import { Router } from "express";
 import * as z from "zod";
 import { db } from "../db";
@@ -10,7 +10,6 @@ import {
   rankChange,
   rating,
   user,
-  verification,
 } from "../db/schema";
 import { handleError } from "../utils/handleError";
 import {
@@ -202,17 +201,56 @@ usersRoute.get("/users/activity", authMiddleware, async (_, res) => {
             rateeOldArchetype: true,
             rateeNewArchetype: true,
           },
+          with: {
+            rater: {
+              columns: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
+            rateeCourtSession: {
+              with: {
+                court: {
+                  columns: {
+                    name: true,
+                    id: true,
+                  },
+                },
+              },
+            },
+          },
         },
         rankChange: {
           columns: {
             oldRank: true,
             newRank: true,
           },
+          with: {
+            college: {
+              columns: {
+                id: true,
+                name: true,
+                abbreviation: true,
+              },
+            },
+          },
         },
       },
     });
 
-    res.json(activityEntries);
+    const [{ anonymousRater }] = await db
+      .select({
+        anonymousRater: user.anonymousRater,
+      })
+      .from(user)
+      .where(eq(user.id, res.locals.userId!));
+
+    const filteredActivityEntries = activityEntries.filter(
+      (ae) => (ae.type === "rating" && !anonymousRater) || ae.type !== "rating",
+    );
+
+    res.json(filteredActivityEntries);
   } catch (error) {
     handleError(error, res, "GET /users/activity");
   }

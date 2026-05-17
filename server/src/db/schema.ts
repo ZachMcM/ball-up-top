@@ -28,6 +28,10 @@ export const user = pgTable(
     phoneNumber: text("phone_number").unique(),
     phoneNumberVerified: boolean("phone_number_verified"),
 
+    // rating anonymity 
+    anonymousRater: boolean("anonymous_rater").default(true).notNull(),
+    anonymousRaterUpdatedAt: timestamp("anonymous_rater_updated_at"),
+
     // ratings
     overall: integer().default(60).notNull(),
     finishingRating: integer("finishing_rating").default(60).notNull(),
@@ -219,6 +223,8 @@ export const rating = pgTable(
       "run_competitiveness_at_time",
     ).notNull(),
 
+    anonymousRaterAtTime: boolean("anonymous_rater_at_time").notNull(),
+
     finalWeightAppliedShooting: doublePrecision(
       "final_weight_applied_shooting",
     ).notNull(),
@@ -326,7 +332,7 @@ export const activity = pgTable(
       .references(() => user.id)
       .notNull(),
     type: text()
-      .$type<"overall_change" | "rank_change" | "archetype_change">()
+      .$type<"overall_change" | "rank_change" | "archetype_change" | "rating">()
       .notNull(),
 
     ratingId: integer("rating_id").references(() => rating.id),

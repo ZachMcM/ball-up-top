@@ -81,7 +81,7 @@ export default function LeaderboardPage() {
           </View>
         ) : (
           <>
-            <Text className="text-2xl font-bold px-4">{leaderboard.college.name}</Text>
+            <Text className="px-4 text-2xl font-bold">{leaderboard.college.name}</Text>
             <NativewindFlatList
               ListEmptyComponent={
                 <Empty>
@@ -123,7 +123,12 @@ export default function LeaderboardPage() {
                             <Text className="text-sm font-medium text-muted-foreground">Spots</Text>
                           </View>
                           <Text className="text-sm font-medium text-muted-foreground">
-                            Now #{mover.rank} · {mover.overall} OVR
+                            Now{'  '}
+                            <Text className="font-bebas tabular-nums">
+                              #{mover.rank}
+                            </Text> ·{' '}
+                            <Text className="font-bebas tabular-nums">{mover.overall}</Text>{' '}
+                            OVR
                           </Text>
                         </Pressable>
                       ))}

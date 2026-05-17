@@ -342,6 +342,13 @@ courtSessionsRoute.post(
 
       const sessionCollegeId = sessionCourt.collegeId;
 
+      const [{ anonymousRater }] = await db
+        .select({
+          anonymousRater: user.anonymousRater,
+        })
+        .from(user)
+        .where(eq(user.id, res.locals.userId!));
+
       const { ratingIds, rankChangeIds, rateeIds } = await db.transaction(
         async (tx) => {
           const collegeId = sessionCollegeId;
@@ -499,6 +506,8 @@ courtSessionsRoute.post(
                 defenseRating,
                 playmakingRating,
                 finishingRating,
+
+                anonymousRaterAtTime: anonymousRater,
 
                 raterOverallAtTime: ep.raterOverallAtTime,
                 runCompetitivenessAtTime: ep.runCompetitivenessAtTime,

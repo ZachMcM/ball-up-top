@@ -26,16 +26,11 @@ export default function ProfilePage() {
   });
 
   const handleShareProfile = async () => {
-    // TODO fix in dev version
-    try {
-      await Share.share({
-        title: `Ball Up Top`,
-        url: `ball-up-top-client://user/${userId}`,
-        message: `Check out ${user?.name}'s Ball Up Top profile!`,
-      });
-    } catch (error) {
-      // TODO
-    }
+    await Share.share({
+      title: `Ball Up Top`,
+      url: `ball-up-top-client://(tabs)/profile/user/${userId}`,
+      message: `Check out ${user?.name}'s Ball Up Top profile!`,
+    });
   };
 
   const router = useRouter();
