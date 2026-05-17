@@ -68,7 +68,7 @@ export function OverallHistoryGraph({ points }: { points: OverallHistoryPoint[] 
           year: "2-digit"
         }),
         dataPointLabelComponent: () => (
-          <Text className="text-lg leading-5 font-bebas font-medium text-muted-foreground">{entry.overall}</Text>
+          <Text className="text-lg leading-5 font-bebas font-medium">{entry.overall}</Text>
         ),
       }))}
     />
