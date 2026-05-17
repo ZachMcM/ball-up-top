@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { ArrowRight, ChevronDown, ChevronRightIcon, SearchIcon } from 'lucide-react-native';
+import { SearchIcon } from 'lucide-react-native';
 import { useMemo, useRef } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 
@@ -71,11 +71,11 @@ export default function LeaderboardPage() {
         <>
           <View className="flex flex-col gap-1 px-4">
             <Pressable
-              className="flex flex-row items-end gap-0.5 active:opacity-80"
+              className="flex flex-row items-center gap-1.5 active:opacity-80"
               onPress={() => searchSheetRef.current?.present()}
               hitSlop={8}>
               <Text className="text-xs font-medium text-muted-foreground">Search All Players</Text>
-              <Icon as={ChevronRightIcon} size={14} className="text-muted-foreground" />
+              <Icon as={SearchIcon} size={14} className="text-muted-foreground" />
             </Pressable>
             <Text className="text-2xl font-bold">{leaderboard.college.name}</Text>
           </View>
@@ -188,7 +188,7 @@ export default function LeaderboardPage() {
         </>
       )}
       {currentUserEntry && (
-        <View className="absolute bottom-2 left-3 right-3 flex flex-row items-center gap-3 rounded-2xl bg-primary px-4 py-3">
+        <View className="absolute bottom-1.5 left-2 right-2 flex flex-row items-center gap-3 rounded-2xl bg-primary px-4 py-3">
           {currentUserEntry.rank && (
             <Text className="font-bebas text-3xl font-extrabold leading-[33px] text-primary-foreground">
               #{currentUserEntry.rank}

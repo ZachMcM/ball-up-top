@@ -40,14 +40,6 @@ export function LeaderboardSearchModal({ bottomSheetRef, users }: LeaderboardSea
     []
   );
 
-  const handlePlayerPress = (userId: string) => {
-    bottomSheetRef.current?.dismiss();
-    router.push({
-      pathname: `/(tabs)/(${tabContext})/user/[userId]` as const,
-      params: { userId },
-    });
-  };
-
   return (
     <BottomSheetModal
       ref={bottomSheetRef}

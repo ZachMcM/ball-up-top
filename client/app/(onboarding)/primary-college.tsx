@@ -1,17 +1,15 @@
+import { CollegeCombobox } from '@/components/design/CollegeCombobox';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
-import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { authClient } from '@/lib/auth-client';
 import { getColleges, patchUserPrimaryCollege } from '@/lib/endpoints';
-import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { ArrowLeftIcon, CheckCircle } from 'lucide-react-native';
-import { useState } from 'react';
+import { ArrowLeftIcon } from 'lucide-react-native';
 import { Controller, useForm } from 'react-hook-form';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { toast } from 'sonner-native';
 import * as z from 'zod';
 
@@ -37,7 +35,6 @@ export default function PrimaryCollegePage() {
   });
 
   const router = useRouter();
-
   const { refetch: refetchAuthClientSession } = authClient.useSession();
   const queryClient = useQueryClient();
 
@@ -46,15 +43,10 @@ export default function PrimaryCollegePage() {
       await patchUserPrimaryCollege(primaryCollegeId);
       return primaryCollegeId;
     },
-
     onSuccess: (primaryCollegeId) => {
       refetchAuthClientSession();
-      queryClient.invalidateQueries({
-        queryKey: ['home'],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['leaderboard', primaryCollegeId],
-      });
+      queryClient.invalidateQueries({ queryKey: ['home'] });
+      queryClient.invalidateQueries({ queryKey: ['leaderboard', primaryCollegeId] });
       toast.success('Primary college saved!', { position: 'bottom-center' });
     },
     onError: (error) => {
@@ -62,8 +54,6 @@ export default function PrimaryCollegePage() {
       toast.error(error.message, { position: 'bottom-center' });
     },
   });
-
-  const [searchInput, setSearchInput] = useState('');
 
   return (
     <KeyboardAvoidingView
@@ -74,74 +64,19 @@ export default function PrimaryCollegePage() {
         <Controller
           control={control}
           rules={{ required: true }}
-          render={({ field: { onChange, value }, fieldState: { error } }) => {
-            const filtered =
-              searchInput.length > 0
-                ? colleges?.filter((c) =>
-                    c.name.toLocaleLowerCase().includes(searchInput.toLocaleLowerCase())
-                  )
-                : [];
-            return (
-              <View className="flex w-full flex-col gap-4">
-                <Input
-                  className="rounded-full"
-                  placeholder="Search for your college..."
-                  value={searchInput}
-                  onChangeText={setSearchInput}
-                  editable={!collegesPending && !!colleges}
-                />
-                <View className="flex flex-col">
-                  {searchInput.length === 0 ? (
-                    <View className="items-center py-8">
-                      <Text className="text-sm text-center text-muted-foreground">
-                        Type your college name to find your court.
-                      </Text>
-                    </View>
-                  ) : filtered?.length === 0 ? (
-                    <View className="items-center py-8">
-                      <Text className="text-sm text-center text-muted-foreground">
-                        No colleges match "{searchInput}". Try a shorter term.
-                      </Text>
-                    </View>
-                  ) : (
-                    filtered?.map((c, index) => (
-                      <Pressable
-                        key={c.id}
-                        onPress={() => {
-                          if (c.id === value) {
-                            onChange(undefined);
-                          } else {
-                            onChange(c.id);
-                          }
-                        }}
-                        className={cn(
-                          'flex flex-row items-center justify-between border-b border-border px-4 py-3 active:opacity-70',
-                          index === 0 && 'border-t',
-                          value === c.id && 'bg-primary/10'
-                        )}>
-                        <View className="flex flex-col gap-0.5">
-                          <Text
-                            className={cn(
-                              'text-sm',
-                              value === c.id ? 'font-semibold' : 'font-medium'
-                            )}>
-                            {c.name}
-                          </Text>
-                          <Text className="text-xs text-muted-foreground">{c.abbreviation}</Text>
-                        </View>
-                        {value === c.id && (
-                          <Icon as={CheckCircle} size={18} className="text-primary" />
-                        )}
-                      </Pressable>
-                    ))
-                  )}
-                </View>
-                {error && (
-                  <Text className="text-sm font-medium text-destructive">{error.message}</Text>
-                )}
-              </View>
-            );
-          }}
+          render={({ field: { onChange, value }, fieldState: { error } }) => (
+            <View className="flex w-full flex-col gap-3">
+              <CollegeCombobox
+                colleges={colleges}
+                isPending={collegesPending}
+                selectedCollegeId={value}
+                onSelect={onChange}
+              />
+              {error && (
+                <Text className="text-sm font-medium text-destructive">{error.message}</Text>
+              )}
+            </View>
+          )}
           name="primaryCollegeId"
         />
         <Text className="text-center text-xs font-medium text-muted-foreground">
@@ -160,7 +95,7 @@ export default function PrimaryCollegePage() {
             className="flex-1"
             onPress={handleSubmit((values) => savePrimaryCollege(values.primaryCollegeId))}>
             <Text>Continue</Text>
-            {isSaving && <ActivityIndicator size="small" className='text-primary-foreground' />}
+            {isSaving && <ActivityIndicator size="small" className="text-primary-foreground" />}
           </Button>
         </View>
       </View>

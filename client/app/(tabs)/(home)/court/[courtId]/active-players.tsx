@@ -148,10 +148,7 @@ export default function CourtActivePlayersPage() {
                 <Button disabled={isCheckOutPending} onPress={checkOut} size="lg">
                   <Text>Check Out Of Court</Text>
                   {isCheckOutPending && (
-                    <ActivityIndicator
-                      size="small"
-                      className="className='text-primary-foreground'"
-                    />
+                    <ActivityIndicator size="small" className="text-primary-foreground" />
                   )}
                 </Button>
               ) : (
@@ -159,10 +156,7 @@ export default function CourtActivePlayersPage() {
                   <Button disabled={checkInDisabled} onPress={() => checkIn(courtId)} size="lg">
                     <Text>Check In To Court</Text>
                     {isCheckInPending && (
-                      <ActivityIndicator
-                        size="small"
-                        className="className='text-primary-foreground'"
-                      />
+                      <ActivityIndicator size="small" className="text-primary-foreground" />
                     )}
                   </Button>
                   {unratedCourtSession ? (

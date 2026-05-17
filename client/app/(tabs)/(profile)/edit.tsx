@@ -1,4 +1,5 @@
 import { NativewindScrollView } from '@/components/NativewindScrollView';
+import { CollegeCombobox } from '@/components/design/CollegeCombobox';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -8,6 +9,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -21,11 +23,10 @@ import {
   patchUserName,
   patchUserPrimaryCollege,
 } from '@/lib/endpoints';
-import { cn } from '@/lib/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { CheckCircleIcon, ChevronRightIcon, SquarePenIcon } from 'lucide-react-native';
+import { SquarePenIcon } from 'lucide-react-native';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import { toast } from 'sonner-native';
@@ -38,9 +39,8 @@ export default function EditProfilePage() {
 
   const [nameValue, setNameValue] = useState(user?.name ?? '');
   const [selectedAsset, setSelectedAsset] = useState<ImagePicker.ImagePickerAsset | null>(null);
-  const [collegeSearch, setCollegeSearch] = useState('');
   const [pendingCollegeId, setPendingCollegeId] = useState<number | null>(null);
-  const [signOutDialogOpen, setSignOutDialogOpen] = useState(false)
+  const [signOutDialogOpen, setSignOutDialogOpen] = useState(false);
 
   const { data: colleges, isPending: collegesPending } = useQuery({
     queryKey: ['colleges'],
@@ -113,10 +113,6 @@ export default function EditProfilePage() {
   const avatarUri = selectedAsset?.uri ?? user?.image ?? undefined;
   const identityChanged = (nameValue.trim() && nameValue.trim() !== user?.name) || !!selectedAsset;
 
-  const filteredColleges = colleges?.filter((c) =>
-    c.name.toLocaleLowerCase().includes(collegeSearch.toLocaleLowerCase())
-  );
-
   return (
     <NativewindScrollView
       contentInsetAdjustmentBehavior="automatic"
@@ -125,21 +121,16 @@ export default function EditProfilePage() {
       {/* Identity */}
       <View className="flex flex-col gap-4">
         <Text className="text-sm font-semibold text-muted-foreground">Identity</Text>
-        <View className="flex flex-col items-center gap-2">
-          <Pressable onPress={pickImage} className="active:opacity-70">
-            <Avatar
-              alt={user?.name ?? 'Profile'}
-              className="size-24 bg-secondary"
-              source={{ uri: avatarUri }}
-            />
-          </Pressable>
-          <Pressable onPress={pickImage} className="active:opacity-70">
-            <View className="flex flex-row items-center gap-1">
-              <Text className="text-sm font-medium text-muted-foreground">Edit Photo</Text>
-              <Icon as={SquarePenIcon} className="text-muted-foreground" size={14} />
-            </View>
-          </Pressable>
-        </View>
+        <Pressable
+          onPress={pickImage}
+          className="flex flex-col items-center gap-2 active:opacity-70">
+          <Avatar
+            alt={user?.name ?? 'Profile'}
+            className="size-24 bg-secondary"
+            source={{ uri: avatarUri }}
+          />
+          <Text className="text-sm font-medium">Edit Photo</Text>
+        </Pressable>
         <View className="flex flex-col gap-1.5">
           <Text className="text-sm font-medium">Display Name</Text>
           <Input
@@ -161,61 +152,15 @@ export default function EditProfilePage() {
       </View>
 
       {/* Primary Court */}
-      <View className="flex flex-col gap-4">
+      <View className="flex flex-col gap-3">
         <Text className="text-sm font-semibold text-muted-foreground">Primary Court</Text>
-        <Input
-          placeholder="Search for your college..."
-          value={collegeSearch}
-          className="rounded-full"
-          onChangeText={setCollegeSearch}
-          editable={!collegesPending}
+        <CollegeCombobox
+          colleges={colleges}
+          isPending={collegesPending}
+          isLoading={isSavingCollege}
+          selectedCollegeId={currentCollegeId}
+          onSelect={(id) => setPendingCollegeId(id)}
         />
-        {isSavingCollege && (
-          <View className="items-center">
-            <ActivityIndicator size="small" />
-          </View>
-        )}
-        <View className="flex flex-col">
-          {collegesPending ? (
-            [1, 2, 3, 4].map((i) => (
-              <View key={i} className="flex flex-col gap-1.5 border-b border-border px-4 py-3">
-                <View className="h-3 rounded-full bg-muted" style={{ width: 140 + i * 24 }} />
-                <View className="h-2 rounded-full bg-muted" style={{ width: 52 + i * 8 }} />
-              </View>
-            ))
-          ) : filteredColleges?.length === 0 && collegeSearch.length > 0 ? (
-            <View className="items-center py-8">
-              <Text className="text-center text-sm text-muted-foreground">
-                No colleges match "{collegeSearch}". Try a shorter term.
-              </Text>
-            </View>
-          ) : (
-            filteredColleges?.map((c, index) => (
-              <Pressable
-                key={c.id}
-                onPress={() => c.id !== currentCollegeId && setPendingCollegeId(c.id)}
-                className={cn(
-                  'flex flex-row items-center justify-between border-b border-border px-4 py-3 active:opacity-70',
-                  index === 0 && 'border-t',
-                  currentCollegeId === c.id && 'bg-primary/10'
-                )}>
-                <View className="flex flex-col gap-0.5">
-                  <Text
-                    className={cn(
-                      'text-sm',
-                      currentCollegeId === c.id ? 'font-semibold' : 'font-medium'
-                    )}>
-                    {c.name}
-                  </Text>
-                  <Text className="text-xs text-muted-foreground">{c.abbreviation}</Text>
-                </View>
-                {currentCollegeId === c.id && (
-                  <Icon as={CheckCircleIcon} size={18} className="text-primary" />
-                )}
-              </Pressable>
-            ))
-          )}
-        </View>
       </View>
 
       {/* Email */}
@@ -232,7 +177,28 @@ export default function EditProfilePage() {
       <View className="flex flex-col gap-4">
         <Text className="text-sm font-semibold text-muted-foreground">Account</Text>
         <AlertDialog open={signOutDialogOpen} onOpenChange={setSignOutDialogOpen}>
-          
+          <AlertDialogTrigger asChild>
+            <Pressable>
+              <Text className="font-semibold text-destructive">Sign Out</Text>
+            </Pressable>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Sign out of your account?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to sign out of your account? You will have to sign back in to
+                access your account.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex flex-row items-center gap-2">
+              <AlertDialogCancel>
+                <Text>Cancel</Text>
+              </AlertDialogCancel>
+              <AlertDialogAction variant="destructive" onPress={() => authClient.signOut()}>
+                <Text>Continue</Text>
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
         </AlertDialog>
       </View>
 

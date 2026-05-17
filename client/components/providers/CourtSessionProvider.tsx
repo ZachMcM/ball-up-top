@@ -199,7 +199,7 @@ export function SessionFooter() {
   }, [activeCourtSession?.startTime]);
 
   return activeCourtSession ? (
-    <View className="border-t border-border bg-card/70 px-4 py-3">
+    <View className="border border-border bg-card/70 px-4 py-3 m-1 mb-2 rounded-2xl">
       <View className="flex flex-row items-center justify-between">
         <View className="flex flex-row items-center gap-3">
           <View className="size-2.5 rounded-full bg-green-400" />
