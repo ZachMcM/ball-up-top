@@ -320,26 +320,42 @@ export default function RatePage() {
           <View className="flex flex-1 flex-col items-center justify-center gap-6 py-12">
             <Text className="text-center text-2xl font-bold">How Ratings Work</Text>
 
-            <View className="flex flex-col gap-4 max-w-xs">
+            <View className="flex max-w-sm flex-col gap-4">
               <Text className="text-center text-base text-muted-foreground">
-                &bull; Rate each player across four skills: Defense, Finishing, Shooting, and Playmaking.
+                &bull; Rate each player across four skills: Defense, Finishing, Shooting, and
+                Playmaking.
+              </Text>
+
+              <Text className='text-center text-base text-muted-foreground'>
+                &bull; Our algorithm determines how impactful your rating is to a user and updates
+                their overall accordingly.
               </Text>
 
               <Text className="text-center text-base text-muted-foreground">
-                &bull; Use the presets or adjust manually. Be honest about what you saw on the court.
+                &bull; Rate fairly, Use the presets or adjust manually. Skip if you can't accurately
+                rate someone.
               </Text>
 
               <Text className="text-center text-base text-muted-foreground">
+                &bull; Trolling / gaming will be detected and removed, so rate accurately and
+                honestly.
+              </Text>
+
+              {/* TODO in anonymity PR */}
+              {/* <Text className="text-center text-base text-muted-foreground">
                 &bull; Your specific scores stay anonymous. Players see their averages, not who said what.
-              </Text>
+              </Text> */}
 
               <Text className="text-center text-sm font-medium">
                 Fair ratings make everyone's OVR accurate, including yours.
               </Text>
             </View>
 
-            <Button className="w-full max-w-xs" size="lg" onPress={() => setExplainerAcknowledged(true)}>
-              <Text>Got it</Text>
+            <Button
+              className="w-full max-w-xs"
+              size="lg"
+              onPress={() => setExplainerAcknowledged(true)}>
+              <Text>I understand, I'm in!</Text>
             </Button>
           </View>
         ) : (
@@ -351,7 +367,9 @@ export default function RatePage() {
                   <Text className="text-lg font-semibold">
                     Player {step + 1} of {totalSteps}
                   </Text>
-                  <Text className="text-sm font-medium">{(((step + 1) / totalSteps) * 100).toFixed(0)}%</Text>
+                  <Text className="text-sm font-medium">
+                    {(((step + 1) / totalSteps) * 100).toFixed(0)}%
+                  </Text>
                 </View>
                 <Progress className="h-1" value={((step + 1) / totalSteps) * 100} />
               </View>
@@ -466,7 +484,7 @@ export default function RatePage() {
                       <Button disabled={isSubmitting} className="flex-1">
                         <Text>Submit</Text>
                         {isSubmitting ? (
-                          <ActivityIndicator className='text-primary-foreground' size="small" />
+                          <ActivityIndicator className="text-primary-foreground" size="small" />
                         ) : (
                           <Icon className="text-primary-foreground" size={18} as={CheckIcon} />
                         )}

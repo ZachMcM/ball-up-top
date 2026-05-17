@@ -63,9 +63,10 @@ usersRoute.patch("/users/primary-college", authMiddleware, async (req, res) => {
         .onConflictDoNothing();
 
       if (userResult?.onboardingStep !== "complete") {
-        await tx.update(user).set({
-          onboardingStep: "complete",
-        });
+        await tx
+          .update(user)
+          .set({ onboardingStep: "socialContract" })
+          .where(eq(user.id, res.locals.userId!));
       }
     });
 
@@ -75,6 +76,26 @@ usersRoute.patch("/users/primary-college", authMiddleware, async (req, res) => {
     res.json({ success: true });
   } catch (error) {
     handleError(error, res, "PATCH /users/primary-college");
+  }
+});
+
+usersRoute.patch("/users/social-contract", authMiddleware, async (req, res) => {
+  try {
+    await db
+      .update(user)
+      .set({ onboardingStep: "complete" })
+      .where(
+        and(
+          eq(user.id, res.locals.userId!),
+          ne(user.onboardingStep, "complete"),
+        ),
+      );
+
+    invalidateQueriesForUser(res.locals.userId!, ["home"]);
+
+    res.json({ success: true });
+  } catch (error) {
+    handleError(error, res, "PATCH /users/social-contract");
   }
 });
 

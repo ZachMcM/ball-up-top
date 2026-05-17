@@ -60,6 +60,13 @@ export async function patchUserPrimaryCollege(primaryCollegeId: number) {
   });
 }
 
+export async function patchUserAcceptSocialContract() {
+  await serverRequest({
+    endpoint: '/users/social-contract',
+    method: 'PATCH',
+  });
+}
+
 export async function patchUserName(name: string, options?: { onboardingStep?: 'height' }) {
   await serverRequest({
     endpoint: '/users/name',

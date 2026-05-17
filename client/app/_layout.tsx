@@ -152,6 +152,14 @@ export function RootNavigator() {
           }}
         />
       </Stack.Protected>
+      <Stack.Protected guard={showOnboarding && onboardingStep === 'socialContract'}>
+        <Stack.Screen
+          name="(onboarding)/social-contract"
+          options={{
+            headerShown: false,
+          }}
+        />
+      </Stack.Protected>
       <Stack.Protected
         guard={
           !isLoading &&

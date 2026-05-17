@@ -48,7 +48,7 @@ export const user = pgTable(
     onboardingStep: text("onboarding_step")
       .default("name")
       .notNull()
-      .$type<"name" | "height" | "image" | "primaryCollege" | "complete">(),
+      .$type<"name" | "height" | "image" | "primaryCollege" | "socialContract" | "complete">(),
 
     expoPushToken: text("expo_push_token"),
   },
