@@ -3,7 +3,7 @@ import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/sections/Hero";
 import { Features } from "@/components/sections/Features";
 import { HowItWorks } from "@/components/sections/HowItWorks";
-import { AppPreview } from "@/components/sections/AppPreview";
+import { Ratings } from "@/components/sections/Ratings";
 import { CampusExpansion } from "@/components/sections/CampusExpansion";
 import { DownloadCTA } from "@/components/sections/DownloadCTA";
 
@@ -15,7 +15,7 @@ export default function Home() {
         <Hero />
         <Features />
         <HowItWorks />
-        <AppPreview />
+        <Ratings />
         <CampusExpansion />
         <DownloadCTA />
       </main>

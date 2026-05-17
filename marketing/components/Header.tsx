@@ -21,7 +21,7 @@ export function Header() {
               height={26}
               className="opacity-90 group-hover:opacity-100 transition-opacity"
             />
-            <span className="text-xl uppercase tracking-wide">Ball Up Top</span>
+            <span className="font-heading text-xl uppercase tracking-wide">Ball Up Top</span>
           </Link>
 
           {/* Desktop Nav */}

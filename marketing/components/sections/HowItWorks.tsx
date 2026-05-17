@@ -108,7 +108,7 @@ export function HowItWorks() {
           <p className="text-sm text-accent font-semibold uppercase tracking-widest mb-4">
             The Loop
           </p>
-          <h2 className="text-[52px] sm:text-[68px] uppercase leading-[0.9] tracking-tight">
+          <h2 className="font-heading text-[52px] sm:text-[68px] uppercase leading-[0.9] tracking-tight">
             Four steps to your ranking
           </h2>
         </div>
@@ -138,7 +138,7 @@ export function HowItWorks() {
                   <div className="text-accent relative z-10">{step.icon}</div>
                   {/* Number badge */}
                   <div className="absolute -top-1 -right-1 w-6 h-6 bg-accent rounded-full flex items-center justify-center z-20">
-                    <span className="text-[11px] text-white leading-none">
+                    <span className="font-display text-[13px] text-white leading-none" style={{ fontVariantNumeric: "tabular-nums" }}>
                       {String(index + 1)}
                     </span>
                   </div>
@@ -150,7 +150,7 @@ export function HowItWorks() {
                 </p>
 
                 {/* Title */}
-                <h3 className="text-[24px] sm:text-[28px] uppercase leading-tight tracking-tight mb-3">
+                <h3 className="font-heading text-[24px] sm:text-[28px] uppercase leading-tight tracking-tight mb-3">
                   {step.title}
                 </h3>
 
@@ -181,7 +181,7 @@ export function HowItWorks() {
             </svg>
           </div>
           <div>
-            <p className="text-[22px] uppercase tracking-tight mb-1">
+            <p className="font-heading text-[22px] uppercase tracking-tight mb-1">
               The Loop Gets Stronger with Every Player
             </p>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xl">

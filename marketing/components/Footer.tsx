@@ -60,7 +60,7 @@ export function Footer() {
                 height={22}
                 className="opacity-80 group-hover:opacity-100 transition-opacity"
               />
-              <span className="text-[18px] uppercase tracking-wide">
+              <span className="font-heading text-[18px] uppercase tracking-wide">
                 Ball Up Top
               </span>
             </Link>

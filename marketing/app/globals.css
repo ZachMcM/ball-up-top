@@ -4,8 +4,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: system-ui, -apple-system, sans-serif;
   --font-heading: var(--font-heading);
+  --font-display: var(--font-heading);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-muted: var(--muted);
@@ -33,7 +34,7 @@
   --muted-foreground: #666666;
   --border: #242424;
   --ring: #444444;
-  --accent: #f97316;
+  --accent: #FD5103;
   --accent-foreground: #ffffff;
 }
 
