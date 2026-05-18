@@ -341,11 +341,6 @@ export default function RatePage() {
                 honestly.
               </Text>
 
-              {/* TODO in anonymity PR */}
-              {/* <Text className="text-center text-base text-muted-foreground">
-                &bull; Your specific scores stay anonymous. Players see their averages, not who said what.
-              </Text> */}
-
               <Text className="text-center text-sm font-medium">
                 Fair ratings make everyone's OVR accurate, including yours.
               </Text>

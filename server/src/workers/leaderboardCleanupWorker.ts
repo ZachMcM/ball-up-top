@@ -27,7 +27,7 @@ async function processLeaderboardCleanupJob(_: Job) {
 }
 
 export const leaderboardCleanupWorker = new Worker(
-  "session-timeout",
+  "leaderboard_cleanup_queue",
   processLeaderboardCleanupJob,
   { connection: redisConnection },
 );
