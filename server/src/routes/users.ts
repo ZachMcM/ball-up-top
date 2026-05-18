@@ -502,3 +502,51 @@ usersRoute.patch(
     }
   },
 );
+
+const PatchAnonymousRaterSchema = z.object({
+  anonymousRater: z.boolean(),
+});
+
+usersRoute.patch("/users/anonymousRater", authMiddleware, async (req, res) => {
+  try {
+    const validBody = PatchAnonymousRaterSchema.safeParse(req.body);
+
+    if (!validBody.success) {
+      return res.status(400).json({ error: validBody.error.message });
+    }
+
+    const { anonymousRater } = validBody.data;
+
+    const [targetUser] = await db
+      .select({
+        anonymousRaterUpdatedAt: user.anonymousRaterUpdatedAt,
+      })
+      .from(user)
+      .where(eq(user.id, res.locals.userId!));
+
+    if (
+      !targetUser.anonymousRaterUpdatedAt ||
+      Date.now() - new Date(targetUser.anonymousRaterUpdatedAt).getTime() >
+        30 * 24 * 60 * 60 * 1000
+    ) {
+      await db
+        .update(user)
+        .set({
+          anonymousRater,
+          anonymousRaterUpdatedAt: new Date(),
+        })
+        .where(eq(user.id, res.locals.userId!));
+
+      invalidateQueriesForUser(res.locals.userId!, ["activity"]);
+
+      res.json({ success: true });
+    } else {
+      return res.status(400).json({
+        error:
+          "You must wait 30 days before changing your rater anonymity status.",
+      });
+    }
+  } catch (error) {
+    handleError(error, res, "PATCH /users/anonymousRater");
+  }
+});
