@@ -194,11 +194,14 @@ function ActivityRow({ activity }: { activity: Activity }) {
   const handlePress = () => {
     if (activity.type === 'overall_change' || activity.type === 'archetype_change') {
       router.push({
-        pathname: '/(tabs)/(profile)/user/[userId]',
+        pathname: `/(tabs)/(${tabContext})/user/[userId]` as const,
         params: { userId: currentUserdata?.user.id! },
       });
     } else if (activity.type === 'rank_change') {
-      router.push('/(tabs)/(leaderboard)');
+      router.push({
+        pathname: `/(tabs)/(${tabContext})/college/[collegeId]` as const,
+        params: { collegeId: activity.rankChange?.college.id! },
+      });
     } else {
       router.push({
         pathname: `/(tabs)/(${tabContext})/user/[userId]` as const,
@@ -223,13 +226,15 @@ function ActivityRow({ activity }: { activity: Activity }) {
           </View>
         ) : (
           imageUrl && (
-            <Image
-              source={{
-                uri: imageUrl,
-              }}
-              style={{ width: '100%', height: '100%' }}
-              className="absolute inset-0 object-cover"
-            />
+            <View className="relative h-10 w-10 overflow-hidden rounded-full">
+              <Image
+                source={{
+                  uri: imageUrl,
+                }}
+                style={{ width: '100%', height: '100%' }}
+                className="absolute inset-0 object-cover"
+              />
+            </View>
           )
         )}
         {!activity.read && (
@@ -337,9 +342,12 @@ function getActivityDisplay(activity: Activity): {
       imageUrl: activity.rating.rater.image,
       descriptionComponent: (
         <Text className="leading-[22px]">
-          <Text>You received a rating from</Text>
+          <Text>You received a rating from </Text>
           <Text className="font-semibold">{activity.rating.rater.name} </Text>
-          <Text>at {activity.rating.rateeCourtSession.court.name}</Text>
+          <Text>
+            at {activity.rating.rateeCourtSession.court.name}
+            {'  '}
+          </Text>
           <Text className="text-[13px] font-medium text-muted-foreground">
             {getRelativeTime(new Date(activity.createdAt))}
           </Text>

@@ -18,6 +18,13 @@ export default function ProfileLayout() {
         }}
       />
       <Stack.Screen
+        name="college/[collegeId]"
+        options={{
+          headerTitle: 'Leaderboard',
+          headerLeft: () => <BackButton />,
+        }}
+      />
+      <Stack.Screen
         name="edit"
         options={{ headerTitle: 'Edit Profile', headerLeft: () => <BackButton /> }}
       />

@@ -11,6 +11,13 @@ export default function ActivityLayout() {
         }}
       />
       <Stack.Screen
+        name="college/[collegeId]"
+        options={{
+          headerTitle: 'Leaderboard',
+          headerLeft: () => <BackButton />,
+        }}
+      />
+      <Stack.Screen
         name="user/[userId]"
         options={{
           headerTitle: 'Profile',

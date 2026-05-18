@@ -18,6 +18,13 @@ export default function HomeLayout() {
         }}
       />
       <Stack.Screen
+        name="college/[collegeId]"
+        options={{
+          headerTitle: 'Leaderboard',
+          headerLeft: () => <BackButton />,
+        }}
+      />
+      <Stack.Screen
         name="court/[courtId]/active-players"
         options={{
           presentation: 'modal',

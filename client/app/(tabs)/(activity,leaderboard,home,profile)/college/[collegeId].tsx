@@ -13,22 +13,21 @@ import { getLeaderboard } from '@/lib/endpoints';
 import { cn } from '@/lib/utils';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
-import { Stack, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { SearchIcon } from 'lucide-react-native';
 import { useMemo, useRef } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 
-export default function LeaderboardPage() {
+export default function CollegeLeaderboardPage() {
   const { data: currentUserData } = authClient.useSession();
-  const currentUserId = currentUserData?.user.id;
 
-  // Get the user's primary college ID
-  const primaryCollegeId = (currentUserData?.user as any)?.primaryCollegeId;
+  const searchParams = useLocalSearchParams();
+  const collegeId = Number(searchParams.collegeId) 
 
   const { data: leaderboard, isPending } = useQuery({
-    queryKey: ['leaderboard', primaryCollegeId],
-    queryFn: () => getLeaderboard(primaryCollegeId!),
-    enabled: !!primaryCollegeId,
+    queryKey: ['leaderboard', collegeId],
+    queryFn: () => getLeaderboard(collegeId!),
+    enabled: !!collegeId,
   });
 
   const rankedUsers = useMemo(() => {
@@ -36,8 +35,8 @@ export default function LeaderboardPage() {
   }, [leaderboard?.users]);
 
   const currentUserEntry = useMemo(() => {
-    return rankedUsers.find((u) => u.id === currentUserId);
-  }, [leaderboard, currentUserId]);
+    return rankedUsers.find((u) => u.id === currentUserData?.user.id);
+  }, [leaderboard, currentUserData?.user.id]);
 
   const searchSheetRef = useRef<BottomSheetModal | null>(null);
 
@@ -124,11 +123,8 @@ export default function LeaderboardPage() {
                           </View>
                           <Text className="text-sm font-medium text-muted-foreground">
                             Now{'  '}
-                            <Text className="font-bebas tabular-nums">
-                              #{mover.rank}
-                            </Text> ·{' '}
-                            <Text className="font-bebas tabular-nums">{mover.overall}</Text>{' '}
-                            OVR
+                            <Text className="font-bebas tabular-nums">#{mover.rank}</Text> ·{' '}
+                            <Text className="font-bebas tabular-nums">{mover.overall}</Text> OVR
                           </Text>
                         </Pressable>
                       ))}
