@@ -12,7 +12,7 @@ import { authClient } from '@/lib/auth-client';
 import { getUser } from '@/lib/endpoints';
 import { useQuery } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { CogIcon, ShareIcon } from 'lucide-react-native';
+import { CogIcon, FootprintsIcon, ShareIcon } from 'lucide-react-native';
 import { ActivityIndicator, Pressable, Share, View } from 'react-native';
 
 export default function ProfilePage() {
@@ -45,11 +45,18 @@ export default function ProfilePage() {
                 <Icon size={22} as={ShareIcon} />
               </Pressable>
               {currentUserData?.user.id === userId && (
-                <Pressable
-                  className="active:opacity-70"
-                  onPress={() => router.navigate('/(tabs)/(profile)/edit')}>
-                  <Icon size={22} as={CogIcon} />
-                </Pressable>
+                <>
+                  <Pressable
+                    className="active:opacity-70"
+                    onPress={() => router.push('/(tabs)/(profile)/anonymity')}>
+                    <Icon size={22} as={FootprintsIcon} />
+                  </Pressable>
+                  <Pressable
+                    className="active:opacity-70"
+                    onPress={() => router.navigate('/(tabs)/(profile)/edit')}>
+                    <Icon size={22} as={CogIcon} />
+                  </Pressable>
+                </>
               )}
             </View>
           ),

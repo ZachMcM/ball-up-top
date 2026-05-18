@@ -294,6 +294,7 @@ usersRoute.get("/users/:id", authMiddleware, async (req, res) => {
           FROM ${rating}
           WHERE ${rating.rateeId} = ${user.id}
         )`,
+        anonymousRater: user.anonymousRater,
       })
       .from(user)
       .innerJoin(college, eq(user.primaryCollegeId, college.id))

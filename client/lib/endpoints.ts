@@ -284,6 +284,14 @@ export async function getUserHasSubmittedRatings(): Promise<{ hasSubmittedRating
   });
 }
 
+export async function patchUserAnonymousRater(anonymousRater: boolean): Promise<void> {
+  await serverRequest({
+    endpoint: '/users/anonymousRater',
+    method: 'PATCH',
+    body: JSON.stringify({ anonymousRater }),
+  });
+}
+
 export async function patchUserProfile(data: {
   name: string;
   height: string;

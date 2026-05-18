@@ -25,6 +25,10 @@ export default function ProfileLayout() {
         name="edit-email"
         options={{ headerTitle: 'Change Email', presentation: 'modal' }}
       />
+      <Stack.Screen
+        name="anonymity"
+        options={{ headerTitle: 'Rater Anonymity', presentation: 'modal' }}
+      />
     </Stack>
   );
 }

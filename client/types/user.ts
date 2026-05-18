@@ -14,4 +14,5 @@ export type User = {
   primaryCollegeAbbr: string;
   rankDelta: number | null;
   overallHistory: { overall: number; createdAt: Date }[];
+  anonymousRater: boolean;
 };
