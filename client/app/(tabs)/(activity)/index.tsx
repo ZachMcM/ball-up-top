@@ -1,3 +1,4 @@
+import { NativewindScrollView } from '@/components/NativewindScrollView';
 import { NativewindSectionList } from '@/components/NativewindSectionList';
 import { Empty, EmptyDescription, EmptyTitle } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
@@ -26,13 +27,14 @@ type ActivitySection = {
   data: Activity[];
 };
 
-type FilterType = 'all' | 'overall_change' | 'rank_change' | 'archetype_change';
+type FilterType = 'all' | 'overall_change' | 'rank_change' | 'archetype_change' | 'rating';
 
 const FILTERS: { key: FilterType; label: string }[] = [
   { key: 'all', label: 'All' },
   { key: 'overall_change', label: 'Overall' },
   { key: 'rank_change', label: 'Rank' },
   { key: 'archetype_change', label: 'Archetype' },
+  { key: 'rating', label: 'Rating' },
 ];
 
 export default function ActivityPage() {
@@ -116,24 +118,29 @@ export default function ActivityPage() {
 
   return (
     <View className="flex flex-1 flex-col gap-6 pt-6">
-      <View className="flex flex-row items-center gap-2 px-4">
-        {FILTERS.map((filter) => (
-          <Pressable
-            key={filter.key}
-            onPress={() => setActiveFilter(filter.key)}
-            className={cn(
-              'rounded-full px-4 py-1.5',
-              activeFilter === filter.key ? 'bg-foreground' : 'border border-border bg-background'
-            )}>
-            <Text
+      <View className="flex flex-row items-center px-4">
+        <NativewindScrollView
+          showsHorizontalScrollIndicator={false}
+          contentContainerClassName="gap-2"
+          horizontal>
+          {FILTERS.map((filter) => (
+            <Pressable
+              key={filter.key}
+              onPress={() => setActiveFilter(filter.key)}
               className={cn(
-                'text-xs font-medium',
-                activeFilter === filter.key ? 'text-background' : 'text-muted-foreground'
+                'rounded-full px-4 py-1.5',
+                activeFilter === filter.key ? 'bg-foreground' : 'border border-border bg-background'
               )}>
-              {filter.label}
-            </Text>
-          </Pressable>
-        ))}
+              <Text
+                className={cn(
+                  'text-xs font-medium',
+                  activeFilter === filter.key ? 'text-background' : 'text-muted-foreground'
+                )}>
+                {filter.label}
+              </Text>
+            </Pressable>
+          ))}
+        </NativewindScrollView>
       </View>
 
       <View className="flex-1">

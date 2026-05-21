@@ -10,8 +10,9 @@ import { Text } from '@/components/ui/text';
 import { VerticalRatingBar } from '@/components/ui/vertical-rating-bar';
 import { authClient } from '@/lib/auth-client';
 import { getUser } from '@/lib/endpoints';
+import { useRoute } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams, usePathname, useRouter } from 'expo-router';
 import { CogIcon, FootprintsIcon, ShareIcon } from 'lucide-react-native';
 import { ActivityIndicator, Pressable, Share, View } from 'react-native';
 
@@ -28,7 +29,7 @@ export default function ProfilePage() {
   const handleShareProfile = async () => {
     await Share.share({
       title: `Ball Up Top`,
-      url: `ball-up-top-client://(tabs)/profile/user/${userId}`,
+      url: `ball-up-top-client://user/${userId}`,
       message: `Check out ${user?.name}'s Ball Up Top profile!`,
     });
   };

@@ -67,7 +67,9 @@ export default function HomePage() {
 
             <View className="flex flex-col gap-4">
               <View className="flex flex-col gap-0.5 px-4">
-                <Text className="text-[17px] font-semibold">{home.primaryCollege.abbreviation} Courts</Text>
+                <Text className="text-[17px] font-semibold">
+                  {home.primaryCollege.abbreviation} Courts
+                </Text>
                 <Text className="text-sm font-medium text-muted-foreground">
                   {(() => {
                     const live = home.courts.filter((c) => c.activePlayerCount > 0).length;
@@ -123,7 +125,10 @@ function CourtRow({
       <View className="flex flex-1 flex-row items-center gap-3">
         <AspectRatio
           ratio={1}
-          className="relative aspect-square w-12 overflow-hidden rounded-xl bg-card">
+          className={cn(
+            'relative aspect-square w-14 overflow-hidden rounded-xl bg-card',
+            court.activePlayerCount > 0 && 'w-16'
+          )}>
           <Image
             source={{
               uri: court.image!,
@@ -136,7 +141,7 @@ function CourtRow({
           <Text
             className={cn(
               court.activePlayerCount > 0
-                ? 'text-[16px] font-semibold'
+                ? 'text-lg font-semibold'
                 : 'font-medium text-muted-foreground'
             )}>
             {court.name}

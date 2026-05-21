@@ -39,6 +39,21 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
         });
 
         for (const r of ratings) {
+          if (!r.anonymousRaterAtTime) {
+            await db.insert(activity).values({
+              userId: r.rateeId,
+              type: "rating",
+              ratingId: r.id,
+            });
+
+            await sendPushNotification({
+              userId: r.rateeId,
+              title: "Received A Rating",
+              body: `You received a rating from ${r.ratee.name}!`,
+              data: { url: "(tabs)/activity" },
+            });
+          }
+          
           // Overall change activity and notification
           if (r.rateeOldOverall !== r.rateeNewOverall) {
             await db.insert(activity).values({
@@ -69,21 +84,6 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
               userId: r.rateeId,
               title: "Archetype Changed",
               body: `Your archetype is now ${r.rateeNewArchetype}!`,
-              data: { url: "(tabs)/activity" },
-            });
-          }
-
-          if (!r.anonymousRaterAtTime) {
-            await db.insert(activity).values({
-              userId: r.rateeId,
-              type: "rating",
-              ratingId: r.id,
-            });
-
-            await sendPushNotification({
-              userId: r.rateeId,
-              title: "Received A Rating",
-              body: `You received a rating from ${r.ratee.name}!`,
               data: { url: "(tabs)/activity" },
             });
           }
