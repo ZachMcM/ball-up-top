@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { authClient } from '@/lib/auth-client';
@@ -26,7 +25,6 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { SquarePenIcon } from 'lucide-react-native';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import { toast } from 'sonner-native';
@@ -39,7 +37,6 @@ export default function EditProfilePage() {
 
   const [nameValue, setNameValue] = useState(user?.name ?? '');
   const [selectedAsset, setSelectedAsset] = useState<ImagePicker.ImagePickerAsset | null>(null);
-  const [pendingCollegeId, setPendingCollegeId] = useState<number | null>(null);
   const [signOutDialogOpen, setSignOutDialogOpen] = useState(false);
 
   const { data: colleges, isPending: collegesPending } = useQuery({
@@ -159,7 +156,7 @@ export default function EditProfilePage() {
           isPending={collegesPending}
           isLoading={isSavingCollege}
           selectedCollegeId={currentCollegeId}
-          onSelect={(id) => setPendingCollegeId(id)}
+          onSelect={(id) => saveCollege(id)}
         />
       </View>
 
@@ -202,34 +199,6 @@ export default function EditProfilePage() {
         </AlertDialog>
       </View>
 
-      <AlertDialog
-        open={pendingCollegeId !== null}
-        onOpenChange={(open) => !open && setPendingCollegeId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Switch primary court?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Your leaderboard and home feed will switch to{' '}
-              {colleges?.find((c) => c.id === pendingCollegeId)?.name ?? 'this court'}. You can
-              always change it back.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex flex-row items-center">
-            <AlertDialogCancel onPress={() => setPendingCollegeId(null)}>
-              <Text>Cancel</Text>
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onPress={() => {
-                if (pendingCollegeId !== null) {
-                  saveCollege(pendingCollegeId);
-                  setPendingCollegeId(null);
-                }
-              }}>
-              <Text>Switch</Text>
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </NativewindScrollView>
   );
 }

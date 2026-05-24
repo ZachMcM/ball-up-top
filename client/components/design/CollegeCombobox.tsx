@@ -1,20 +1,25 @@
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
+import { THEME } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 import { College } from '@/types/college';
-import { Portal } from '@rn-primitives/portal';
-import { CheckIcon } from 'lucide-react-native';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Keyboard, Platform, Pressable, TextInput, View } from 'react-native';
-import { FullWindowOverlay as RNFullWindowOverlay } from 'react-native-screens';
+import { BottomSheetBackdrop, BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import { CheckIcon, ChevronDownIcon } from 'lucide-react-native';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Pressable, View } from 'react-native';
+import { useColorScheme } from 'nativewind';
+import { NativewindFlatList } from '../NativewindFlatList';
 import { Input } from '../ui/input';
-
-const FullWindowOverlay =
-  Platform.OS === 'ios'
-    ? RNFullWindowOverlay
-    : ({ children }: { children: React.ReactNode }) => <>{children}</>;
-
-type DropdownPos = { top: number; left: number; width: number };
 
 type CollegeComboboxProps = {
   colleges: College[] | undefined;
@@ -31,126 +36,160 @@ export function CollegeCombobox({
   selectedCollegeId,
   onSelect,
 }: CollegeComboboxProps) {
-  const wrapperRef = useRef<View>(null);
-  const inputRef = useRef<TextInput>(null);
-  const [dropdownPos, setDropdownPos] = useState<DropdownPos | null>(null);
-  const [inputValue, setInputValue] = useState('');
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const { colorScheme } = useColorScheme();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [pendingCollegeId, setPendingCollegeId] = useState<number | null>(null);
+  const pendingCollegeIdRef = useRef<number | null>(null);
 
-  const isOpen = dropdownPos !== null;
   const selectedCollege = colleges?.find((c) => c.id === selectedCollegeId);
-
-  useEffect(() => {
-    if (!isOpen) {
-      setInputValue(selectedCollege?.name ?? '');
-    }
-  }, [selectedCollege, isOpen]);
-
-  // Re-anchor after keyboard appears in case a KeyboardAvoidingView shifts the layout
-  useEffect(() => {
-    if (!isOpen) return;
-    const sub = Keyboard.addListener('keyboardDidShow', () => {
-      wrapperRef.current?.measureInWindow((x, y, width, height) => {
-        setDropdownPos({ top: y + height + 4, left: x, width });
-      });
-    });
-    return () => sub.remove();
-  }, [isOpen]);
+  const pendingCollege = colleges?.find((c) => c.id === pendingCollegeId);
 
   const filteredColleges = useMemo(() => {
-    const q = inputValue.toLowerCase();
-    return colleges?.filter((c) => c.name.toLowerCase().includes(q) || c.abbreviation.toLowerCase().includes(q)) ?? [];
-  }, [colleges, inputValue]);
+    const q = searchQuery.toLowerCase();
+    return (
+      colleges?.filter(
+        (c) => c.name.toLowerCase().includes(q) || c.abbreviation.toLowerCase().includes(q)
+      ) ?? []
+    );
+  }, [colleges, searchQuery]);
 
-  function handleFocus() {
-    wrapperRef.current?.measureInWindow((x, y, width, height) => {
-      setDropdownPos({ top: y + height + 4, left: x, width });
-    });
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} opacity={0.5} />
+    ),
+    []
+  );
+
+  function handleOpen() {
+    if (isPending || isLoading) return;
+    bottomSheetRef.current?.present();
   }
 
-  function handleClose() {
-    setDropdownPos(null);
-    setInputValue(selectedCollege?.name ?? '');
-    inputRef.current?.blur();
+  function handleSelectCollege(id: number) {
+    if (id === selectedCollegeId) return;
+    pendingCollegeIdRef.current = id;
+    bottomSheetRef.current?.dismiss();
   }
 
-  function handleSelect(id: number) {
-    const college = colleges?.find((c) => c.id === id);
-    setInputValue(college?.name ?? '');
-    setDropdownPos(null);
-    onSelect(id);
-    inputRef.current?.blur();
+  function handleSheetDismiss() {
+    setSearchQuery('');
+    if (pendingCollegeIdRef.current !== null) {
+      setPendingCollegeId(pendingCollegeIdRef.current);
+      pendingCollegeIdRef.current = null;
+    }
+  }
+
+  function handleConfirm() {
+    if (pendingCollegeId !== null) {
+      onSelect(pendingCollegeId);
+      setPendingCollegeId(null);
+    }
   }
 
   return (
     <>
-      <View ref={wrapperRef}>
-        <Input
-          ref={inputRef}
-          value={inputValue}
-          onChangeText={setInputValue}
-          onFocus={handleFocus}
-          placeholder={isPending ? 'Loading...' : 'Select your college...'}
-          editable={!isPending && !isLoading}
-          autoCorrect={false}
-          returnKeyType="search"
-          className="rounded-2xl"
-        />
-        {isLoading && (
-          <View className="absolute bottom-0 right-3 top-0 justify-center">
-            <ActivityIndicator size="small" />
-          </View>
+      <Pressable
+        onPress={handleOpen}
+        disabled={isPending || isLoading}
+        className={cn(
+          'flex h-10 w-full min-w-0 flex-row items-center justify-between rounded-2xl border border-input bg-background px-3 shadow-sm shadow-black/5 dark:bg-input/30',
+          (isPending || isLoading) && 'opacity-50'
+        )}>
+        <Text className={cn('text-base leading-5', !selectedCollege && 'text-muted-foreground')}>
+          {isPending ? 'Loading...' : selectedCollege?.name ?? 'Select your college...'}
+        </Text>
+        {isLoading ? (
+          <ActivityIndicator size="small" />
+        ) : (
+          <Icon as={ChevronDownIcon} size={16} className="text-muted-foreground" />
         )}
-      </View>
+      </Pressable>
 
-      {isOpen && (
-        <Portal name="college-combobox">
-          <FullWindowOverlay>
-            <Pressable className="absolute inset-0" onPress={handleClose} />
-            <View
-              className="absolute z-50 mt-1.5 overflow-hidden rounded-2xl border border-border bg-popover p-1.5 shadow-md shadow-black/5"
-              style={{
-                top: dropdownPos.top,
-                left: dropdownPos.left,
-                width: dropdownPos.width,
-                elevation: 8,
-              }}>
-              {filteredColleges?.length === 0 ? (
-                <View className="items-center">
-                  <Text className="text-center text-sm text-muted-foreground py-2 px-3">
-                    No colleges match "{inputValue}". Try a shorter term.
-                  </Text>
-                </View>
-              ) : (
-                filteredColleges.map((college) => (
-                  <Pressable
-                    key={college.id}
-                    onPress={() => college.id !== selectedCollegeId && handleSelect(college.id)}
+      <BottomSheetModal
+        ref={bottomSheetRef}
+        snapPoints={['75%']}
+        enablePanDownToClose
+        backdropComponent={renderBackdrop}
+        backgroundStyle={{ backgroundColor: THEME[colorScheme!].background }}
+        handleIndicatorStyle={{ backgroundColor: THEME[colorScheme!].muted }}
+        onDismiss={handleSheetDismiss}>
+        <BottomSheetView className="flex flex-1 flex-col gap-4">
+          <View className="px-4 pt-4">
+            <Input
+              className="h-9 rounded-full"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholder="Search colleges..."
+              autoCorrect={false}
+              autoFocus
+            />
+          </View>
+          <NativewindFlatList
+            data={filteredColleges}
+            keyExtractor={(item) => String(item.id)}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item: college }) => (
+              <Pressable
+                onPress={() => handleSelectCollege(college.id)}
+                className={cn(
+                  'flex flex-row items-center justify-between px-4 py-3 active:opacity-70',
+                  college.id === selectedCollegeId && 'bg-primary/10'
+                )}>
+                <View className="flex flex-col gap-0.5">
+                  <Text
                     className={cn(
-                      'flex flex-row items-center justify-between rounded-lg py-2 px-3 active:opacity-70',
-                      college.id === selectedCollegeId && 'bg-primary/10'
+                      'text-sm',
+                      college.id === selectedCollegeId ? 'font-semibold' : 'font-medium'
                     )}>
-                    <View className="flex flex-col gap-0.5">
-                      <Text
-                        className={cn(
-                          'text-sm',
-                          college.id === selectedCollegeId ? 'font-semibold' : 'font-medium'
-                        )}>
-                        {college.name}
-                      </Text>
-                      <Text className="text-xs text-muted-foreground">{college.abbreviation}</Text>
-                    </View>
-                    {college.id === selectedCollegeId && (
-                      <View className="size-6 flex justify-center items-center rounded-full bg-primary">
-                        <Icon strokeWidth={2.5} as={CheckIcon} size={16} className="text-primary-foreground" />
-                      </View>
-                    )}
-                  </Pressable>
-                ))
-              )}
-            </View>
-          </FullWindowOverlay>
-        </Portal>
-      )}
+                    {college.name}
+                  </Text>
+                  <Text className="text-xs text-muted-foreground">{college.abbreviation}</Text>
+                </View>
+                {college.id === selectedCollegeId && (
+                  <View className="size-6 flex justify-center items-center rounded-full bg-primary">
+                    <Icon
+                      strokeWidth={2.5}
+                      as={CheckIcon}
+                      size={16}
+                      className="text-primary-foreground"
+                    />
+                  </View>
+                )}
+              </Pressable>
+            )}
+            ListEmptyComponent={
+              <View className="items-center py-8">
+                <Text className="px-6 text-center text-sm text-muted-foreground">
+                  No colleges match "{searchQuery}". Try a shorter term.
+                </Text>
+              </View>
+            }
+          />
+        </BottomSheetView>
+      </BottomSheetModal>
+
+      <AlertDialog
+        open={pendingCollegeId !== null}
+        onOpenChange={(open) => !open && setPendingCollegeId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Switch primary court?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your leaderboard and home feed will switch to{' '}
+              {pendingCollege?.name ?? 'this court'}. You can always change it back.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex flex-row items-center">
+            <AlertDialogCancel onPress={() => setPendingCollegeId(null)}>
+              <Text>Cancel</Text>
+            </AlertDialogCancel>
+            <AlertDialogAction onPress={handleConfirm}>
+              <Text>Switch</Text>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
