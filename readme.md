@@ -1,7 +1,5 @@
 # README.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Project Overview
 
 Ball Up Top is a mobile pickup basketball app where players check into courts via GPS, rate opponents after sessions, and build skill profiles with EMA-weighted ratings (45-99) and 40+ archetypes. Positioned as "Yik Yak for college pickup basketball" — identity-driven.
