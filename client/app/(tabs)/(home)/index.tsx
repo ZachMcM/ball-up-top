@@ -67,9 +67,7 @@ export default function HomePage() {
 
             <View className="flex flex-col gap-4">
               <View className="flex flex-col gap-0.5 px-4">
-                <Text className="text-[17px] font-semibold">
-                  {home.primaryCollege.name} Courts
-                </Text>
+                <Text className="text-[17px] font-semibold">{home.primaryCollege.name} Courts</Text>
                 <Text className="text-sm font-medium text-muted-foreground">
                   {(() => {
                     const live = home.courts.filter((c) => c.activePlayerCount > 0).length;
@@ -118,17 +116,13 @@ function CourtRow({
     <Pressable
       onPress={onPress}
       className={cn(
-        'flex flex-row items-center justify-between border-b border-border px-4',
-        court.activePlayerCount > 0 ? 'py-4' : 'py-3.5',
+        'flex flex-row items-center justify-between border-b border-border px-4 py-3',
         isFirst && 'border-t'
       )}>
       <View className="flex flex-1 flex-row items-center gap-3">
         <AspectRatio
           ratio={1}
-          className={cn(
-            'relative aspect-square w-14 overflow-hidden rounded-xl bg-card',
-            court.activePlayerCount > 0 && 'w-16'
-          )}>
+          className="relative aspect-square w-14 overflow-hidden rounded-xl bg-card">
           <Image
             source={{
               uri: court.image!,
@@ -158,9 +152,12 @@ function CourtRow({
           )}
         </View>
       </View>
-      <View className="flex flex-row items-center gap-2">
+      <View className="flex flex-row items-center gap-3">
         {court.activePlayerCount > 0 && <AvatarStack players={court.activePlayers} />}
-        <Icon as={ChevronRight} size={20} className="text-muted-foreground" />
+        <View className="flex flex-row items-center gap-0.5">
+          <Text className="text-sm font-medium text-muted-foreground">View</Text>
+          <Icon as={ChevronRight} size={20} className="text-muted-foreground" />
+        </View>
       </View>
     </Pressable>
   );
