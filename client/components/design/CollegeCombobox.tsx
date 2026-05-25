@@ -97,7 +97,7 @@ export function CollegeCombobox({
           (isPending || isLoading) && 'opacity-50'
         )}>
         <Text className={cn('text-base leading-5', !selectedCollege && 'text-muted-foreground')}>
-          {isPending ? 'Loading...' : selectedCollege?.name ?? 'Select your college...'}
+          {isPending ? 'Loading...' : (selectedCollege?.name ?? 'Select your college...')}
         </Text>
         {isLoading ? (
           <ActivityIndicator size="small" />
@@ -115,7 +115,7 @@ export function CollegeCombobox({
         handleIndicatorStyle={{ backgroundColor: THEME[colorScheme!].muted }}
         onDismiss={handleSheetDismiss}>
         <BottomSheetView className="flex flex-1 flex-col gap-4">
-          <View className="px-4 pt-4">
+          <View className="py-2.5 px-4">
             <Input
               className="h-9 rounded-full"
               value={searchQuery}
@@ -129,12 +129,13 @@ export function CollegeCombobox({
             data={filteredColleges}
             keyExtractor={(item) => String(item.id)}
             showsVerticalScrollIndicator={false}
-            renderItem={({ item: college }) => (
+            renderItem={({ item: college, index }) => (
               <Pressable
                 onPress={() => handleSelectCollege(college.id)}
                 className={cn(
-                  'flex flex-row items-center justify-between px-4 py-3 active:opacity-70',
-                  college.id === selectedCollegeId && 'bg-primary/10'
+                  'flex flex-row items-center justify-between border-b border-border px-4 py-3',
+                  college.id === selectedCollegeId && 'bg-muted-foreground/10 dark:bg-card',
+                  index === 0 && 'border-t'
                 )}>
                 <View className="flex flex-col gap-0.5">
                   <Text
@@ -147,7 +148,7 @@ export function CollegeCombobox({
                   <Text className="text-xs text-muted-foreground">{college.abbreviation}</Text>
                 </View>
                 {college.id === selectedCollegeId && (
-                  <View className="size-6 flex justify-center items-center rounded-full bg-primary">
+                  <View className="flex size-6 items-center justify-center rounded-full bg-primary">
                     <Icon
                       strokeWidth={2.5}
                       as={CheckIcon}
@@ -176,8 +177,8 @@ export function CollegeCombobox({
           <AlertDialogHeader>
             <AlertDialogTitle>Switch primary court?</AlertDialogTitle>
             <AlertDialogDescription>
-              Your leaderboard and home feed will switch to{' '}
-              {pendingCollege?.name ?? 'this court'}. You can always change it back.
+              Your leaderboard and home feed will switch to {pendingCollege?.name ?? 'this court'}.
+              You can always change it back.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex flex-row items-center">
