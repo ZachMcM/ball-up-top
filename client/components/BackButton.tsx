@@ -8,7 +8,7 @@ export default function BackButton() {
   const router = useRouter();
 
   // Check if we're at the root of the current navigation stack
-  const isAtRoot = useNavigationState((state) => {
+  const isAtRoot = useNavigationState((state) => {  
     if (!state) return true;
     return state.index === 0;
   });
@@ -20,7 +20,7 @@ export default function BackButton() {
 
   return (
     <Pressable className='active:opacity-70' onPress={() => router.back()}>
-      <Icon size={24} as={ChevronLeftIcon} />
+      <Icon size={22} as={ChevronLeftIcon} />
     </Pressable>
   );
 }

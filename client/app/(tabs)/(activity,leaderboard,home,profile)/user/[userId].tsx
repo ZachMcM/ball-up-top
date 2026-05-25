@@ -41,7 +41,7 @@ export default function ProfilePage() {
       <Stack.Screen
         options={{
           headerRight: () => (
-            <View className="flex flex-row items-center gap-4">
+            <View className="flex flex-row items-center gap-3">
               <Pressable className="active:opacity-70" onPress={handleShareProfile}>
                 <Icon size={22} as={ShareIcon} />
               </Pressable>
