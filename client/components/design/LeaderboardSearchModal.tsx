@@ -43,7 +43,7 @@ export function LeaderboardSearchModal({ bottomSheetRef, users }: LeaderboardSea
   return (
     <BottomSheetModal
       ref={bottomSheetRef}
-      snapPoints={['75%']}
+      snapPoints={['75%', '100%']}
       enablePanDownToClose
       backdropComponent={renderBackdrop}
       backgroundStyle={{
@@ -59,6 +59,7 @@ export function LeaderboardSearchModal({ bottomSheetRef, users }: LeaderboardSea
             onChangeText={setSearchQuery}
             placeholder="Search All Players..."
             autoCorrect={false}
+            onFocus={() => bottomSheetRef.current?.snapToIndex(1)}
           />
         </View>
         <NativewindFlatList
