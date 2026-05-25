@@ -108,7 +108,7 @@ export function CollegeCombobox({
 
       <BottomSheetModal
         ref={bottomSheetRef}
-        snapPoints={['75%']}
+        snapPoints={['75%', '100%']}
         enablePanDownToClose
         backdropComponent={renderBackdrop}
         backgroundStyle={{ backgroundColor: THEME[colorScheme!].background }}
@@ -122,7 +122,7 @@ export function CollegeCombobox({
               onChangeText={setSearchQuery}
               placeholder="Search colleges..."
               autoCorrect={false}
-              autoFocus
+              onFocus={() => bottomSheetRef.current?.snapToIndex(1)}
             />
           </View>
           <NativewindFlatList
