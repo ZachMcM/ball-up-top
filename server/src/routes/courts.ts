@@ -165,7 +165,7 @@ courtsRoute.post(
       invalidateQueries(["courts"], ["court", courtId]);
       invalidateQueries(["court", courtId, "active-players"]);
       invalidateQueries(["user", res.locals.userId!]);
-      invalidateQueriesForUser(res.locals.userId!, ["home"]);
+      invalidateQueries(["home"])
       await invalidateHomeForCollege(targetCourt.collegeId);
 
       // Queue court threshold check for notifications
