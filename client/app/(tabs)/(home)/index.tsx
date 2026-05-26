@@ -165,6 +165,7 @@ function CourtRow({
 
 function AvatarStack({ players }: { players: HomeCourt['activePlayers'] }) {
   if (players.length === 0) return null;
+
   return (
     <View className="flex flex-row">
       {players.slice(0, 3).map((p, i) => (
@@ -175,6 +176,11 @@ function AvatarStack({ players }: { players: HomeCourt['activePlayers'] }) {
           source={{ uri: p.image ?? undefined }}
         />
       ))}
+      {
+        players.length > 3 && <View className='size-9 bg-secondary -ml-2 rounded-full flex items-center justify-center'>
+          <Text className='text-muted-foreground font-semibold'>+{players.length - 3}</Text>
+        </View>
+      }
     </View>
   );
 }
