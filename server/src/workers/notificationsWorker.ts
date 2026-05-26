@@ -50,7 +50,7 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
               userId: r.rateeId,
               title: "Received A Rating",
               body: `You received a rating from ${r.ratee.name}!`,
-              data: { url: "(tabs)/activity" },
+              data: { url: "/activity" },
             });
           }
           
@@ -68,7 +68,7 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
               userId: r.rateeId,
               title: "Overall Changed",
               body: `Your overall ${direction} to ${r.rateeNewOverall}!`,
-              data: { url: "(tabs)/activity" },
+              data: { url: "/activity" },
             });
           }
 
@@ -84,7 +84,7 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
               userId: r.rateeId,
               title: "Archetype Changed",
               body: `Your archetype is now ${r.rateeNewArchetype}!`,
-              data: { url: "(tabs)/activity" },
+              data: { url: "/activity" },
             });
           }
 
@@ -116,7 +116,7 @@ async function processNotificationJob(job: Job<NotificationJobData>) {
             userId: rc.userId,
             title: "Rank Changed",
             body: msg,
-            data: { url: "(tabs)/activity" },
+            data: { url: "/activity" },
           });
 
           invalidateQueriesForUser(rc.userId, ["activity"]);
